@@ -1,5 +1,5 @@
 ############################ BEGIN REVISED VERSION ############################
-
+############## STILL NEED TO REVISE PARAMETER LIST
 ##' Load and format data object
 #'
 #' @description This function takes in user-supplied data and returns a data
@@ -52,6 +52,7 @@ load_sw_data <- function(
   {
 
     if (!methods::is(data,"data.frame")) { stop("`data` must be a data frame.") }
+    if (methods::is(data,"tbl_df")) { stop("`data` must be a non-tibble data frame.") }
     if (nrow(data)==0) { stop("`data` is an empty data frame.") }
 
     for (arg in c("period", "cluster_id", "individual_id", "treatment",
@@ -93,43 +94,48 @@ load_sw_data <- function(
         val <- data[, var, drop = F]
         val2 <- list()
 
-        # Convert factor/character columns
-        for (col in names(val)) {
-          if (is.numeric(val[, col])) {
-            val2[[col]] <- val[, col]
-          } else if (is.logical(val[, col])) {
-            val2[[col]] <- as.integer(val[, col])
-          } else if (is.factor(val[, col]) ||
-                     is.character(val[, col])) {
-            tmp_col <- as.integer(as.factor(val[, col]))
-            tmp_unique <- unique(tmp_col)
-            tmp_size <- length(tmp_unique)
-            for (i in c(1:(tmp_size - 1))) {
-              col_new <- paste0(col, "_", i)
-              val2[[col_new]] <- as.integer(tmp_col == tmp_unique[i])
-            }
-          } else {
-            stop(paste0("The data type of column `", col, "` is not supported."))
-          }
-        }
-        val <- as.data.frame(val2)
-        x_names <- names(val)
+        # David question - Do we want to convert character/factor columns to
+        # indicator columns as in the code below?
+        # # Convert factor/character columns
+        # for (col in names(val)) {
+        #   if (is.numeric(val[, col])) {
+        #     val2[[col]] <- val[, col]
+        #   } else if (is.logical(val[, col])) {
+        #     val2[[col]] <- as.integer(val[, col])
+        #   } else if (is.factor(val[, col]) ||
+        #              is.character(val[, col])) {
+        #     tmp_col <- as.integer(as.factor(val[, col]))
+        #     tmp_unique <- unique(tmp_col)
+        #     tmp_size <- length(tmp_unique)
+        #     for (i in c(1:(tmp_size - 1))) {
+        #       col_new <- paste0(col, "_", i)
+        #       val2[[col_new]] <- as.integer(tmp_col == tmp_unique[i])
+        #     }
+        #   } else {
+        #     stop(paste0("The data type of column `", col,
+        #                 "is ", class(val[, col])
+        #                 # "` is not supported."
+        #                 ))
+        #   }
+        # }
+        # val <- as.data.frame(val2)
+        # x_names <- names(val)
       } else {
         val <- data[, var]
       }
 
-      # # Validate: `period`
-      # if (arg %in% c("period")) {
-      #   if (!is.numeric(val)) {
-      #     stop(paste0("`", arg, "` must be numeric."))
-      #   }
-      # }
+      # Validate: `period`
+      if (arg %in% c("period")) {
+        if (!is.numeric(val)) {
+          stop(paste0("`", arg, "` must be numeric."))
+        }
+      }
 
       # David question - what types do we want to allow for treatment and outcome?
       # Currently allowing numeric, 0, 1, F, T for both
       # Validate: `treatment`, `outcome`
       if (arg %in% c("treatment", "outcome")) {
-        if (any(!(val %in% c(0, 1, F, T)) | is.numeric(val))) {
+        if (any(!(val %in% c(0, 1, F, T) | is.numeric(val)))) {
           stop(paste0(
             "`",
             arg,
@@ -160,6 +166,7 @@ load_sw_data <- function(
 
       assign(x = paste0(".", arg), value = val)
 
+
     }
 
     }
@@ -178,8 +185,9 @@ load_sw_data <- function(
   # .n_v <- sum(.vacc)
   # .n_p <- sum(1-.vacc)
 
+  # David question - do we want to rename covariates?
   # Rename covariate dataframe to c("x1", "x2", ...)
-  names(.covariates) <- paste0("x", c(1:.dim_x))
+  # names(.covariates) <- paste0("x", c(1:.dim_x))
 
   # !!!!! Warning/error if there is only one unique level or too many (>15) unique levels
   # !!!!! Warning/error if there are numbers passed in as character strings
@@ -200,6 +208,8 @@ load_sw_data <- function(
   )
 
 
+
+
   # Create and return data object
 
   # David question - Do we want to assign a class and/or attributes?
@@ -217,7 +227,7 @@ load_sw_data <- function(
 
 ############################ END REVISED VERSION ############################
 
-### Test revised version
+########################### Test revised version
 
 # load data
 library(geeCRT)
@@ -228,18 +238,36 @@ sampleSWCRTLarge_renamed <- load_sw_data(
     cluster_id = "id",
     individual_id = "record_id",
     treatment = "treatment",
-    covariates = c("age"),
+    covariates = c("age", "sex"),
     outcome = "y_bin",
     # outcome = "y_con",
     data = sampleSWCRTLarge %>%
+      slice_head(n = 5) %>%
+      # test validation of treatment variable
+      # mutate(treatment = "RED") %>%
       rename("period_orig" = "period") %>%
       mutate(record_id = row_number()) %>%
       rowwise() %>%
       mutate(age = runif(1, min = 6, max = 100)) %>%
+      mutate(sex = sample(
+        x = c("male", "female"),
+        size = 1
+      )) %>%
       ungroup() %>%
-      relocate(age)
-
+      relocate(age) %>%
+      as.data.frame()
 )
+
+str(sampleSWCRTLarge_renamed)
+
+sampleSWCRTLarge %>%
+  rename("period_orig" = "period") %>%
+  mutate(record_id = row_number()) %>%
+  rowwise() %>%
+  mutate(age = runif(1, min = 6, max = 100)) %>%
+  ungroup() %>%
+  relocate(age) %>%
+  glimpse()
 
 
 ############################ BEGIN ORIGINAL VERSION ############################
@@ -361,6 +389,7 @@ load_data <- function(
             stop(paste0("`", arg, "` must only contain binary values (either T",
                         "/F or 1/0)."))
           }
+
         }
 
         # No missing values allowed (except marker)
@@ -494,6 +523,8 @@ hvtn505$HIVwk28preunblfu <- "test"
 dat <- load_data(time=4, event="HIVwk28preunbl", vacc="trt",
                  marker="IgG_V2", covariates=c("age","BMI","bhvrisk"),
                  weights="wt", ph2="casecontrol", data=hvtn505)
+
+hvtn505 %>% glimpse()
 
 ##### End experiment with original version #######
 
