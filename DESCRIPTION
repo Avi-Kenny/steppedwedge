@@ -13,5 +13,6 @@ VignetteBuilder: knitr
 Imports: 
     dplyr (>= 1.0.10),
     stats (>= 4.0.0),
+    knitr (>= 1.46)
 URL: https://avi-kenny.github.io/steppedwedge/
 BugReports: https://github.com/Avi-Kenny/steppedwedge/issues
