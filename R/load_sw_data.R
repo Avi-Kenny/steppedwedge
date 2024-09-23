@@ -5,7 +5,7 @@
 #' @param individual_id A character string (optional); the name of the numeric variable identifying the individual.
 #' @param treatment A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.
 #' @param covariates A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.
-#' @param outcome A character string; the name of the numeric or binary variable indicating treatment. Accepts either numeric or Boolean (T/F) values.
+#' @param outcome A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.
 #' @param data A dataframe containing the stepped wedge trial data.
 #'
 #' @return An object of class \code{sw_data}

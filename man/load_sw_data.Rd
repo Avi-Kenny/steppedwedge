@@ -25,7 +25,7 @@ load_sw_data(
 
 \item{covariates}{A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.}
 
-\item{outcome}{A character string; the name of the numeric or binary variable indicating treatment. Accepts either numeric or Boolean (T/F) values.}
+\item{outcome}{A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.}
 
 \item{data}{A dataframe containing the stepped wedge trial data.}
 }
