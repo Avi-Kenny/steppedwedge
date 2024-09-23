@@ -24,6 +24,7 @@ plot_sw_design <- function(data)
     geom_tile(color = "black") +
     scale_fill_manual(values = c("1" = "grey", "0" = "white")) +
     # reverse order of y axis and label every integer on y axis
+    scale_x_continuous(breaks = seq(min(sw_data$period), max(sw_data$period), by = 1)) +
     scale_y_reverse(breaks = 1:max(sw_data$cluster_id)) +
     geom_text(aes(label = n), vjust = 1) +
     theme_minimal() +
