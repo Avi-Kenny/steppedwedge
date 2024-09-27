@@ -174,6 +174,14 @@ load_sw_data <- function(
   # attr(dat, "n_plac") <- .n_p
   attr(dat, "n_clusters") <- length(unique(dat$cluster_id))
   attr(dat, "n_periods") <- length(unique(dat$period))
+
+  dat <- dat %>%
+    group_by(cluster_id) %>%
+    # create variable for first sw_step where each index_ward has no_we_exposure == 1
+    mutate(first_exposure = min(period[treatment == 1])) %>%
+    ungroup() %>%
+    mutate(cluster_id = fct_reorder(factor(cluster_id), first_exposure))
+
   class(dat) <- c("data.frame", "sw_dat")
   return(dat)
 
