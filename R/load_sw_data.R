@@ -7,6 +7,7 @@
 #' @param covariates A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.
 #' @param outcome A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.
 #' @param data A dataframe containing the stepped wedge trial data.
+#' @param time_type A character string describing how time is accounted for: 'discrete' (default) or 'continuous'
 #'
 #' @return An object of class \code{sw_data}
 #' @export
@@ -16,7 +17,8 @@
 #' treatment = "treatment", covariates = NULL, outcome = "y_bin",
 #' data = geeCRT::sampleSWCRTLarge)
 load_sw_data <- function(
-    period, cluster_id, individual_id = NULL, treatment, covariates = NULL, outcome, data
+    period, cluster_id, individual_id = NULL, treatment, covariates = NULL,
+    outcome, time_type = "discrete", data
 ) {
 
   ########## David - work on individual_id and covariates as optional inputs ######
@@ -31,6 +33,15 @@ load_sw_data <- function(
     # David question - added this error message for tibble dataframe
     if (methods::is(data,"tbl_df")) { stop("`data` must be a non-tibble data frame.") }
     if (nrow(data)==0) { stop("`data` is an empty data frame.") }
+
+    # Validate: `time_type`
+    if (!(time_type %in% c("discrete", "continuous"))) {
+      stop(paste0(
+        "`",
+        arg,
+        "` must be a character string specifying `discrete` or `continuous`."
+      ))
+    }
 
     for (arg in c("period", "cluster_id", "treatment",
                   "covariates", "individual_id", "outcome")) {
@@ -145,7 +156,8 @@ load_sw_data <- function(
     "period" = .period,
     "cluster_id" = .cluster_id,
     "individual_id" = .individual_id,
-    "treatment" = .treatment
+    "treatment" = .treatment,
+    "time_type" = time_type
   )
 
   # Handle missing values
@@ -157,33 +169,43 @@ load_sw_data <- function(
   num_dropped <- nrow(dat) - nrow(dat_no_missing)
   num_total <- nrow(dat)
 
-  message(paste0(num_dropped, "/", num_total, " rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`."))
-
-
-  # Create and return data object
-
-  # David question - Do we want to assign a class and/or attributes?
-  # maybe add attributes later
-  # class(dat) <- c("data.frame", "steppedwedge_dat")
-  # attr(dat, "groups") <- .groups
-  # attr(dat, "covariate_names") <- x_names
-  # attr(dat, "dim_x") <- .dim_x
-  # attr(dat, "n") <- .n_v+.n_p
-  # attr(dat, "n_vacc") <- .n_v
-  # attr(dat, "n_vacc2") <- sum(df_v$z)
-  # attr(dat, "n_plac") <- .n_p
-  attr(dat, "n_clusters") <- length(unique(dat$cluster_id))
-  attr(dat, "n_periods") <- length(unique(dat$period))
-
-  dat <- dat %>%
+  # Order cluster id factor levels by roll-out sequence of intervention
+  dat_return <- dat_no_missing %>%
     group_by(cluster_id) %>%
     # create variable for first sw_step where each index_ward has no_we_exposure == 1
     mutate(first_exposure = min(period[treatment == 1])) %>%
     ungroup() %>%
     mutate(cluster_id = fct_reorder(factor(cluster_id), first_exposure))
 
-  class(dat) <- c("data.frame", "sw_dat")
-  return(dat)
+  # Add attributes and class to data object, return data object
+  n_clusters <- length(unique(dat_return$cluster_id))
+  n_periods <- length(unique(dat_return$period))
+  n_sequences <- length(unique(dat_return$first_exposure))
+  attr(dat_return, "n_clusters") <- n_clusters
+  attr(dat_return, "n_periods") <- n_periods
+  attr(dat_return, "n_sequences") <- n_sequences
+
+  class(dat_return) <- c("data.frame", "sw_dat")
+
+  message(
+    paste0(
+      "Stepped wedge dataset loaded. ",
+      str_to_title(time_type),
+      " time design with ",
+      n_clusters,
+      " clusters, ",
+      n_sequences,
+      " sequences, and ",
+      n_periods,
+      " time points. ",
+      num_dropped,
+      "/",
+      num_total,
+      " rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`."
+    )
+  )
+
+  return(dat_return)
 
 }
 

@@ -8,8 +8,12 @@
 #' @examples
 plot_sw_design <- function(data)
 {
+  num_clusters <- attr(data, "n_clusters")
+  num_periods <- attr(data, "n_periods")
+  num_sequences <- attr(data, "n_sequences")
   data <- data.frame(data)
-  num_clusters <- length(unique(data$cluster_id))
+  # num_clusters <- length(unique(data$cluster_id))
+
   num_periods <- length(unique(data$period))
   # Create a data frame with positions and shading status
   sw_data <- data %>%
@@ -40,6 +44,7 @@ plot_sw_design <- function(data)
 
   return(list(num_clusters = num_clusters,
               num_periods = num_periods,
+              num_sequences = num_sequences,
               summary = summary,
               design_plot = design_plot))
 }
