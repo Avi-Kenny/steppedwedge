@@ -169,13 +169,17 @@ load_sw_data <- function(
   num_dropped <- nrow(dat) - nrow(dat_no_missing)
   num_total <- nrow(dat)
 
-  # Order cluster id factor levels by roll-out sequence of intervention
+  # Order cluster id factor levels by roll-out sequence of intervention,
+  # and calculate exposure time for each cluster-period
   dat_return <- dat_no_missing %>%
     group_by(cluster_id) %>%
     # create variable for first sw_step where each index_ward has no_we_exposure == 1
     mutate(first_exposure = min(period[treatment == 1])) %>%
     ungroup() %>%
-    mutate(cluster_id = fct_reorder(factor(cluster_id), first_exposure))
+    mutate(cluster_id = fct_reorder(factor(cluster_id), first_exposure)) %>%
+    mutate(exposure_time = ifelse(treatment == 1,
+                                  period - first_exposure + 1,
+                                  0))
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))

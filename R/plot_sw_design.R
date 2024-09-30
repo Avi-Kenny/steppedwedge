@@ -40,7 +40,9 @@ plot_sw_design <- function(data)
          fill = "Treatment",
          caption = "*Number in each cell represents sample size for the cluster-period.",
          x = "Period",
-         y = "Cluster ID")
+         y = "Cluster ID") +
+    # move legend to bottom
+    theme(legend.position = "bottom")
 
   return(list(num_clusters = num_clusters,
               num_periods = num_periods,
