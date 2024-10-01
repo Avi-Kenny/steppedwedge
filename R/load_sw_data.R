@@ -37,9 +37,7 @@ load_sw_data <- function(
     # Validate: `time_type`
     if (!(time_type %in% c("discrete", "continuous"))) {
       stop(paste0(
-        "`",
-        arg,
-        "` must be a character string specifying `discrete` or `continuous`."
+        "`time_type` must be a character string specifying `discrete` or `continuous`."
       ))
     }
 
