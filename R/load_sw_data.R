@@ -158,6 +158,21 @@ load_sw_data <- function(
     "time_type" = time_type
   )
 
+  # Test whether, for all observations with a particular value of cluster_id and period, the value of treatment is the same
+  # If not, throw an error
+  # if (any(duplicated(dat[, c("cluster_id", "period")]) & duplicated(dat[, c("cluster_id", "period", "treatment")]))) {
+  #   stop("For each unique combination of `cluster_id` and `period`, the value of `treatment` must be the same.")
+  # }
+
+  dat2 <- dat %>%
+    distinct(cluster_id, period, treatment) %>%
+    group_by(cluster_id, period) %>%
+    filter(n() > 1)
+
+  if (nrow(dat2) > 0) {
+    stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+  }
+
   # Handle missing values
   # Ignore everything related to covariates for now, only check necessary columns for missingness
   # Give warning if anything necessary missing (x/y records contain missing data and are being dropped)
