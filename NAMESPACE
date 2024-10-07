@@ -2,3 +2,5 @@
 
 export(load_sw_data)
 export(plot_sw_design)
+importFrom(magrittr,"%<>%")
+importFrom(magrittr,"%>%")
