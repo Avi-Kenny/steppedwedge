@@ -5,9 +5,15 @@
 #' @return A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
 #' @export
 #'
-#' @examples TO DO
+#' @examples
+#' # TO DO
 plot_sw_design <- function(data)
 {
+
+  # Prevent R CMD CHECK note
+  aes <- cluster_id <- first_exposure <- n <- period <- treatment <- NULL
+  rm(aes,cluster_id,first_exposure,n,period,treatment)
+
   num_clusters <- attr(data, "n_clusters")
   num_periods <- attr(data, "n_periods")
   num_sequences <- attr(data, "n_sequences")

@@ -16,5 +16,5 @@ A list with the number of clusters, number of periods, a summary of the data, an
 Title
 }
 \examples{
-TO DO
+# TO DO
 }
