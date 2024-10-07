@@ -12,7 +12,8 @@ plot_sw_design <- function(data)
 
   # Prevent R CMD CHECK note
   aes <- cluster_id <- first_exposure <- n <- period <- treatment <- NULL
-  rm(aes,cluster_id,first_exposure,n,period,treatment)
+  x <- geeCRT::sampleSWCRTLarge
+  rm(aes,cluster_id,first_exposure,n,period,treatment,x)
 
   num_clusters <- attr(data, "n_clusters")
   num_periods <- attr(data, "n_periods")

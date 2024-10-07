@@ -13,7 +13,6 @@ VignetteBuilder: knitr
 Imports: 
     dplyr (>= 1.0.10),
     stats (>= 4.0.0),
-    knitr (>= 1.46),
     forcats (>= 1.0.0),
     stringr (>= 1.5.1),
     magrittr (>= 2.0.3),
@@ -23,6 +22,7 @@ Imports:
 URL: https://avi-kenny.github.io/steppedwedge/
 BugReports: https://github.com/Avi-Kenny/steppedwedge/issues
 Suggests: 
+    knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
