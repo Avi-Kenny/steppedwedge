@@ -24,7 +24,8 @@ load_sw_data <- function(
   ########## David - work on individual_id and covariates as optional inputs ######
 
   # To prevent R CMD CHECK notes # David question
-  .covariates <- .period <- .cluster_id <- .individual_id <- NULL; rm(.covariates, .period, .cluster_id, .individual_id);
+  .covariates <- .period <- .cluster_id <- .individual_id <- first_exposure <- NULL
+  rm(.covariates,.period,.cluster_id,.individual_id,first_exposure)
 
   # Input validation
   {
