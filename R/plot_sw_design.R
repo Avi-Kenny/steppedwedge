@@ -1,4 +1,4 @@
-#' Title
+#' Plot stepped wedge design
 #'
 #' @param data A dataframe containing the stepped wedge trial data.
 #'
