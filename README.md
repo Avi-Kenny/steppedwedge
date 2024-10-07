@@ -3,8 +3,14 @@
   [![CRAN status](https://www.r-pkg.org/badges/version/steppedwedge)](https://CRAN.R-project.org/package=steppedwedge)
   ![GitHub](https://img.shields.io/github/license/Avi-Kenny/steppedwedge)
   [![R-CMD-check](https://github.com/Avi-Kenny/steppedwedge/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/Avi-Kenny/steppedwedge/actions/workflows/R-CMD-check.yml)
-  [![Codecov test coverage](https://codecov.io/gh/Avi-Kenny/steppedwedge/branch/master/graph/badge.svg)](https://app.codecov.io/gh/Avi-Kenny/steppedwedge?branch=master)
+  [![Codecov test coverage](https://codecov.io/gh/Avi-Kenny/steppedwedge/graph/badge.svg)](https://app.codecov.io/gh/Avi-Kenny/steppedwedge)
+  
+  
+  
   [![](https://cranlogs.r-pkg.org/badges/steppedwedge)](https://CRAN.R-project.org/package=steppedwedge)
+  
+  
+  
 <!-- badges: end -->
 
 
