@@ -5,7 +5,7 @@
 #' @return A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
 #' @export
 #'
-#' @examples
+#' @examples TO DO
 plot_sw_design <- function(data)
 {
   num_clusters <- attr(data, "n_clusters")

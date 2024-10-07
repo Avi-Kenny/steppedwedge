@@ -165,9 +165,9 @@ load_sw_data <- function(
   # }
 
   dat2 <- dat %>%
-    distinct(cluster_id, period, treatment) %>%
-    group_by(cluster_id, period) %>%
-    filter(n() > 1)
+    dplyr::distinct(cluster_id, period, treatment) %>%
+    dplyr::group_by(cluster_id, period) %>%
+    dplyr::filter(dplyr::n() > 1)
 
   if (nrow(dat2) > 0) {
     stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
@@ -185,12 +185,12 @@ load_sw_data <- function(
   # Order cluster id factor levels by roll-out sequence of intervention,
   # and calculate exposure time for each cluster-period
   dat_return <- dat_no_missing %>%
-    group_by(cluster_id) %>%
+    dplyr::group_by(cluster_id) %>%
     # create variable for first sw_step where each index_ward has no_we_exposure == 1
-    mutate(first_exposure = min(period[treatment == 1])) %>%
-    ungroup() %>%
-    mutate(cluster_id = fct_reorder(factor(cluster_id), first_exposure)) %>%
-    mutate(exposure_time = ifelse(treatment == 1,
+    dplyr::mutate(first_exposure = min(period[treatment == 1])) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure)) %>%
+    dplyr::mutate(exposure_time = ifelse(treatment == 1,
                                   period - first_exposure + 1,
                                   0))
 
@@ -207,7 +207,7 @@ load_sw_data <- function(
   message(
     paste0(
       "Stepped wedge dataset loaded. ",
-      str_to_title(time_type),
+      stringr::str_to_title(time_type),
       " time design with ",
       n_clusters,
       " clusters, ",
