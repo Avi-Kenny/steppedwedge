@@ -2,4 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-10-07T03:42Z
+last_built: 2024-10-07T03:52Z
+urls:
+  reference: https://avi-kenny.github.io/steppedwedge/reference
+  article: https://avi-kenny.github.io/steppedwedge/articles
