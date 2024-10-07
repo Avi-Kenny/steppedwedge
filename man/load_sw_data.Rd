@@ -11,6 +11,7 @@ load_sw_data(
   treatment,
   covariates = NULL,
   outcome,
+  time_type = "discrete",
   data
 )
 }
@@ -26,6 +27,8 @@ load_sw_data(
 \item{covariates}{A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.}
 
 \item{outcome}{A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.}
+
+\item{time_type}{A character string describing how time is accounted for: 'discrete' (default) or 'continuous'}
 
 \item{data}{A dataframe containing the stepped wedge trial data.}
 }

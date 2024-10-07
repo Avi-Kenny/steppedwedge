@@ -15,3 +15,6 @@ A list with the number of clusters, number of periods, a summary of the data, an
 \description{
 Title
 }
+\examples{
+TO DO
+}
