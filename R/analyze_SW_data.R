@@ -1,4 +1,14 @@
-analyze_SW_data <- function(dat, outcome_type, method) {
+#' Title
+#'
+#' @param dat 
+#' @param outcome_type 
+#' @param method 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+analyze_sw_data <- function(dat, outcome_type, method) {
   
   df_results <- data.frame()
   
@@ -7,7 +17,7 @@ analyze_SW_data <- function(dat, outcome_type, method) {
   ##########################################.
   
   # Fit mixed model
-  model_it_mixed <- lmer(
+  model_it_mixed <- lme4::lmer(
     outcome ~ factor(period) + treatment + (1|cluster_id),
     data = dat
   )
@@ -35,41 +45,41 @@ analyze_SW_data <- function(dat, outcome_type, method) {
   ###############################################.
   
   # Fit mixed model
-  model_eti_mixed <- lmer(
+  model_eti_mixed <- lme4::lmer(
     outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
     data = dat
   )
-  summary(model)
+  summary(model_eti_mixed)
   
   ####### Resume here ############
   
-  # Specify the indices corresponding to the exposure time variables
-  indices <- c(8:13)
-  
-  # Extract coefficient estimates and covariance matrix corresponding to exposure
-  #     time variables
-  coeffs <- summary(model)$coefficients[,1][indices]
-  cov_mtx <- vcov(model)[indices,indices]
-  
-  # Estimate the TATE over the interval [0,6]
-  tate_est <- mean(coeffs)
-  tate_se <- sqrt(mean(cov_mtx))
-  tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-  
-  # Estimate the TATE over the interval [0,6] (equivalent calculation using
-  #     matrix multiplication)
-  M <- matrix(rep(1/6, 6), nrow=1)
-  tate_est <- (M %*% coeffs)[1]
-  tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
-  tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-  
-  # Estimate the LTE
-  lte_est <- as.numeric(coeffs[6])
-  lte_se <- sqrt(cov_mtx[6,6])
-  lte_ci <- lte_est + c(-1.96,1.96) * lte_se
-  
-  # Estimate the effect curve
-  curve_eti <- as.numeric(c(0, coeffs))
+  # # Specify the indices corresponding to the exposure time variables
+  # indices <- c(8:13)
+  # 
+  # # Extract coefficient estimates and covariance matrix corresponding to exposure
+  # #     time variables
+  # coeffs <- summary(model_eti_mixed)$coefficients[,1][indices]
+  # cov_mtx <- vcov(model_eti_mixed)[indices,indices]
+  # 
+  # # Estimate the TATE over the interval [0,6]
+  # tate_est <- mean(coeffs)
+  # tate_se <- sqrt(mean(cov_mtx))
+  # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+  # 
+  # # Estimate the TATE over the interval [0,6] (equivalent calculation using
+  # #     matrix multiplication)
+  # M <- matrix(rep(1/6, 6), nrow=1)
+  # tate_est <- (M %*% coeffs)[1]
+  # tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+  # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+  # 
+  # # Estimate the LTE
+  # lte_est <- as.numeric(coeffs[6])
+  # lte_se <- sqrt(cov_mtx[6,6])
+  # lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+  # 
+  # # Estimate the effect curve
+  # curve_eti <- as.numeric(c(0, coeffs))
   
   return(new_row)
   
