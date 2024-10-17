@@ -1,14 +1,16 @@
 #' Title
 #'
-#' @param dat 
-#' @param outcome_type 
-#' @param method 
+#' @param dat A dataframe containing the stepped wedge trial data.
+#' @param outcome_type A character string; either "binary" or "continuous".
+#' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
+#' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
+#' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.
 #'
-#' @return
+#' @return A list with ___
 #' @export
 #'
 #' @examples
-analyze_sw_data <- function(dat, outcome_type, method) {
+analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption) {
   
   df_results <- data.frame()
   
