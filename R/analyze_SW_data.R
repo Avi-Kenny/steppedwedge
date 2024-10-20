@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples
+#' # TO DO
 analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption) {
   
   ### Add input validation
@@ -84,7 +85,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     # Extract coefficient estimates and covariance matrix corresponding to exposure
     #     time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
-    cov_mtx <- vcov(model_eti_mixed)[indices,indices]
+    cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
     
     if(estimand == "TATE") {
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_sw_design.R
 \name{plot_sw_design}
 \alias{plot_sw_design}
-\title{Title}
+\title{Plot stepped wedge design}
 \usage{
 plot_sw_design(data)
 }
@@ -13,7 +13,7 @@ plot_sw_design(data)
 A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
 }
 \description{
-Title
+Plot stepped wedge design
 }
 \examples{
 # TO DO
