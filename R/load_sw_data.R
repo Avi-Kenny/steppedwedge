@@ -193,7 +193,8 @@ load_sw_data <- function(
     dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure)) %>%
     dplyr::mutate(exposure_time = ifelse(treatment == 1,
                                   period - first_exposure + 1,
-                                  0))
+                                  0)) %>%
+    dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))
