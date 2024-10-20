@@ -8,7 +8,7 @@ sample_data <- data.frame(
   treatment = c(0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1),
   y_bin = c(0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)
 ) %>%
-  arrange(cluster_id)
+  dplyr::arrange(cluster_id)
 
 
 # Test when everything is correct
