@@ -15,6 +15,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
   
   ### Add input validation
   
+  if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
+  
   results <- list()
   
   if(method == "mixed" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
