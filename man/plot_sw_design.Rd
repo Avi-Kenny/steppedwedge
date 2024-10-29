@@ -4,10 +4,10 @@
 \alias{plot_sw_design}
 \title{Plot stepped wedge design}
 \usage{
-plot_sw_design(data)
+plot_sw_design(dat)
 }
 \arguments{
-\item{data}{A dataframe containing the stepped wedge trial data.}
+\item{dat}{A dataframe containing the stepped wedge trial data.}
 }
 \value{
 A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
