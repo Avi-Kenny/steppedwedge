@@ -4,7 +4,16 @@
 \alias{analyze_sw_data}
 \title{Title}
 \usage{
-analyze_sw_data(dat, outcome_type, method, estimand, time_varying_assumption)
+analyze_sw_data(
+  dat,
+  outcome_type,
+  method,
+  estimand,
+  time_varying_assumption,
+  family = "gaussian",
+  link = "identity",
+  corstr = "exchangeable"
+)
 }
 \arguments{
 \item{dat}{A dataframe containing the stepped wedge trial data.}
@@ -16,6 +25,12 @@ analyze_sw_data(dat, outcome_type, method, estimand, time_varying_assumption)
 \item{estimand}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
 
 \item{time_varying_assumption}{A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.}
+
+\item{family}{A character string; see documentation for `glm()`.}
+
+\item{link}{A character string; see documentation for `glm()`.}
+
+\item{corstr}{A character string; see documentation for `geepack::geeglm()`.}
 }
 \value{
 A list with ___

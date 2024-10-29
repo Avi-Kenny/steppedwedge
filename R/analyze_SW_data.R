@@ -5,20 +5,31 @@
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
 #' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.
+#' @param family A character string; see documentation for `glm()`.
+#' @param link A character string; see documentation for `glm()`.
+#' @param corstr A character string; see documentation for `geepack::geeglm()`.
 #'
 #' @return A list with ___
 #' @export
 #'
 #' @examples
 #' # TO DO
-analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption) {
+analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption,
+                            family = "gaussian", link = "identity", corstr = "exchangeable") {
+  
+  cluster_id <- NULL
+  rm(cluster_id)
   
   ### Add input validation
   
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
   
-  results <- list()
   
+  
+  # call appropriate family function with chosen link to create family object
+  family_obj <- get(family)(link = link)
+  
+
   if(method == "mixed" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     
     ################################################.
@@ -34,7 +45,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     } else if(outcome_type == "binary") {
       model_it_mixed <- lme4::glmer(
         outcome ~ factor(period) + treatment + (1|cluster_id),
-        family = "binomial",
+        family = family_obj,
         data = dat
       )
     }
@@ -76,7 +87,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     } else if(outcome_type == "binary") {
       model_eti_mixed <- lme4::glmer(
         outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-        family = "binomial",
+        family = family_obj,
         data = dat
       )
     }
@@ -142,15 +153,21 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
   } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     
+    
     ##############################################.
     ##### Immediate Treatment (IT) GEE model #####
     ##############################################.
     
+    
     # Fit GEE model
     model_it_GEE <- geepack::geeglm(
-      outcome ~ factor(period) + treatment + (1|cluster_id),
-      data = dat
+      outcome ~ factor(period) + treatment,
+      data = dat,
+      family = family_obj,
+      id = cluster_id,
+      corstr = corstr
     )
+    
     summary(model_it_GEE)
     
     # Extract an estimate and confidence interval for the estimated treatment
