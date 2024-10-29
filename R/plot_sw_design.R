@@ -1,29 +1,32 @@
 #' Plot stepped wedge design
 #'
-#' @param data A dataframe containing the stepped wedge trial data.
+#' @param dat A dataframe containing the stepped wedge trial data.
 #'
 #' @return A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
 #' @export
 #'
 #' @examples
 #' # TO DO
-plot_sw_design <- function(data)
+plot_sw_design <- function(dat)
 {
 
   # Prevent R CMD CHECK note
   aes <- cluster_id <- first_exposure <- n <- period <- treatment <- NULL
   x <- geeCRT::sampleSWCRTLarge
   rm(aes,cluster_id,first_exposure,n,period,treatment,x)
+  
+  # Input validation
+  if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
+    
+  num_clusters <- attr(dat, "n_clusters")
+  num_periods <- attr(dat, "n_periods")
+  num_sequences <- attr(dat, "n_sequences")
+  dat <- data.frame(dat)
+  # num_clusters <- length(unique(dat$cluster_id))
 
-  num_clusters <- attr(data, "n_clusters")
-  num_periods <- attr(data, "n_periods")
-  num_sequences <- attr(data, "n_sequences")
-  data <- data.frame(data)
-  # num_clusters <- length(unique(data$cluster_id))
-
-  num_periods <- length(unique(data$period))
+  num_periods <- length(unique(dat$period))
   # Create a data frame with positions and shading status
-  sw_data <- data %>%
+  sw_data <- dat %>%
     dplyr::select(cluster_id, period, treatment) %>%
     dplyr::group_by(cluster_id, period) %>%
     dplyr::mutate(n = n()) %>%
