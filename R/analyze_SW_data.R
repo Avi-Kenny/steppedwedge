@@ -95,8 +95,6 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     summary_eti <- summary(model_eti_mixed)
     
 
-    ####### Resume here ############
-    
     # Specify the indices of summary_eti corresponding to the exposure time variables
     indices <- grep("exposure_time", rownames(summary_eti$coefficients))
     index_max <- length(indices)
@@ -167,14 +165,13 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       id = cluster_id,
       corstr = corstr
     )
-    
-    summary(model_it_GEE)
+    summary_it <- summary(model_it_GEE)
     
     # Extract an estimate and confidence interval for the estimated treatment
     #     effect; recall that the TATE estimator for any interval and the PTE/LTE
     #     estimators are all equivalent when using the immediate treatment model
-    te_est <- summary(model_it_GEE)$coefficients["treatment",1]
-    te_se <- summary(model_it_GEE)$coefficients["treatment",2]
+    te_est <- summary_it$coefficients["treatment",1]
+    te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
     # te_ci_lower <- te_est + c(-1.96) * te_se
     # te_ci_upper <- te_est + c(1.96) * te_se
@@ -197,14 +194,15 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     ###################################################.
     
     # Fit GEE model
-    model_eti_GEE <- lme4::lmer(
-      outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-      data = dat
+    model_eti_GEE <- geepack::geeglm(
+      outcome ~ factor(period) + factor(exposure_time),
+      data = dat,
+      family = family_obj,
+      id = cluster_id,
+      corstr = corstr
     )
     summary_eti <- summary(model_eti_GEE)
     
-    
-    ####### Resume here ############
     
     # Specify the indices of summary_eti corresponding to the exposure time variables
     indices <- grep("exposure_time", rownames(summary_eti$coefficients))
