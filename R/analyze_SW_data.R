@@ -51,7 +51,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     # te_ci_upper <- te_est + c(1.96) * te_se
     
     results <- list(
-      model = "it_mixed",
+      model = model_it_mixed,
+      model_type = "it_mixed",
       estimand = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
@@ -110,7 +111,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
       results <- list(
-        model = "eti_mixed",
+        model = model_eti_mixed,
+        model_type = "eti_mixed",
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
@@ -125,7 +127,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
       
       results <- list(
-        model = "eti_mixed",
+        model = model_eti_mixed,
+        model_type = "eti_mixed",
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,
@@ -160,7 +163,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     # te_ci_upper <- te_est + c(1.96) * te_se
     
     results <- list(
-      model = "it_GEE",
+      model = model_it_GEE,
+      model_type = "it_GEE",
       estimand = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
@@ -210,7 +214,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
       results <- list(
-        model = "eti_GEE",
+        model = model_eti_GEE,
+        model_type = "eti_GEE",
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
@@ -225,7 +230,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
       
       results <- list(
-        model = "eti_GEE",
+        model = model_eti_GEE,
+        model_type = "eti_GEE",
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,
