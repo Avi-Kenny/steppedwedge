@@ -5,20 +5,31 @@
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
 #' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.
+#' @param family A character string; see documentation for `glm()`.
+#' @param link A character string; see documentation for `glm()`.
+#' @param corstr A character string; see documentation for `geepack::geeglm()`.
 #'
 #' @return A list with ___
 #' @export
 #'
 #' @examples
 #' # TO DO
-analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption) {
+analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption,
+                            family = "gaussian", link = "identity", corstr = "exchangeable") {
+  
+  cluster_id <- NULL
+  rm(cluster_id)
   
   ### Add input validation
   
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
   
-  results <- list()
   
+  
+  # call appropriate family function with chosen link to create family object
+  family_obj <- get(family)(link = link)
+  
+
   if(method == "mixed" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     
     ################################################.
@@ -34,7 +45,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     } else if(outcome_type == "binary") {
       model_it_mixed <- lme4::glmer(
         outcome ~ factor(period) + treatment + (1|cluster_id),
-        family = "binomial",
+        family = family_obj,
         data = dat
       )
     }
@@ -51,7 +62,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     # te_ci_upper <- te_est + c(1.96) * te_se
     
     results <- list(
-      model = "it_mixed",
+      model = model_it_mixed,
+      model_type = "it_mixed",
       estimand = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
@@ -75,7 +87,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     } else if(outcome_type == "binary") {
       model_eti_mixed <- lme4::glmer(
         outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-        family = "binomial",
+        family = family_obj,
         data = dat
       )
     }
@@ -83,8 +95,6 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     summary_eti <- summary(model_eti_mixed)
     
 
-    ####### Resume here ############
-    
     # Specify the indices of summary_eti corresponding to the exposure time variables
     indices <- grep("exposure_time", rownames(summary_eti$coefficients))
     index_max <- length(indices)
@@ -96,21 +106,22 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     if(estimand == "TATE") {
 
-      # Estimate the TATE
-      tate_est <- mean(coeffs)
-      # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
-      tate_se <- sqrt(mean(as.matrix(cov_mtx)))
-      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-  
-      # # Estimate the TATE (equivalent calculation using
-      # #     matrix multiplication)
-      # M <- matrix(rep(1/index_max), index_max, nrow=1)
-      # tate_est <- (M %*% coeffs)[1]
-      # tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      # # Estimate the TATE
+      # tate_est <- mean(coeffs)
+      # # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
+      # tate_se <- sqrt(mean(as.matrix(cov_mtx)))
       # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+  
+      # Estimate the TATE (equivalent calculation using
+      #     matrix multiplication)
+      M <- matrix(rep(1/index_max), index_max, nrow=1)
+      tate_est <- (M %*% coeffs)[1]
+      tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
       results <- list(
-        model = "eti_mixed",
+        model = model_eti_mixed,
+        model_type = "eti_mixed",
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
@@ -125,7 +136,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
       
       results <- list(
-        model = "eti_mixed",
+        model = model_eti_mixed,
+        model_type = "eti_mixed",
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,
@@ -139,28 +151,34 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
   } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     
+    
     ##############################################.
     ##### Immediate Treatment (IT) GEE model #####
     ##############################################.
     
+    
     # Fit GEE model
     model_it_GEE <- geepack::geeglm(
-      outcome ~ factor(period) + treatment + (1|cluster_id),
-      data = dat
+      outcome ~ factor(period) + treatment,
+      data = dat,
+      family = family_obj,
+      id = cluster_id,
+      corstr = corstr
     )
-    summary(model_it_GEE)
+    summary_it <- summary(model_it_GEE)
     
     # Extract an estimate and confidence interval for the estimated treatment
     #     effect; recall that the TATE estimator for any interval and the PTE/LTE
     #     estimators are all equivalent when using the immediate treatment model
-    te_est <- summary(model_it_GEE)$coefficients["treatment",1]
-    te_se <- summary(model_it_GEE)$coefficients["treatment",2]
+    te_est <- summary_it$coefficients["treatment",1]
+    te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
     # te_ci_lower <- te_est + c(-1.96) * te_se
     # te_ci_upper <- te_est + c(1.96) * te_se
     
     results <- list(
-      model = "it_GEE",
+      model = model_it_GEE,
+      model_type = "it_GEE",
       estimand = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
@@ -176,14 +194,15 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     ###################################################.
     
     # Fit GEE model
-    model_eti_GEE <- lme4::lmer(
-      outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-      data = dat
+    model_eti_GEE <- geepack::geeglm(
+      outcome ~ factor(period) + factor(exposure_time),
+      data = dat,
+      family = family_obj,
+      id = cluster_id,
+      corstr = corstr
     )
     summary_eti <- summary(model_eti_GEE)
     
-    
-    ####### Resume here ############
     
     # Specify the indices of summary_eti corresponding to the exposure time variables
     indices <- grep("exposure_time", rownames(summary_eti$coefficients))
@@ -196,21 +215,22 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     if(estimand == "TATE") {
       
-      # Estimate the TATE
-      tate_est <- mean(coeffs)
-      # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
-      tate_se <- sqrt(mean(as.matrix(cov_mtx)))
-      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-      
-      # # Estimate the TATE (equivalent calculation using
-      # #     matrix multiplication)
-      # M <- matrix(rep(1/index_max), index_max, nrow=1)
-      # tate_est <- (M %*% coeffs)[1]
-      # tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      # # Estimate the TATE
+      # tate_est <- mean(coeffs)
+      # # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
+      # tate_se <- sqrt(mean(as.matrix(cov_mtx)))
       # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
+      # Estimate the TATE (equivalent calculation using
+      #     matrix multiplication)
+      M <- matrix(rep(1/index_max), index_max, nrow=1)
+      tate_est <- (M %*% coeffs)[1]
+      tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+      
       results <- list(
-        model = "eti_GEE",
+        model = model_eti_GEE,
+        model_type = "eti_GEE",
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
@@ -225,7 +245,8 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
       
       results <- list(
-        model = "eti_GEE",
+        model = model_eti_GEE,
+        model_type = "eti_GEE",
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,

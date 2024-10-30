@@ -6,6 +6,8 @@
 \alias{steppedwedge-package}
 \title{steppedwedge: An R Package for Analyzing Data from Stepped Wedge Cluster Randomized Trials}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 This R package provides various functions and tools to help fit models for estimating treatment effects in stepped wedge cluster randomized trials.
 }
 \seealso{

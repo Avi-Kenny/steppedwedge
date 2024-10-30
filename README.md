@@ -7,6 +7,7 @@
   [![](https://cranlogs.r-pkg.org/badges/steppedwedge)](https://CRAN.R-project.org/package=steppedwedge)
 <!-- badges: end -->
 
+$${\color{red}\text{Note: package is currently in development. Check back soon.}}$$
 
 # steppedwedge <img src='man/figures/logo.png' align="right" height="150" />
 
