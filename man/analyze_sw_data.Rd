@@ -12,7 +12,8 @@ analyze_sw_data(
   time_varying_assumption,
   family = "gaussian",
   link = "identity",
-  corstr = "exchangeable"
+  corstr = "exchangeable",
+  ddf = "Kenward-Roger"
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ analyze_sw_data(
 \item{link}{A character string; see documentation for `glm()`.}
 
 \item{corstr}{A character string; see documentation for `geepack::geeglm()`.}
+
+\item{ddf}{A character string specifying Denominator Degrees of Freedom correction; either "Kenward-Roger" (default), "Satterthwaite", or "lme4"}
 }
 \value{
 A list with ___
