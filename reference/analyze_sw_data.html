@@ -46,7 +46,8 @@
 <span>  <span class="va">time_varying_assumption</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
 <span>  link <span class="op">=</span> <span class="st">"identity"</span>,</span>
-<span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span></span>
+<span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span>,</span>
+<span>  ddf <span class="op">=</span> <span class="st">"Kenward-Roger"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -84,6 +85,10 @@
 
 <dt id="arg-corstr">corstr<a class="anchor" aria-label="anchor" href="#arg-corstr"></a></dt>
 <dd><p>A character string; see documentation for `geepack::geeglm()`.</p></dd>
+
+
+<dt id="arg-ddf">ddf<a class="anchor" aria-label="anchor" href="#arg-ddf"></a></dt>
+<dd><p>A character string specifying Denominator Degrees of Freedom correction; either "Kenward-Roger" (default), "Satterthwaite", or "lme4"</p></dd>
 
 </dl></div>
     <div class="section level2">
