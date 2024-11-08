@@ -26,5 +26,61 @@ test_that("Input validation works", {
 
 # Valid input
 
+# Model type and estimand returned correctly
+
+test_that("Correct model type and estimand for IT mixed model", {
+  result <- analyze_sw_data(sw_data, "mixed", "TATE", "IT", "gaussian", "identity")
+  expect_equal(result$model_type, "it_mixed")
+  expect_equal(result$estimand, "TATE/LTE")
+})
+
+test_that("Correct model type and estimand for ETI mixed model, TATE", {
+  result <- analyze_sw_data(sw_data, "mixed", "TATE", "ETI", "gaussian", "identity")
+  expect_equal(result$model_type, "eti_mixed")
+  expect_equal(result$estimand, "TATE")
+})
+
+test_that("Correct model type and estimand for ETI mixed model, LTE", {
+  result <- analyze_sw_data(sw_data, "mixed", "LTE", "ETI", "gaussian", "identity")
+  expect_equal(result$model_type, "eti_mixed")
+  expect_equal(result$estimand, "LTE")
+})
+
+test_that("Correct model type and estimand for IT GEE model, TATE", {
+  result <- analyze_sw_data(sw_data, "GEE", "TATE", "IT", "gaussian", "identity")
+  expect_equal(result$model_type, "it_GEE")
+  expect_equal(result$estimand, "TATE/LTE")
+})
+
+test_that("Correct model type and estimand for ETI GEE model, TATE", {
+  result <- analyze_sw_data(sw_data, "GEE", "TATE", "ETI", "gaussian", "identity")
+  expect_equal(result$model_type, "eti_GEE")
+  expect_equal(result$estimand, "TATE")
+})
+
+test_that("Correct model type and estimand for ETI GEE model, LTE", {
+  result <- analyze_sw_data(sw_data, "GEE", "LTE", "ETI", "gaussian", "identity")
+  expect_equal(result$model_type, "eti_GEE")
+  expect_equal(result$estimand, "LTE")
+})
+
+
+# Model coefficients returned correctly
+
+test_that("Model coefficients are returned correctly", {
+  result <- analyze_sw_data(sw_data, "mixed", "TATE", "IT", "gaussian", "identity")
+  expect_true("te_est" %in% names(result))
+  expect_true("te_se" %in% names(result))
+  expect_true("te_ci" %in% names(result))
+})
+
+# Different family and link functions
+
+test_that("Function handles different family and link functions", {
+  result_binomial <- analyze_sw_data(sw_data, "mixed", "TATE", "IT", "binomial", "logit")
+  result_gaussian <- analyze_sw_data(sw_data, "mixed", "TATE", "IT", "gaussian", "identity")
+  expect_true(result_binomial$model@resp$family$family == "binomial")
+  expect_true(methods::is(result_gaussian$model,"lmerMod"))
+})
 
 
