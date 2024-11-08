@@ -8,7 +8,6 @@
 #' @param family A character string; see documentation for `glm()`.
 #' @param link A character string; see documentation for `glm()`.
 #' @param corstr A character string; see documentation for `geepack::geeglm()`.
-#' @param ddf A character string specifying Denominator Degrees of Freedom correction; either "Kenward-Roger" (default), "Satterthwaite", or "lme4"
 #'
 #' @return A list with ___
 #' @export
@@ -16,8 +15,7 @@
 #' @examples
 #' # TO DO
 analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption,
-                            family = "gaussian", link = "identity", corstr = "exchangeable",
-                            ddf = "Kenward-Roger") {
+                            family = "gaussian", link = "identity", corstr = "exchangeable") {
   
   cluster_id <- NULL
   rm(cluster_id)
@@ -40,13 +38,9 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     # Fit mixed model
     if(outcome_type == "continuous") {
-      model_it_mixed <- lmerTest::lmer(
+      model_it_mixed <- lme4::lmer(
         outcome ~ factor(period) + treatment + (1|cluster_id),
         data = dat
-      )
-      summary_it <- summary(
-        model_it_mixed,
-        ddf = ddf
       )
     } else if(outcome_type == "binary") {
       model_it_mixed <- lme4::glmer(
@@ -54,12 +48,9 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
         family = family_obj,
         data = dat
       )
-      summary_it <- summary(
-        model_it_mixed
-      )
     }
     
-    
+    summary_it <- summary(model_it_mixed)
     
     # Extract an estimate and confidence interval for the estimated treatment
     #     effect; recall that the TATE estimator for any interval and the PTE/LTE
@@ -89,13 +80,9 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     # Fit mixed model
     if(outcome_type == "continuous") {
-      model_eti_mixed <- lmerTest::lmer(
+      model_eti_mixed <- lme4::lmer(
         outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
         data = dat
-      )
-      summary_it <- summary(
-        model_it_mixed,
-        ddf = ddf
       )
     } else if(outcome_type == "binary") {
       model_eti_mixed <- lme4::glmer(
@@ -103,10 +90,9 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
         family = family_obj,
         data = dat
       )
-      summary_it <- summary(
-        model_it_mixed
-      )
     }
+    
+    summary_eti <- summary(model_eti_mixed)
     
 
     # Specify the indices of summary_eti corresponding to the exposure time variables
