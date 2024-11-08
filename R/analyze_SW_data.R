@@ -215,12 +215,6 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     if(estimand == "TATE") {
       
-      # # Estimate the TATE
-      # tate_est <- mean(coeffs)
-      # # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
-      # tate_se <- sqrt(mean(as.matrix(cov_mtx)))
-      # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-      
       # Estimate the TATE (equivalent calculation using
       #     matrix multiplication)
       M <- matrix(rep(1/index_max), index_max, nrow=1)
