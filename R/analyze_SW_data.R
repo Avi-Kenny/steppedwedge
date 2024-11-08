@@ -1,7 +1,6 @@
 #' Title
 #'
 #' @param dat A dataframe containing the stepped wedge trial data.
-#' @param outcome_type A character string; either "binary" or "continuous".
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
 #' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.
@@ -14,8 +13,8 @@
 #'
 #' @examples
 #' # TO DO
-analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_assumption,
-                            family = "gaussian", link = "identity", corstr = "exchangeable") {
+analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
+                            family, link, corstr = "exchangeable") {
   
   cluster_id <- NULL
   rm(cluster_id)
@@ -37,12 +36,12 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     ################################################.
     
     # Fit mixed model
-    if(outcome_type == "continuous") {
+    if(family == "gaussian" & link == "identity") {
       model_it_mixed <- lme4::lmer(
         outcome ~ factor(period) + treatment + (1|cluster_id),
         data = dat
       )
-    } else if(outcome_type == "binary") {
+    } else {
       model_it_mixed <- lme4::glmer(
         outcome ~ factor(period) + treatment + (1|cluster_id),
         family = family_obj,
@@ -79,12 +78,12 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     #####################################################.
     
     # Fit mixed model
-    if(outcome_type == "continuous") {
+    if(family == "gaussian" & link == "identity") {
       model_eti_mixed <- lme4::lmer(
         outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
         data = dat
       )
-    } else if(outcome_type == "binary") {
+    } else {
       model_eti_mixed <- lme4::glmer(
         outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
         family = family_obj,
@@ -106,13 +105,7 @@ analyze_sw_data <- function(dat, outcome_type, method, estimand, time_varying_as
     
     if(estimand == "TATE") {
 
-      # # Estimate the TATE
-      # tate_est <- mean(coeffs)
-      # # tate_se <- sqrt(mean(cov_mtx)) # David question--line below ok?
-      # tate_se <- sqrt(mean(as.matrix(cov_mtx)))
-      # tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-  
-      # Estimate the TATE (equivalent calculation using
+      # Estimate the TATE (using
       #     matrix multiplication)
       M <- matrix(rep(1/index_max), index_max, nrow=1)
       tate_est <- (M %*% coeffs)[1]

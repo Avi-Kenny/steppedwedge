@@ -6,19 +6,16 @@
 \usage{
 analyze_sw_data(
   dat,
-  outcome_type,
   method,
   estimand,
   time_varying_assumption,
-  family = "gaussian",
-  link = "identity",
+  family,
+  link,
   corstr = "exchangeable"
 )
 }
 \arguments{
 \item{dat}{A dataframe containing the stepped wedge trial data.}
-
-\item{outcome_type}{A character string; either "binary" or "continuous".}
 
 \item{method}{A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.}
 
