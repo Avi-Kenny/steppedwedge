@@ -29,7 +29,7 @@ plot_sw_design <- function(dat)
   sw_data <- dat %>%
     dplyr::select(cluster_id, period, treatment) %>%
     dplyr::group_by(cluster_id, period) %>%
-    dplyr::mutate(n = n()) %>%
+    dplyr::mutate(n = dplyr::n()) %>%
     dplyr::distinct()
   summary <- summary(sw_data)
 
@@ -40,7 +40,7 @@ plot_sw_design <- function(dat)
     ggplot2::scale_fill_manual(values = c("1" = "grey", "0" = "white")) +
     # reverse order of y axis and label every integer on y axis
     ggplot2::scale_x_continuous(breaks = seq(min(sw_data$period), max(sw_data$period), by = 1)) +
-    ggplot2::geom_text(aes(label = n), vjust = 1) +
+    ggplot2::geom_text(ggplot2::aes(label = n), vjust = 1) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.ticks = ggplot2::element_blank(),
