@@ -229,12 +229,6 @@ load_sw_data <- function(
 }
 
 
-#### usethis::use_package(package="sticky", type="Imports", min_version=T)
-#### Unit testing
-#### usethis::use_test("test-core-functions")
-#### usethis::use_vignette(name="basic", title="Basic package workflow")
-#### usethis::use_testthat()
-### Immediate need: design plot, discrete/continuous time, missing data
-### Print method-# of clusters, # of time points, etc.
+
 
 
