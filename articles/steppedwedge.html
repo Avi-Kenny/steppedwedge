@@ -66,6 +66,136 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://avi-kenny.github.io/steppedwedge/">steppedwedge</a></span><span class="op">)</span></span></code></pre></div>
+<p>The <code>load_sw_data</code> function takes in raw data and creates
+a data object that can be accepted by the <code>plot_sw_design</code>
+and <code>analyze_sw_data</code> functions. We use the made-up dataframe
+<code>sw_data_example</code> to demonstrate the workflow.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_sw_data.html">load_sw_data</a></span><span class="op">(</span></span>
+<span>  period <span class="op">=</span> <span class="st">"period"</span>,</span>
+<span>  cluster_id <span class="op">=</span> <span class="st">"cluster"</span>,</span>
+<span>  individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  treatment <span class="op">=</span> <span class="st">"trt"</span>,</span>
+<span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  outcome <span class="op">=</span> <span class="st">"outcome_bin"</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points. 0/2011 rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`.</span></span></code></pre></div>
+<p>The <code>plot_sw_design</code> function produces a diagram of the
+stepped wedge design and a summary of the variables.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_sw_design.html">plot_sw_design</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">plot_dat</span></span>
+<span><span class="co">#&gt; $num_clusters</span></span>
+<span><span class="co">#&gt; [1] 15</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $num_periods</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $num_sequences</span></span>
+<span><span class="co">#&gt; [1] 5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $summary</span></span>
+<span><span class="co">#&gt;    cluster_id     period      treatment         n        </span></span>
+<span><span class="co">#&gt;  1      : 6   Min.   :1.0   Min.   :0.0   Min.   :15.00  </span></span>
+<span><span class="co">#&gt;  2      : 6   1st Qu.:2.0   1st Qu.:0.0   1st Qu.:19.25  </span></span>
+<span><span class="co">#&gt;  3      : 6   Median :3.5   Median :0.5   Median :22.00  </span></span>
+<span><span class="co">#&gt;  4      : 6   Mean   :3.5   Mean   :0.5   Mean   :22.34  </span></span>
+<span><span class="co">#&gt;  5      : 6   3rd Qu.:5.0   3rd Qu.:1.0   3rd Qu.:26.00  </span></span>
+<span><span class="co">#&gt;  6      : 6   Max.   :6.0   Max.   :1.0   Max.   :30.00  </span></span>
+<span><span class="co">#&gt;  (Other):54                                              </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $design_plot</span></span></code></pre></div>
+<p><img src="steppedwedge_files/figure-html/unnamed-chunk-3-1.png" width="864" style="display: block; margin: auto;"></p>
+<p>The <code>analyze_sw_data</code> function analyzes the stepped wedge
+data. First, we analyze the data using a mixed effects model, with the
+Time Average Treament Effect (TATE) as the estimand, assuming an
+Immediate Treatment (IT) effect, passing the
+<code>family = "binomial"</code> and <code>link = "logit"</code>
+arguments to <code>glmer</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_sw_data.html">analyze_sw_data</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  time_varying_assumption <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
+<span>  link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="va">analysis_1</span><span class="op">$</span><span class="va">model</span></span>
+<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
+<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
+<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(period) + treatment + (1 | cluster_id)</span></span>
+<span><span class="co">#&gt;    Data: dat</span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
+<span><span class="co">#&gt;  2054.801  2099.652 -1019.401  2038.801      2003 </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  cluster_id (Intercept) 0       </span></span>
+<span><span class="co">#&gt; Number of obs: 2011, groups:  cluster_id, 15</span></span>
+<span><span class="co">#&gt; Fixed Effects:</span></span>
+<span><span class="co">#&gt;     (Intercept)  factor(period)2  factor(period)3  factor(period)4  </span></span>
+<span><span class="co">#&gt;        -1.31117          0.07874          0.15508          0.09773  </span></span>
+<span><span class="co">#&gt; factor(period)5  factor(period)6        treatment  </span></span>
+<span><span class="co">#&gt;        -0.13764          0.11375         -0.19690  </span></span>
+<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings</span></span></code></pre></div>
+<p>Repeat the analysis, but using GEE rather than a mixed model.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/analyze_sw_data.html">analyze_sw_data</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"GEE"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  time_varying_assumption <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
+<span>  link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; geepack::geeglm(formula = outcome ~ factor(period) + treatment, </span></span>
+<span><span class="co">#&gt;     family = family_obj, data = dat, id = cluster_id, corstr = corstr)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;     (Intercept) factor(period)2 factor(period)3 factor(period)4 factor(period)5 </span></span>
+<span><span class="co">#&gt;     -1.30124846      0.05519872      0.14804502      0.07418674     -0.15673203 </span></span>
+<span><span class="co">#&gt; factor(period)6       treatment </span></span>
+<span><span class="co">#&gt;      0.12102708     -0.20139810 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 2011 Total (i.e. Null);  2004 Residual</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scale Link:                   identity</span></span>
+<span><span class="co">#&gt; Estimated Scale Parameters:  [1] 1.002224</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation:  Structure = exchangeable    Link = identity </span></span>
+<span><span class="co">#&gt; Estimated Correlation Parameters:</span></span>
+<span><span class="co">#&gt;        alpha </span></span>
+<span><span class="co">#&gt; -0.004809356 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of clusters:   15   Maximum cluster size: 153 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $model_type</span></span>
+<span><span class="co">#&gt; [1] "it_GEE"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $estimand</span></span>
+<span><span class="co">#&gt; [1] "TATE/LTE"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_est</span></span>
+<span><span class="co">#&gt; [1] -0.2013981</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_se</span></span>
+<span><span class="co">#&gt; [1] 0.08027659</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_ci</span></span>
+<span><span class="co">#&gt; [1] -0.35874021 -0.04405599</span></span></code></pre></div>
   </main>
 </div>
 
