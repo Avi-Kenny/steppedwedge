@@ -17,3 +17,66 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(steppedwedge)
 ```
+
+
+The `load_sw_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze_sw_data` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
+
+```{r}
+
+data(sw_data_example)
+
+dat <- load_sw_data(
+  period = "period",
+  cluster_id = "cluster",
+  individual_id = NULL,
+  treatment = "trt",
+  covariates = NULL,
+  outcome = "outcome_bin",
+  data = sw_data_example
+)
+
+```
+
+
+The `plot_sw_design` function produces a diagram of the stepped wedge design and a summary of the variables.
+
+```{r, fig.width=9, fig.height=8, fig.align = "center"}
+
+plot_dat <- plot_sw_design(dat)
+
+plot_dat
+
+```
+
+
+The `analyze_sw_data` function analyzes the stepped wedge data. First, we analyze the data using a mixed effects model, with the Time Average Treament Effect (TATE) as the estimand, assuming an Immediate Treatment (IT) effect, passing the `family = "binomial"` and `link = "logit"` arguments to `glmer`. 
+
+```{r}
+
+analysis_1 <- analyze_sw_data(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  time_varying_assumption = "IT",
+  family = "binomial",
+  link = "logit")
+
+analysis_1$model
+
+```
+
+
+Repeat the analysis, but using GEE rather than a mixed model.
+
+```{r}
+
+analyze_sw_data(
+  dat = dat,
+  method = "GEE",
+  estimand = "TATE", 
+  time_varying_assumption = "IT",
+  family = "binomial",
+  link = "logit")
+
+```
+
