@@ -25,6 +25,8 @@ The `load_sw_data` function takes in raw data and creates a data object that can
 
 data(sw_data_example)
 
+head(sw_data_example)
+
 dat <- load_sw_data(
   period = "period",
   cluster_id = "cluster",
@@ -61,7 +63,7 @@ analysis_1 <- analyze_sw_data(
   family = "binomial",
   link = "logit")
 
-analysis_1$model
+print(analysis_1)
 
 ```
 
@@ -70,13 +72,32 @@ Repeat the analysis, but using GEE rather than a mixed model.
 
 ```{r}
 
-analyze_sw_data(
+analysis_2 <- analyze_sw_data(
   dat = dat,
   method = "GEE",
   estimand = "TATE", 
   time_varying_assumption = "IT",
   family = "binomial",
   link = "logit")
+
+print(analysis_2)
+
+```
+
+
+Mixed model, with Time Average Treament Effect (TATE) as the estimand, without assuming an Immediate Treatment (IT) effect.
+
+```{r}
+
+analysis_3 <- analyze_sw_data(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  time_varying_assumption = "ETI",
+  family = "binomial",
+  link = "logit")
+
+print(analysis_3)
 
 ```
 
