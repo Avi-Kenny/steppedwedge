@@ -3,7 +3,8 @@ Type: Package
 Title: An R Package for Analyzing Data from Stepped Wedge Cluster Randomized Trials
 Version: 0.1.0
 Authors@R: c(person("Avi", "Kenny", email = "avi.kenny@gmail.com", role = c("aut", "cre")),
-             person("David", "Arthur", email = "david.arthur291@duke.edu", role = "aut"))
+             person("David", "Arthur", email = "david.arthur291@duke.edu", role = "aut"),
+             person("Yongdong", "Ouyang", email = "yongdong.ouyang@sickkids.ca", role = "aut"))
 Description: This R package provides various functions and tools to help fit models for estimating treatment effects in stepped wedge cluster randomized trials.
 License: GPL-3
 Encoding: UTF-8
