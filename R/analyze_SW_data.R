@@ -3,7 +3,7 @@
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
-#' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.
+#' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, "ETI", for Exposure time indicator, or "NCS", for Natural cubic spline.
 #' @param family A character string; see documentation for `glm()`.
 #' @param link A character string; see documentation for `glm()`.
 #' @param corstr A character string; see documentation for `geepack::geeglm()`.
@@ -160,19 +160,23 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
       model_ncs_mixed <- lmer(
-        outcome ~ factor(period) + b1+b2+b3+b4 + (1|cluster),
+        outcome ~ factor(period) + b1+b2+b3+b4 + (1|cluster_id),
         data = dat
       )
-      # summary(model)
+      # summary(model_ncs_mixed)
     }
     
+    summary_ncs <- summary(model_ncs_mixed)
+    
     # Specify the indices corresponding to the spline terms
-    indices <- c(8:11)
+    # indices <- c(8:11)
+    indices <- grep("^b[0-9]+$", rownames(summary_ncs$coefficients))
+    index_max <- length(indices)
     
     # Extract coefficient estimates and covariance matrix corresponding to spline
     #     terms
-    coeffs_spl <- summary(model_ncs_mixed)$coefficients[,1][indices]
-    cov_mtx_spl <- vcov(model_ncs_mixed)[indices,indices]
+    coeffs_spl <- summary_ncs$coefficients[,1][indices]
+    cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
     
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
     B <- matrix(NA, nrow=(J-1), ncol=4)
@@ -184,93 +188,44 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
     
-    # Estimate the TATE over the interval [0,6]
-    M <- matrix(rep(1/6, 6), nrow=1)
-    tate_est <- (M %*% coeffs_trans)[1]
-    tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
-    tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-    
-    # Estimate the LTE
-    lte_est <- as.numeric(coeffs_trans[6])
-    lte_se <- sqrt(cov_mtx[6,6])
-    lte_ci <- lte_est + c(-1.96,1.96) * lte_se
-    
-    # Estimate the effect curve
-    curve_ncs <- c(0, coeffs_trans)
-    
-    # Display results
-    display_results("TATE", tate_est, tate_ci)
-    display_results("LTE", lte_est, lte_ci)
-    
-    
-    
-    
-    
-    
-    # Fit mixed model
-    if(family == "gaussian" & link == "identity") {
-      model_eti_mixed <- lme4::lmer(
-        outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-        data = dat
-      )
-    } else {
-      model_eti_mixed <- lme4::glmer(
-        outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
-        family = family_obj,
-        data = dat
-      )
-    }
-    
-    summary_eti <- summary(model_eti_mixed)
-    
-    
-    # Specify the indices of summary_eti corresponding to the exposure time variables
-    indices <- grep("exposure_time", rownames(summary_eti$coefficients))
-    index_max <- length(indices)
-    
-    # Extract coefficient estimates and covariance matrix corresponding to exposure
-    #     time variables
-    coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
-    cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
-    
     if(estimand == "TATE") {
-      
-      # Estimate the TATE (using
-      #     matrix multiplication)
-      M <- matrix(rep(1/index_max), index_max, nrow=1)
-      tate_est <- (M %*% coeffs)[1]
+      # Estimate the TATE over the interval [0,6]
+      M <- matrix(rep(1/index_max, index_max), nrow=1)
+      tate_est <- (M %*% coeffs_trans)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
       results <- list(
-        model = model_eti_mixed,
-        model_type = "eti_mixed",
+        model = model_ncs_mixed,
+        model_type = "ncs_mixed",
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci
       )
-      
     } else if(estimand == "LTE") {
-      
+    
       # Estimate the LTE
-      lte_est <- as.numeric(coeffs[index_max])
-      lte_se <- sqrt(cov_mtx[index_max,index_max])
+      lte_est <- as.numeric(coeffs_trans[index_max])
+      lte_se <- sqrt(cov_mtx[index_max, index_max])
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
-      
-      results <- list(
-        model = model_eti_mixed,
-        model_type = "eti_mixed",
-        estimand = "LTE",
-        te_est = lte_est,
-        te_se = lte_se,
-        te_ci = lte_ci
-      )
-      # 
-      # # Estimate the effect curve
-      # curve_eti <- as.numeric(c(0, coeffs))
-      
-    } 
+    }
+    
+    results <- list(
+      model = model_ncs_mixed,
+      model_type = "ncs_mixed",
+      estimand = "LTE",
+      te_est = lte_est,
+      te_se = lte_se,
+      te_ci = lte_ci
+    )
+    
+    # # Estimate the effect curve
+    # curve_ncs <- c(0, coeffs_trans)
+    
+    # Display results
+    display_results("TATE", tate_est, tate_ci)
+    display_results("LTE", lte_est, lte_ci)
     
   } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     
