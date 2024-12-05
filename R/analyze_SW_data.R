@@ -151,7 +151,7 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     
     # Create the spline basis (4 degrees of freedom)
     J <- length(unique(dat$period))
-    ns_basis <- ns(c(0:(J-1)), knots=c((J-1)/4,(2*(J-1))/4,(3*(J-1))/4))
+    ns_basis <- splines::ns(c(0:(J-1)), knots=c((J-1)/4,(2*(J-1))/4,(3*(J-1))/4))
     dat$b1 <- ns_basis[dat$exposure_time+1,1]
     dat$b2 <- ns_basis[dat$exposure_time+1,2]
     dat$b3 <- ns_basis[dat$exposure_time+1,3]
@@ -159,7 +159,7 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
-      model_ncs_mixed <- lmer(
+      model_ncs_mixed <- lme4::lmer(
         outcome ~ factor(period) + b1+b2+b3+b4 + (1|cluster_id),
         data = dat
       )
@@ -222,10 +222,6 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     
     # # Estimate the effect curve
     # curve_ncs <- c(0, coeffs_trans)
-    
-    # Display results
-    display_results("TATE", tate_est, tate_ci)
-    display_results("LTE", lte_est, lte_ci)
     
   } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
     

@@ -24,6 +24,7 @@ Useful links:
 Authors:
 \itemize{
   \item David Arthur \email{david.arthur291@duke.edu}
+  \item Yongdong Ouyang \email{yongdong.ouyang@sickkids.ca}
 }
 
 }

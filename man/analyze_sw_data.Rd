@@ -21,7 +21,7 @@ analyze_sw_data(
 
 \item{estimand}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
 
-\item{time_varying_assumption}{A character string; either "IT" for immediate treatment effect, or "ETI", for Exposure time indicator.}
+\item{time_varying_assumption}{A character string; either "IT" for immediate treatment effect, "ETI", for Exposure time indicator, or "NCS", for Natural cubic spline.}
 
 \item{family}{A character string; see documentation for `glm()`.}
 
