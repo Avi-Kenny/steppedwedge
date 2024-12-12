@@ -146,7 +146,7 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     
     
     ############################################.
-    ##### Natural Cubic Spline (NCS) model #####
+    ##### Natural Cubic Spline (NCS) mixed model #####
     ############################################.
     
     # Create the spline basis (4 degrees of freedom)
@@ -160,10 +160,16 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
       model_ncs_mixed <- lme4::lmer(
-        outcome ~ factor(period) + b1+b2+b3+b4 + (1|cluster_id),
+        outcome ~ factor(period) + b1 + b2 + b3 + b4 + (1|cluster_id),
         data = dat
       )
       # summary(model_ncs_mixed)
+    } else {
+      model_ncs_mixed <- lme4::glmer(
+        outcome ~ factor(period) + b1 + b2 + b3 + b4 + (1|cluster_id),
+        family = family_obj,
+        data = dat
+      )
     }
     
     summary_ncs <- summary(model_ncs_mixed)
@@ -209,16 +215,18 @@ analyze_sw_data <- function(dat, method, estimand, time_varying_assumption,
       lte_est <- as.numeric(coeffs_trans[index_max])
       lte_se <- sqrt(cov_mtx[index_max, index_max])
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      
+      results <- list(
+        model = model_ncs_mixed,
+        model_type = "ncs_mixed",
+        estimand = "LTE",
+        te_est = lte_est,
+        te_se = lte_se,
+        te_ci = lte_ci
+      )
     }
     
-    results <- list(
-      model = model_ncs_mixed,
-      model_type = "ncs_mixed",
-      estimand = "LTE",
-      te_est = lte_est,
-      te_se = lte_se,
-      te_ci = lte_ci
-    )
+    
     
     # # Estimate the effect curve
     # curve_ncs <- c(0, coeffs_trans)
