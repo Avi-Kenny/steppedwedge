@@ -19,7 +19,7 @@ library(steppedwedge)
 ```
 
 
-The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze_sw_data` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
+The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
 ```{r}
 
@@ -51,11 +51,11 @@ plot_dat
 ```
 
 
-The `analyze_sw_data` function analyzes the stepped wedge data. First, we analyze the data using a mixed effects model, with the Time Average Treament Effect (TATE) as the estimand, assuming an Immediate Treatment (IT) effect, passing the `family = "binomial"` and `link = "logit"` arguments to `glmer`. 
+The `analyze` function analyzes the stepped wedge data. First, we analyze the data using a mixed effects model, with the Time Average Treament Effect (TATE) as the estimand, assuming an Immediate Treatment (IT) effect, passing the `family = "binomial"` and `link = "logit"` arguments to `glmer`. 
 
 ```{r}
 
-analysis_1 <- analyze_sw_data(
+analysis_1 <- analyze(
   dat = dat,
   method = "mixed",
   estimand = "TATE", 
@@ -72,7 +72,7 @@ Repeat the analysis, but using GEE rather than a mixed model.
 
 ```{r}
 
-analysis_2 <- analyze_sw_data(
+analysis_2 <- analyze(
   dat = dat,
   method = "GEE",
   estimand = "TATE", 
@@ -89,7 +89,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand, without a
 
 ```{r}
 
-analysis_3 <- analyze_sw_data(
+analysis_3 <- analyze(
   dat = dat,
   method = "mixed",
   estimand = "TATE", 
