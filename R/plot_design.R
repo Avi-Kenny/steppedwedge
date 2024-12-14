@@ -7,17 +7,17 @@
 #'
 #' @examples
 #' # TO DO
-plot_sw_design <- function(dat)
+plot_design <- function(dat)
 {
 
   # Prevent R CMD CHECK note
   aes <- cluster_id <- first_exposure <- n <- period <- treatment <- NULL
   x <- geeCRT::sampleSWCRTLarge
   rm(aes,cluster_id,first_exposure,n,period,treatment,x)
-  
+
   # Input validation
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
-    
+
   num_clusters <- attr(dat, "n_clusters")
   num_periods <- attr(dat, "n_periods")
   num_sequences <- attr(dat, "n_sequences")

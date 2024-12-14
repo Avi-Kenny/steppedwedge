@@ -19,7 +19,7 @@ library(steppedwedge)
 ```
 
 
-The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
+The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_design` and `analyze` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
 ```{r}
 
@@ -40,11 +40,11 @@ dat <- load_data(
 ```
 
 
-The `plot_sw_design` function produces a diagram of the stepped wedge design and a summary of the variables.
+The `plot_design` function produces a diagram of the stepped wedge design and a summary of the variables.
 
 ```{r, fig.width=9, fig.height=8, fig.align = "center"}
 
-plot_dat <- plot_sw_design(dat)
+plot_dat <- plot_design(dat)
 
 plot_dat
 

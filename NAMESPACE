@@ -2,6 +2,6 @@
 
 export(analyze)
 export(load_data)
-export(plot_sw_design)
+export(plot_design)
 importFrom(magrittr,"%<>%")
 importFrom(magrittr,"%>%")
