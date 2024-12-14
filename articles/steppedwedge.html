@@ -66,9 +66,9 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://avi-kenny.github.io/steppedwedge/">steppedwedge</a></span><span class="op">)</span></span></code></pre></div>
-<p>The <code>load_sw_data</code> function takes in raw data and creates
-a data object that can be accepted by the <code>plot_sw_design</code>
-and <code>analyze_sw_data</code> functions. We use the made-up dataframe
+<p>The <code>load_data</code> function takes in raw data and creates a
+data object that can be accepted by the <code>plot_design</code> and
+<code>analyze</code> functions. We use the made-up dataframe
 <code>sw_data_example</code> to demonstrate the workflow.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -83,7 +83,7 @@ and <code>analyze_sw_data</code> functions. We use the made-up dataframe
 <span><span class="co">#&gt; 5       1      1   0           0   -0.8249006</span></span>
 <span><span class="co">#&gt; 6       1      1   0           0   -0.8456510</span></span>
 <span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_sw_data.html">load_sw_data</a></span><span class="op">(</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
 <span>  period <span class="op">=</span> <span class="st">"period"</span>,</span>
 <span>  cluster_id <span class="op">=</span> <span class="st">"cluster"</span>,</span>
 <span>  individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -93,11 +93,11 @@ and <code>analyze_sw_data</code> functions. We use the made-up dataframe
 <span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points. 0/2011 rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`.</span></span></code></pre></div>
-<p>The <code>plot_sw_design</code> function produces a diagram of the
+<p>The <code>plot_design</code> function produces a diagram of the
 stepped wedge design and a summary of the variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_sw_design.html">plot_sw_design</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
+<span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_design.html">plot_design</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">plot_dat</span></span>
 <span><span class="co">#&gt; $num_clusters</span></span>
@@ -121,15 +121,14 @@ stepped wedge design and a summary of the variables.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $design_plot</span></span></code></pre></div>
 <p><img src="steppedwedge_files/figure-html/unnamed-chunk-3-1.png" width="864" style="display: block; margin: auto;"></p>
-<p>The <code>analyze_sw_data</code> function analyzes the stepped wedge
-data. First, we analyze the data using a mixed effects model, with the
-Time Average Treament Effect (TATE) as the estimand, assuming an
-Immediate Treatment (IT) effect, passing the
-<code>family = "binomial"</code> and <code>link = "logit"</code>
-arguments to <code>glmer</code>.</p>
+<p>The <code>analyze</code> function analyzes the stepped wedge data.
+First, we analyze the data using a mixed effects model, with the Time
+Average Treament Effect (TATE) as the estimand, assuming an Immediate
+Treatment (IT) effect, passing the <code>family = "binomial"</code> and
+<code>link = "logit"</code> arguments to <code>glmer</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">analysis_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_sw_data.html">analyze_sw_data</a></span><span class="op">(</span></span>
+<span><span class="va">analysis_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
@@ -175,7 +174,7 @@ arguments to <code>glmer</code>.</p>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">analysis_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_sw_data.html">analyze_sw_data</a></span><span class="op">(</span></span>
+<span><span class="va">analysis_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"GEE"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
@@ -227,7 +226,7 @@ arguments to <code>glmer</code>.</p>
 estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">analysis_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_sw_data.html">analyze_sw_data</a></span><span class="op">(</span></span>
+<span><span class="va">analysis_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
