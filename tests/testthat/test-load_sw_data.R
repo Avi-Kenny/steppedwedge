@@ -12,8 +12,8 @@ sample_data <- data.frame(
 
 
 # Test when everything is correct
-test_that("load_sw_data works correctly", {
-  result <- load_sw_data(
+test_that("load_data works correctly", {
+  result <- load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -37,10 +37,10 @@ test_that("load_sw_data works correctly", {
   expect_equal(result$outcome, sample_data$y_bin)
 })
 
-# Unit test for load_sw_data function with incorrect inputs
-test_that("load_sw_data handles incorrect inputs correctly", {
+# Unit test for load_data function with incorrect inputs
+test_that("load_data handles incorrect inputs correctly", {
   # Incorrect data type for `data`
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -50,7 +50,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   ), "`data` must be a data frame.")
 
   # Incorrect `time_type`
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -61,7 +61,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   ), "`time_type` must be a character string specifying `discrete` or `continuous`.")
 
   # Non-existent column names
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "nonexistent",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -73,7 +73,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   # Incorrect type for `treatment`
   sample_data_invalid_treatment <- sample_data
   sample_data_invalid_treatment$treatment <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R")
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -85,7 +85,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   # Incorrect type for `outcome`
   sample_data_invalid_outcome <- sample_data
   sample_data_invalid_outcome$y_bin <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R")
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -95,7 +95,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   ), "`outcome` must only contain numeric or binary values \\(either T/F or 1/0\\).")
 
   # Empty string for `period`
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -105,7 +105,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   ), "`period` must be a character string specifying a single variable in `data`.")
 
   # NULL for `period`
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = NULL,
     cluster_id = "cluster_id",
     individual_id = "individual_id",
@@ -117,7 +117,7 @@ test_that("load_sw_data handles incorrect inputs correctly", {
   # More than one value of treatment within a given combination of cluster_id and period
   sample_data_multiple_treatment_values <- sample_data
   sample_data_multiple_treatment_values[1, "treatment"] <- 1
-  expect_error(load_sw_data(
+  expect_error(load_data(
     period = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",

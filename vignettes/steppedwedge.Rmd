@@ -19,7 +19,7 @@ library(steppedwedge)
 ```
 
 
-The `load_sw_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze_sw_data` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
+The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_sw_design` and `analyze_sw_data` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
 ```{r}
 
@@ -27,7 +27,7 @@ data(sw_data_example)
 
 head(sw_data_example)
 
-dat <- load_sw_data(
+dat <- load_data(
   period = "period",
   cluster_id = "cluster",
   individual_id = NULL,

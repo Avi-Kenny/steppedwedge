@@ -13,10 +13,10 @@
 #' @export
 #'
 #' @examples
-#' load_sw_data(period = "period", cluster_id = "id", individual_id = NULL,
+#' load_data(period = "period", cluster_id = "id", individual_id = NULL,
 #' treatment = "treatment", covariates = NULL, outcome = "y_bin",
 #' data = geeCRT::sampleSWCRTLarge)
-load_sw_data <- function(
+load_data <- function(
     period, cluster_id, individual_id = NULL, treatment, covariates = NULL,
     outcome, time_type = "discrete", data
 ) {
