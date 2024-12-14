@@ -38,12 +38,12 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
       model_it_mixed <- lme4::lmer(
-        outcome ~ factor(period) + treatment + (1|cluster_id),
+        outcome ~ factor(time) + treatment + (1|cluster_id),
         data = dat
       )
     } else {
       model_it_mixed <- lme4::glmer(
-        outcome ~ factor(period) + treatment + (1|cluster_id),
+        outcome ~ factor(time) + treatment + (1|cluster_id),
         family = family_obj,
         data = dat
       )
@@ -80,12 +80,12 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
       model_eti_mixed <- lme4::lmer(
-        outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
+        outcome ~ factor(time) + factor(exposure_time) + (1|cluster_id),
         data = dat
       )
     } else {
       model_eti_mixed <- lme4::glmer(
-        outcome ~ factor(period) + factor(exposure_time) + (1|cluster_id),
+        outcome ~ factor(time) + factor(exposure_time) + (1|cluster_id),
         family = family_obj,
         data = dat
       )
@@ -150,7 +150,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
     ############################################.
 
     # Create the spline basis (4 degrees of freedom)
-    J <- length(unique(dat$period))
+    J <- length(unique(dat$time))
     ns_basis <- splines::ns(c(0:(J-1)), knots=c((J-1)/4,(2*(J-1))/4,(3*(J-1))/4))
     dat$b1 <- ns_basis[dat$exposure_time+1,1]
     dat$b2 <- ns_basis[dat$exposure_time+1,2]
@@ -160,13 +160,13 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
     # Fit mixed model
     if(family == "gaussian" & link == "identity") {
       model_ncs_mixed <- lme4::lmer(
-        outcome ~ factor(period) + b1 + b2 + b3 + b4 + (1|cluster_id),
+        outcome ~ factor(time) + b1 + b2 + b3 + b4 + (1|cluster_id),
         data = dat
       )
       # summary(model_ncs_mixed)
     } else {
       model_ncs_mixed <- lme4::glmer(
-        outcome ~ factor(period) + b1 + b2 + b3 + b4 + (1|cluster_id),
+        outcome ~ factor(time) + b1 + b2 + b3 + b4 + (1|cluster_id),
         family = family_obj,
         data = dat
       )
@@ -241,7 +241,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
 
     # Fit GEE model
     model_it_GEE <- geepack::geeglm(
-      outcome ~ factor(period) + treatment,
+      outcome ~ factor(time) + treatment,
       data = dat,
       family = family_obj,
       id = cluster_id,
@@ -277,7 +277,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
 
     # Fit GEE model
     model_eti_GEE <- geepack::geeglm(
-      outcome ~ factor(period) + factor(exposure_time),
+      outcome ~ factor(time) + factor(exposure_time),
       data = dat,
       family = family_obj,
       id = cluster_id,

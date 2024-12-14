@@ -1,6 +1,6 @@
 #' Load and format data object
 #'
-#' @param period A character string; the name of the numeric variable representing the discrete time period of the observation.
+#' @param time A character string; the name of the numeric variable representing time. Time can be either discrete or continuous.
 #' @param cluster_id A character string; the name of the numeric variable identifying the cluster.
 #' @param individual_id A character string (optional); the name of the numeric variable identifying the individual.
 #' @param treatment A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.
@@ -13,19 +13,19 @@
 #' @export
 #'
 #' @examples
-#' load_data(period = "period", cluster_id = "id", individual_id = NULL,
+#' load_data(time = "period", cluster_id = "id", individual_id = NULL,
 #' treatment = "treatment", covariates = NULL, outcome = "y_bin",
 #' data = geeCRT::sampleSWCRTLarge)
 load_data <- function(
-    period, cluster_id, individual_id = NULL, treatment, covariates = NULL,
+    time, cluster_id, individual_id = NULL, treatment, covariates = NULL,
     outcome, time_type = "discrete", data
 ) {
 
   ########## David - work on individual_id and covariates as optional inputs ######
 
   # To prevent R CMD CHECK notes # David question
-  .covariates <- .period <- .cluster_id <- .individual_id <- first_exposure <- NULL
-  rm(.covariates,.period,.cluster_id,.individual_id,first_exposure)
+  .covariates <- .time <- .cluster_id <- .individual_id <- first_exposure <- NULL
+  rm(.covariates,.time,.cluster_id,.individual_id,first_exposure)
 
   # Input validation
   {
@@ -42,7 +42,7 @@ load_data <- function(
       ))
     }
 
-    for (arg in c("period", "cluster_id", "treatment",
+    for (arg in c("time", "cluster_id", "treatment",
                   "covariates", "individual_id", "outcome")) {
 
       var <- get(arg)
@@ -95,8 +95,8 @@ load_data <- function(
         val <- data[, var]
       }
 
-      # Validate: `period`
-      if (arg %in% c("period")) {
+      # Validate: `time`
+      if (arg %in% c("time")) {
         if (!is.numeric(val)) {
           stop(paste0("`", arg, "` must be numeric."))
         }
@@ -152,22 +152,22 @@ load_data <- function(
   dat <- cbind(
     .covariates,
     "outcome" = .outcome,
-    "period" = .period,
+    "time" = .time,
     "cluster_id" = .cluster_id,
     "individual_id" = .individual_id,
     "treatment" = .treatment,
     "time_type" = time_type
   )
 
-  # Test whether, for all observations with a particular value of cluster_id and period, the value of treatment is the same
+  # Test whether, for all observations with a particular value of cluster_id and time, the value of treatment is the same
   # If not, throw an error
-  # if (any(duplicated(dat[, c("cluster_id", "period")]) & duplicated(dat[, c("cluster_id", "period", "treatment")]))) {
-  #   stop("For each unique combination of `cluster_id` and `period`, the value of `treatment` must be the same.")
+  # if (any(duplicated(dat[, c("cluster_id", "time")]) & duplicated(dat[, c("cluster_id", "time", "treatment")]))) {
+  #   stop("For each unique combination of `cluster_id` and `time`, the value of `treatment` must be the same.")
   # }
 
   dat2 <- dat %>%
-    dplyr::distinct(cluster_id, period, treatment) %>%
-    dplyr::group_by(cluster_id, period) %>%
+    dplyr::distinct(cluster_id, time, treatment) %>%
+    dplyr::group_by(cluster_id, time) %>%
     dplyr::filter(dplyr::n() > 1)
 
   if (nrow(dat2) > 0) {
@@ -177,7 +177,7 @@ load_data <- function(
   # Handle missing values
   # Ignore everything related to covariates for now, only check necessary columns for missingness
   # Give warning if anything necessary missing (x/y records contain missing data and are being dropped)
-  dat_no_missing <- dat[stats::complete.cases(dat$outcome, dat$period, dat$cluster_id, dat$treatment), ]
+  dat_no_missing <- dat[stats::complete.cases(dat$outcome, dat$time, dat$cluster_id, dat$treatment), ]
 
   # Count number of rows dropped due to missing values
   num_dropped <- nrow(dat) - nrow(dat_no_missing)
@@ -188,20 +188,20 @@ load_data <- function(
   dat_return <- dat_no_missing %>%
     dplyr::group_by(cluster_id) %>%
     # create variable for first sw_step where each index_ward has no_we_exposure == 1
-    dplyr::mutate(first_exposure = min(period[treatment == 1])) %>%
+    dplyr::mutate(first_exposure = min(time[treatment == 1])) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure)) %>%
     dplyr::mutate(exposure_time = ifelse(treatment == 1,
-                                  period - first_exposure + 1,
+                                  time - first_exposure + 1,
                                   0)) %>%
     dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))
-  n_periods <- length(unique(dat_return$period))
+  n_times <- length(unique(dat_return$time))
   n_sequences <- length(unique(dat_return$first_exposure))
   attr(dat_return, "n_clusters") <- n_clusters
-  attr(dat_return, "n_periods") <- n_periods
+  attr(dat_return, "n_times") <- n_times
   attr(dat_return, "n_sequences") <- n_sequences
 
   class(dat_return) <- c("data.frame", "sw_dat")
@@ -215,12 +215,12 @@ load_data <- function(
       " clusters, ",
       n_sequences,
       " sequences, and ",
-      n_periods,
+      n_times,
       " time points. ",
       num_dropped,
       "/",
       num_total,
-      " rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`."
+      " rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`."
     )
   )
 

@@ -14,7 +14,7 @@ sample_data <- data.frame(
 # Test when everything is correct
 test_that("load_data works correctly", {
   result <- load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
@@ -27,12 +27,12 @@ test_that("load_data works correctly", {
 
   # Check attributes
   expect_equal(attr(result, "n_clusters"), 2)
-  expect_equal(attr(result, "n_periods"), 3)
+  expect_equal(attr(result, "n_times"), 3)
   expect_equal(attr(result, "n_sequences"), 2)
 
   # Check data content
   expect_equal(nrow(result), 18)
-  expect_equal(result$period, sample_data$period)
+  expect_equal(result$time, sample_data$period)
   expect_equal(result$treatment, sample_data$treatment)
   expect_equal(result$outcome, sample_data$y_bin)
 })
@@ -41,7 +41,7 @@ test_that("load_data works correctly", {
 test_that("load_data handles incorrect inputs correctly", {
   # Incorrect data type for `data`
   expect_error(load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
@@ -51,7 +51,7 @@ test_that("load_data handles incorrect inputs correctly", {
 
   # Incorrect `time_type`
   expect_error(load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
@@ -62,19 +62,19 @@ test_that("load_data handles incorrect inputs correctly", {
 
   # Non-existent column names
   expect_error(load_data(
-    period = "nonexistent",
+    time = "nonexistent",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
     outcome = "y_bin",
     data = sample_data
-  ), "`period` must be a character string specifying a single variable in `data`.")
+  ), "`time` must be a character string specifying a single variable in `data`.")
 
   # Incorrect type for `treatment`
   sample_data_invalid_treatment <- sample_data
   sample_data_invalid_treatment$treatment <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R")
   expect_error(load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
@@ -86,7 +86,7 @@ test_that("load_data handles incorrect inputs correctly", {
   sample_data_invalid_outcome <- sample_data
   sample_data_invalid_outcome$y_bin <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R")
   expect_error(load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
@@ -94,31 +94,31 @@ test_that("load_data handles incorrect inputs correctly", {
     data = sample_data_invalid_outcome
   ), "`outcome` must only contain numeric or binary values \\(either T/F or 1/0\\).")
 
-  # Empty string for `period`
+  # Empty string for `time`
   expect_error(load_data(
-    period = "",
+    time = "",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
     outcome = "y_bin",
     data = sample_data
-  ), "`period` must be a character string specifying a single variable in `data`.")
+  ), "`time` must be a character string specifying a single variable in `data`.")
 
-  # NULL for `period`
+  # NULL for `time`
   expect_error(load_data(
-    period = NULL,
+    time = NULL,
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
     outcome = "y_bin",
     data = sample_data
-  ), "`period` must be a character string specifying a single variable in `data`.")
+  ), "`time` must be a character string specifying a single variable in `data`.")
 
-  # More than one value of treatment within a given combination of cluster_id and period
+  # More than one value of treatment within a given combination of cluster_id and time
   sample_data_multiple_treatment_values <- sample_data
   sample_data_multiple_treatment_values[1, "treatment"] <- 1
   expect_error(load_data(
-    period = "period",
+    time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",

@@ -5,7 +5,7 @@
 \title{Load and format data object}
 \usage{
 load_data(
-  period,
+  time,
   cluster_id,
   individual_id = NULL,
   treatment,
@@ -16,7 +16,7 @@ load_data(
 )
 }
 \arguments{
-\item{period}{A character string; the name of the numeric variable representing the discrete time period of the observation.}
+\item{time}{A character string; the name of the numeric variable representing time. Time can be either discrete or continuous.}
 
 \item{cluster_id}{A character string; the name of the numeric variable identifying the cluster.}
 
@@ -39,7 +39,7 @@ An object of class \code{sw_data}
 Load and format data object
 }
 \examples{
-load_data(period = "period", cluster_id = "id", individual_id = NULL,
+load_data(time = "period", cluster_id = "id", individual_id = NULL,
 treatment = "treatment", covariates = NULL, outcome = "y_bin",
 data = geeCRT::sampleSWCRTLarge)
 }

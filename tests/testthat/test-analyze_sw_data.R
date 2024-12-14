@@ -9,7 +9,7 @@ sample_data <- data.frame(
   dplyr::arrange(cluster_id)
 
 sw_data <- load_data(
-  period = "period",
+  time = "period",
   cluster_id = "cluster_id",
   individual_id = "individual_id",
   treatment = "treatment",

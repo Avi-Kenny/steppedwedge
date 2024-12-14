@@ -28,7 +28,7 @@ data(sw_data_example)
 head(sw_data_example)
 
 dat <- load_data(
-  period = "period",
+  time = "period",
   cluster_id = "cluster",
   individual_id = NULL,
   treatment = "trt",

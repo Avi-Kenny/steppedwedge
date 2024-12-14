@@ -9,7 +9,7 @@ sample_data <- data.frame(
   dplyr::arrange(cluster_id)
 
 sw_data <- load_data(
-  period = "period",
+  time = "period",
   cluster_id = "cluster_id",
   individual_id = "individual_id",
   treatment = "treatment",
@@ -34,7 +34,7 @@ test_that("plot_design calculates correct number of clusters", {
 
 test_that("plot_design calculates correct number of periods", {
   result <- plot_design(sw_data)
-  expect_equal(result$num_periods, length(unique(sample_data$period)))
+  expect_equal(result$num_times, length(unique(sample_data$period)))
 })
 
 # Returns correct number of sequences
@@ -50,8 +50,8 @@ test_that("plot_design returns correct summary", {
   result <- plot_design(sw_data)
   expected_summary <- summary(sw_data %>%
                                 data.frame() %>%
-                                dplyr::select(cluster_id, period, treatment) %>%
-                                dplyr::group_by(cluster_id, period) %>%
+                                dplyr::select(cluster_id, time, treatment) %>%
+                                dplyr::group_by(cluster_id, time) %>%
                                 dplyr::mutate(n = dplyr::n()) %>%
                                 dplyr::distinct())
   expect_equal(result$summary, expected_summary)
