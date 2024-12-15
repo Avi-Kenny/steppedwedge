@@ -30,7 +30,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
   if (!all(re %in% c("clust", "time", "ind", "tx"))) {
     stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
   }
-  ### Add more input validation
 
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
 
@@ -68,12 +67,10 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
   # Parse formula terms for random effects
   f_re <- ""
-  # c("clust", "time", "ind", "tx")
   if ("clust" %in% re) {
     f_re <- paste0(f_re, "(1|cluster_id) + ")
   }
   if ("time" %in% re) {
-    # continue here
     dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
     f_re <- paste0(f_re, "(1|ij) + ")
   }
@@ -107,8 +104,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
-    # te_ci_lower <- te_est + c(-1.96) * te_se
-    # te_ci_upper <- te_est + c(1.96) * te_se
 
     results <- list(
       model = model_it_mixed,
@@ -118,8 +113,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       te_se = te_se,
       te_ci = te_ci,
       converged = performance::check_convergence(model_it_mixed)[1]
-      # te_ci_lower = te_ci_lower,
-      # te_ci_upper = te_ci_upper
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -151,8 +144,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     if(estimand == "TATE") {
 
-      # Estimate the TATE (using
-      #     matrix multiplication)
+      # Estimate the TATE
       M <- matrix(rep(1/index_max), index_max, nrow=1)
       tate_est <- (M %*% coeffs)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
@@ -217,7 +209,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     summary_ncs <- summary(model_ncs_mixed)
 
     # Specify the indices corresponding to the spline terms
-    # indices <- c(8:11)
     indices <- grep("^b[0-9]+$", rownames(summary_ncs$coefficients))
     index_max <- length(indices)
 
@@ -300,8 +291,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
-    # te_ci_lower <- te_est + c(-1.96) * te_se
-    # te_ci_upper <- te_est + c(1.96) * te_se
 
     results <- list(
       model = model_it_GEE,
@@ -310,8 +299,6 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci
-      # te_ci_lower = te_ci_lower,
-      # te_ci_upper = te_ci_upper
     )
   } else if(method == "GEE" & exp_time == "ETI") {
 
@@ -343,8 +330,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     if(estimand == "TATE") {
 
-      # Estimate the TATE (equivalent calculation using
-      #     matrix multiplication)
+      # Estimate the TATE
       M <- matrix(rep(1/index_max), index_max, nrow=1)
       tate_est <- (M %*% coeffs)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
