@@ -59,7 +59,7 @@ analysis_1 <- analyze(
   dat = dat,
   method = "mixed",
   estimand = "TATE", 
-  time_varying_assumption = "IT",
+  exp_time = "IT",
   family = "binomial",
   link = "logit")
 
@@ -76,7 +76,7 @@ analysis_2 <- analyze(
   dat = dat,
   method = "GEE",
   estimand = "TATE", 
-  time_varying_assumption = "IT",
+  exp_time = "IT",
   family = "binomial",
   link = "logit")
 
@@ -93,7 +93,7 @@ analysis_3 <- analyze(
   dat = dat,
   method = "mixed",
   estimand = "TATE", 
-  time_varying_assumption = "ETI",
+  exp_time = "ETI",
   family = "binomial",
   link = "logit")
 

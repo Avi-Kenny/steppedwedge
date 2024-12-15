@@ -3,7 +3,7 @@
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
-#' @param time_varying_assumption A character string; either "IT" for immediate treatment effect, "ETI", for Exposure time indicator, or "NCS", for Natural cubic spline.
+#' @param exp_time Model for exposure time; one of c("IT", "ETI", "NCS"). "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.
 #' @param family A character string; see documentation for `glm()`.
 #' @param link A character string; see documentation for `glm()`.
 #' @param corstr A character string; see documentation for `geepack::geeglm()`.
@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' # TO DO
-analyze <- function(dat, method, estimand, time_varying_assumption, family,
+analyze <- function(dat, method, estimand, exp_time, family,
                     link, corstr = "exchangeable") {
 
   cluster_id <- NULL
@@ -29,7 +29,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
   family_obj <- get(family)(link = link)
 
 
-  if(method == "mixed" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
+  if(method == "mixed" & estimand %in% c("TATE", "LTE") & exp_time == "IT") {
 
     ################################################.
     ##### Immediate Treatment (IT) mixed model #####
@@ -71,7 +71,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
       # te_ci_lower = te_ci_lower,
       # te_ci_upper = te_ci_upper
     )
-  } else if(method == "mixed" & time_varying_assumption == "ETI") {
+  } else if(method == "mixed" & exp_time == "ETI") {
 
 
     #####################################################.
@@ -145,7 +145,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
 
     }
 
-  } else if(method == "mixed" & time_varying_assumption == "NCS") {
+  } else if(method == "mixed" & exp_time == "NCS") {
 
 
     ############################################.
@@ -236,7 +236,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
     # # Estimate the effect curve
     # curve_ncs <- c(0, coeffs_trans)
 
-  } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & time_varying_assumption == "IT") {
+  } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & exp_time == "IT") {
 
 
     ##############################################.
@@ -273,7 +273,7 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
       # te_ci_lower = te_ci_lower,
       # te_ci_upper = te_ci_upper
     )
-  } else if(method == "GEE" & time_varying_assumption == "ETI") {
+  } else if(method == "GEE" & exp_time == "ETI") {
 
 
     ###################################################.
