@@ -66,7 +66,8 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
       estimand = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
-      te_ci = te_ci
+      te_ci = te_ci,
+      converged = performance::check_convergence(model_it_mixed)[1]
       # te_ci_lower = te_ci_lower,
       # te_ci_upper = te_ci_upper
     )
@@ -118,7 +119,8 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
-        te_ci = tate_ci
+        te_ci = tate_ci,
+        converged = performance::check_convergence(model_eti_mixed)[1]
       )
 
     } else if(estimand == "LTE") {
@@ -134,7 +136,8 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,
-        te_ci = lte_ci
+        te_ci = lte_ci,
+        converged = performance::check_convergence(model_eti_mixed)[1]
       )
       #
       # # Estimate the effect curve
@@ -207,7 +210,8 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
         estimand = "TATE",
         te_est = tate_est,
         te_se = tate_se,
-        te_ci = tate_ci
+        te_ci = tate_ci,
+        converged = performance::check_convergence(model_ncs_mixed)[1]
       )
     } else if(estimand == "LTE") {
 
@@ -222,7 +226,8 @@ analyze <- function(dat, method, estimand, time_varying_assumption, family,
         estimand = "LTE",
         te_est = lte_est,
         te_se = lte_se,
-        te_ci = lte_ci
+        te_ci = lte_ci,
+        converged = performance::check_convergence(model_ncs_mixed)[1]
       )
     }
 
