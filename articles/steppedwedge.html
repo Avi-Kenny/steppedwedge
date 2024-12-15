@@ -84,7 +84,7 @@ data object that can be accepted by the <code>plot_design</code> and
 <span><span class="co">#&gt; 6       1      1   0           0   -0.8456510</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
-<span>  period <span class="op">=</span> <span class="st">"period"</span>,</span>
+<span>  time <span class="op">=</span> <span class="st">"period"</span>,</span>
 <span>  cluster_id <span class="op">=</span> <span class="st">"cluster"</span>,</span>
 <span>  individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  treatment <span class="op">=</span> <span class="st">"trt"</span>,</span>
@@ -92,7 +92,7 @@ data object that can be accepted by the <code>plot_design</code> and
 <span>  outcome <span class="op">=</span> <span class="st">"outcome_bin"</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points. 0/2011 rows were dropped due to missing values for `cluster_id`, `period`, `treatment`, or `outcome`.</span></span></code></pre></div>
+<span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points. 0/2011 rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`.</span></span></code></pre></div>
 <p>The <code>plot_design</code> function produces a diagram of the
 stepped wedge design and a summary of the variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -103,14 +103,14 @@ stepped wedge design and a summary of the variables.</p>
 <span><span class="co">#&gt; $num_clusters</span></span>
 <span><span class="co">#&gt; [1] 15</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $num_periods</span></span>
+<span><span class="co">#&gt; $num_times</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $num_sequences</span></span>
 <span><span class="co">#&gt; [1] 5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $summary</span></span>
-<span><span class="co">#&gt;    cluster_id     period      treatment         n        </span></span>
+<span><span class="co">#&gt;    cluster_id      time       treatment         n        </span></span>
 <span><span class="co">#&gt;  1      : 6   Min.   :1.0   Min.   :0.0   Min.   :15.00  </span></span>
 <span><span class="co">#&gt;  2      : 6   1st Qu.:2.0   1st Qu.:0.0   1st Qu.:19.25  </span></span>
 <span><span class="co">#&gt;  3      : 6   Median :3.5   Median :0.5   Median :22.00  </span></span>
@@ -142,7 +142,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
 <span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(period) + treatment + (1 | cluster_id)</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) + treatment + (1 | cluster_id)</span></span>
 <span><span class="co">#&gt;    Data: dat</span></span>
 <span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
 <span><span class="co">#&gt;  2054.801  2099.652 -1019.401  2038.801      2003 </span></span>
@@ -151,10 +151,10 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt;  cluster_id (Intercept) 0       </span></span>
 <span><span class="co">#&gt; Number of obs: 2011, groups:  cluster_id, 15</span></span>
 <span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt;     (Intercept)  factor(period)2  factor(period)3  factor(period)4  </span></span>
-<span><span class="co">#&gt;        -1.31117          0.07874          0.15508          0.09773  </span></span>
-<span><span class="co">#&gt; factor(period)5  factor(period)6        treatment  </span></span>
-<span><span class="co">#&gt;        -0.13764          0.11375         -0.19690  </span></span>
+<span><span class="co">#&gt;   (Intercept)  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
+<span><span class="co">#&gt;      -1.31117        0.07874        0.15508        0.09773       -0.13764  </span></span>
+<span><span class="co">#&gt; factor(time)6      treatment  </span></span>
+<span><span class="co">#&gt;       0.11375       -0.19690  </span></span>
 <span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model_type</span></span>
@@ -186,14 +186,14 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; $model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; geepack::geeglm(formula = outcome ~ factor(period) + treatment, </span></span>
+<span><span class="co">#&gt; geepack::geeglm(formula = outcome ~ factor(time) + treatment, </span></span>
 <span><span class="co">#&gt;     family = family_obj, data = dat, id = cluster_id, corstr = corstr)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;     (Intercept) factor(period)2 factor(period)3 factor(period)4 factor(period)5 </span></span>
-<span><span class="co">#&gt;     -1.30124846      0.05519872      0.14804502      0.07418674     -0.15673203 </span></span>
-<span><span class="co">#&gt; factor(period)6       treatment </span></span>
-<span><span class="co">#&gt;      0.12102708     -0.20139810 </span></span>
+<span><span class="co">#&gt;   (Intercept) factor(time)2 factor(time)3 factor(time)4 factor(time)5 </span></span>
+<span><span class="co">#&gt;   -1.30124846    0.05519872    0.14804502    0.07418674   -0.15673203 </span></span>
+<span><span class="co">#&gt; factor(time)6     treatment </span></span>
+<span><span class="co">#&gt;    0.12102708   -0.20139810 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Degrees of Freedom: 2011 Total (i.e. Null);  2004 Residual</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -240,7 +240,7 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
 <span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(period) + factor(exposure_time) + (1 | cluster_id)</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) + factor(exposure_time) + (1 | cluster_id)</span></span>
 <span><span class="co">#&gt;    Data: dat</span></span>
 <span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
 <span><span class="co">#&gt;  2057.742  2125.019 -1016.871  2033.742      1999 </span></span>
@@ -249,9 +249,9 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span><span class="co">#&gt;  cluster_id (Intercept) 1.025e-07</span></span>
 <span><span class="co">#&gt; Number of obs: 2011, groups:  cluster_id, 15</span></span>
 <span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt;            (Intercept)         factor(period)2         factor(period)3  </span></span>
+<span><span class="co">#&gt;            (Intercept)           factor(time)2           factor(time)3  </span></span>
 <span><span class="co">#&gt;               -1.31117                 0.08613                 0.19082  </span></span>
-<span><span class="co">#&gt;        factor(period)4         factor(period)5         factor(period)6  </span></span>
+<span><span class="co">#&gt;          factor(time)4           factor(time)5           factor(time)6  </span></span>
 <span><span class="co">#&gt;                0.04589                -0.17506                 0.14254  </span></span>
 <span><span class="co">#&gt; factor(exposure_time)1  factor(exposure_time)2  factor(exposure_time)3  </span></span>
 <span><span class="co">#&gt;               -0.24845                -0.32298                 0.15013  </span></span>
