@@ -11,6 +11,7 @@ analyze(
   exp_time = "IT",
   cal_time = "categorical",
   family,
+  re = c("clust", "time"),
   corstr = "exchangeable"
 )
 }
@@ -26,6 +27,8 @@ analyze(
 \item{cal_time}{One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.}
 
 \item{family}{A family object; see documentation for `glm()`.}
+
+\item{re}{A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)}
 
 \item{corstr}{A character string; see documentation for `geepack::geeglm()`.}
 }

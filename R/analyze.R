@@ -6,7 +6,8 @@
 #' @param exp_time One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.
 #' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
 #' @param family A family object; see documentation for `glm()`.
-#' @param corstr A character string; see documentation for `geepack::geeglm()`.
+#' @param re A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)
+#' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant if method="mixed" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.
 #'
 #' @return A list with ___
 #' @export
@@ -14,7 +15,8 @@
 #' @examples
 #' # TO DO
 analyze <- function(dat, method="mixed", estimand, exp_time="IT",
-                    cal_time="categorical", family, corstr = "exchangeable") {
+                    cal_time="categorical", family, re=c("clust", "time"),
+                    corstr="exchangeable") {
 
   cluster_id <- NULL
   rm(cluster_id)
@@ -24,6 +26,9 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
   }
   if (!(exp_time %in% c("IT", "ETI", "NCS"))) {
     stop("`exp_time` misspecified.")
+  }
+  if (!all(re %in% c("clust", "time", "ind", "tx"))) {
+    stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
   }
   ### Add more input validation
 
@@ -35,7 +40,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
   }
   if (is.function(family)) { family <- family() }
 
-  # Formula term for calendar time
+  # Parse formula terms for calendar time
   if (cal_time=="categorical") {
     f_cal <- "factor(time) - 1 + "
   } else if (cal_time=="linear") {
@@ -59,6 +64,24 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     f_cal <- "j_1 + j_2 + j_3 + j_4 + "
 
+  }
+
+  # Parse formula terms for random effects
+  f_re <- ""
+  # c("clust", "time", "ind", "tx")
+  if ("clust" %in% re) {
+    f_re <- paste0(f_re, "(1|cluster_id) + ")
+  }
+  if ("time" %in% re) {
+    # continue here
+    dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
+    f_re <- paste0(f_re, "(1|ij) + ")
+  }
+  if ("ind" %in% re) {
+    f_re <- paste0(f_re, "(1|individual_id) + ")
+  }
+  if ("tx" %in% re) {
+    stop("Random treatment effects not yet implemented")
   }
 
   if(method == "mixed" & estimand %in% c("TATE", "LTE") & exp_time == "IT") {

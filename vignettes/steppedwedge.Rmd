@@ -60,8 +60,7 @@ analysis_1 <- analyze(
   method = "mixed",
   estimand = "TATE", 
   exp_time = "IT",
-  family = "binomial",
-  link = "logit")
+  family = "binomial")
 
 print(analysis_1)
 
