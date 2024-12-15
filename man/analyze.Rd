@@ -10,7 +10,7 @@ analyze(
   estimand,
   exp_time = "IT",
   cal_time = "categorical",
-  family,
+  family = gaussian,
   re = c("clust", "time"),
   corstr = "exchangeable"
 )
@@ -30,7 +30,7 @@ analyze(
 
 \item{re}{A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)}
 
-\item{corstr}{A character string; see documentation for `geepack::geeglm()`.}
+\item{corstr}{One of c("independence", "exchangeable", "ar1"); only relevant if method="mixed" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.}
 }
 \value{
 A list with ___

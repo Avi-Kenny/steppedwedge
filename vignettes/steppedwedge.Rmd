@@ -15,7 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+
 library(steppedwedge)
+
 ```
 
 
@@ -24,7 +26,6 @@ The `load_data` function takes in raw data and creates a data object that can be
 ```{r}
 
 data(sw_data_example)
-
 head(sw_data_example)
 
 dat <- load_data(
@@ -46,7 +47,7 @@ The `plot_design` function produces a diagram of the stepped wedge design and a 
 
 plot_dat <- plot_design(dat)
 
-plot_dat
+print(plot_dat)
 
 ```
 
@@ -60,7 +61,8 @@ analysis_1 <- analyze(
   method = "mixed",
   estimand = "TATE", 
   exp_time = "IT",
-  family = "binomial")
+  family = binomial
+)
 
 print(analysis_1)
 
@@ -76,8 +78,9 @@ analysis_2 <- analyze(
   method = "GEE",
   estimand = "TATE", 
   exp_time = "IT",
-  family = "binomial",
-  link = "logit")
+  family = binomial,
+  corstr = "exchangeable"
+)
 
 print(analysis_2)
 
@@ -93,8 +96,8 @@ analysis_3 <- analyze(
   method = "mixed",
   estimand = "TATE", 
   exp_time = "ETI",
-  family = "binomial",
-  link = "logit")
+  family = binomial
+)
 
 print(analysis_3)
 
