@@ -6,12 +6,11 @@
 \usage{
 analyze(
   dat,
-  method,
+  method = "mixed",
   estimand,
   exp_time = "IT",
   cal_time = "categorical",
   family,
-  link,
   corstr = "exchangeable"
 )
 }
@@ -22,13 +21,11 @@ analyze(
 
 \item{estimand}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
 
-\item{exp_time}{Model for exposure time; one of c("IT", "ETI", "NCS"). "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.}
+\item{exp_time}{One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.}
 
-\item{cal_time}{Model for calendar time; one of c("categorical", "NCS", "linear", "none"). "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.}
+\item{cal_time}{One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.}
 
-\item{family}{A character string; see documentation for `glm()`.}
-
-\item{link}{A character string; see documentation for `glm()`.}
+\item{family}{A family object; see documentation for `glm()`.}
 
 \item{corstr}{A character string; see documentation for `geepack::geeglm()`.}
 }

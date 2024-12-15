@@ -3,10 +3,9 @@
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
-#' @param exp_time Model for exposure time; one of c("IT", "ETI", "NCS"). "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.
-#' @param cal_time Model for calendar time; one of c("categorical", "NCS", "linear", "none"). "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
-#' @param family A character string; see documentation for `glm()`.
-#' @param link A character string; see documentation for `glm()`.
+#' @param exp_time One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.
+#' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
+#' @param family A family object; see documentation for `glm()`.
 #' @param corstr A character string; see documentation for `geepack::geeglm()`.
 #'
 #' @return A list with ___
@@ -14,22 +13,31 @@
 #'
 #' @examples
 #' # TO DO
-analyze <- function(dat, method, estimand, exp_time="IT",
-                    cal_time="categorical", family, link, corstr = "exchangeable") {
+analyze <- function(dat, method="mixed", estimand, exp_time="IT",
+                    cal_time="categorical", family, corstr = "exchangeable") {
 
   cluster_id <- NULL
   rm(cluster_id)
 
-  ### Add input validation
+  if (!(cal_time %in% c("categorical", "NCS", "linear", "none"))) {
+    stop("`cal_time` misspecified.")
+  }
+  if (!(exp_time %in% c("IT", "ETI", "NCS"))) {
+    stop("`exp_time` misspecified.")
+  }
+  ### Add more input validation
 
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
 
   # call appropriate family function with chosen link to create family object
-  family_obj <- get(family)(link = link)
+  if (is.character(family)) {
+    family <- get(family, mode="function", envir=parent.frame())
+  }
+  if (is.function(family)) { family <- family() }
 
   # Formula term for calendar time
   if (cal_time=="categorical") {
-    f_cal <- "factor(time) + "
+    f_cal <- "factor(time) - 1 + "
   } else if (cal_time=="linear") {
     f_cal <- "time + "
   } else if (cal_time=="none") {
@@ -60,12 +68,12 @@ analyze <- function(dat, method, estimand, exp_time="IT",
     ################################################.
 
     # Fit mixed model
-    if(family == "gaussian" & link == "identity") {
+    if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "treatment + (1|cluster_id)")
       model_it_mixed <- lme4::lmer(formula, data=dat)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "treatment + (1|cluster_id)")
-      model_it_mixed <- lme4::glmer(formula, family=family_obj, data=dat)
+      model_it_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
     summary_it <- summary(model_it_mixed)
@@ -98,12 +106,12 @@ analyze <- function(dat, method, estimand, exp_time="IT",
     #####################################################.
 
     # Fit mixed model
-    if(family == "gaussian" & link == "identity") {
+    if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time) + (1|cluster_id)")
       model_eti_mixed <- lme4::lmer(formula, data=dat)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time) + (1|cluster_id)")
-      model_eti_mixed <- lme4::glmer(formula, family=family_obj, data=dat)
+      model_eti_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
     summary_eti <- summary(model_eti_mixed)
@@ -175,13 +183,12 @@ analyze <- function(dat, method, estimand, exp_time="IT",
     dat$b4 <- ns_basis[dat$exposure_time+1,4]
 
     # Fit mixed model
-    if(family == "gaussian" & link == "identity") {
+    if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4 + (1|cluster_id)")
       model_ncs_mixed <- lme4::lmer(formula, data=dat)
-      # summary(model_ncs_mixed)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4 + (1|cluster_id)")
-      model_ncs_mixed <- lme4::glmer(formula, family=family_obj, data=dat)
+      model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
     summary_ncs <- summary(model_ncs_mixed)
@@ -258,7 +265,7 @@ analyze <- function(dat, method, estimand, exp_time="IT",
     model_it_GEE <- geepack::geeglm(
       formula,
       data = dat,
-      family = family_obj,
+      family = family,
       id = cluster_id,
       corstr = corstr
     )
@@ -295,7 +302,7 @@ analyze <- function(dat, method, estimand, exp_time="IT",
     model_eti_GEE <- geepack::geeglm(
       formula,
       data = dat,
-      family = family_obj,
+      family = family,
       id = cluster_id,
       corstr = corstr
     )
