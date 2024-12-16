@@ -99,25 +99,6 @@ stepped wedge design and a summary of the variables.</p>
 <span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_design.html">plot_design</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_dat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $num_clusters</span></span>
-<span><span class="co">#&gt; [1] 15</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $num_times</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $num_sequences</span></span>
-<span><span class="co">#&gt; [1] 5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $summary</span></span>
-<span><span class="co">#&gt;    cluster_id      time       treatment         n        </span></span>
-<span><span class="co">#&gt;  1      : 6   Min.   :1.0   Min.   :0.0   Min.   :15.00  </span></span>
-<span><span class="co">#&gt;  2      : 6   1st Qu.:2.0   1st Qu.:0.0   1st Qu.:19.25  </span></span>
-<span><span class="co">#&gt;  3      : 6   Median :3.5   Median :0.5   Median :22.00  </span></span>
-<span><span class="co">#&gt;  4      : 6   Mean   :3.5   Mean   :0.5   Mean   :22.34  </span></span>
-<span><span class="co">#&gt;  5      : 6   3rd Qu.:5.0   3rd Qu.:1.0   3rd Qu.:26.00  </span></span>
-<span><span class="co">#&gt;  6      : 6   Max.   :6.0   Max.   :1.0   Max.   :30.00  </span></span>
-<span><span class="co">#&gt;  (Other):54                                              </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $design_plot</span></span></code></pre></div>
 <p><img src="steppedwedge_files/figure-html/unnamed-chunk-3-1.png" width="864" style="display: block; margin: auto;"></p>
 <p>The <code>analyze</code> function analyzes the stepped wedge data.
@@ -189,7 +170,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; $model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; geepack::geeglm(formula = as.formula(formula), family = family, </span></span>
+<span><span class="co">#&gt; geepack::geeglm(formula = stats::as.formula(formula), family = family, </span></span>
 <span><span class="co">#&gt;     data = dat, id = cluster_id, corstr = corstr)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
