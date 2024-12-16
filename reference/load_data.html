@@ -43,7 +43,6 @@
 <span>  <span class="va">cluster_id</span>,</span>
 <span>  individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">treatment</span>,</span>
-<span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">outcome</span>,</span>
 <span>  time_type <span class="op">=</span> <span class="st">"discrete"</span>,</span>
 <span>  <span class="va">data</span></span>
@@ -70,10 +69,6 @@
 <dd><p>A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.</p></dd>
 
 
-<dt id="arg-covariates">covariates<a class="anchor" aria-label="anchor" href="#arg-covariates"></a></dt>
-<dd><p>A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.</p></dd>
-
-
 <dt id="arg-outcome">outcome<a class="anchor" aria-label="anchor" href="#arg-outcome"></a></dt>
 <dd><p>A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.</p></dd>
 
@@ -94,7 +89,7 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">load_data</span><span class="op">(</span>time <span class="op">=</span> <span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"id"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>treatment <span class="op">=</span> <span class="st">"treatment"</span>, covariates <span class="op">=</span> <span class="cn">NULL</span>, outcome <span class="op">=</span> <span class="st">"y_bin"</span>,</span></span>
+<span class="r-in"><span>treatment <span class="op">=</span> <span class="st">"treatment"</span>, outcome <span class="op">=</span> <span class="st">"y_bin"</span>,</span></span>
 <span class="r-in"><span>data <span class="op">=</span> <span class="fu">geeCRT</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/geeCRT/man/sampleSWCRTLarge.html" class="external-link">sampleSWCRTLarge</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Stepped wedge dataset loaded. Discrete time design with 12 clusters, 4 sequences, and 5 time points. 0/1508 rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      outcome time cluster_id treatment time_type first_exposure exposure_time</span>
