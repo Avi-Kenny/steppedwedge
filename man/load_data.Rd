@@ -9,7 +9,6 @@ load_data(
   cluster_id,
   individual_id = NULL,
   treatment,
-  covariates = NULL,
   outcome,
   time_type = "discrete",
   data
@@ -23,8 +22,6 @@ load_data(
 \item{individual_id}{A character string (optional); the name of the numeric variable identifying the individual.}
 
 \item{treatment}{A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.}
-
-\item{covariates}{A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.}
 
 \item{outcome}{A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.}
 
@@ -40,6 +37,6 @@ Load and format data object
 }
 \examples{
 load_data(time = "period", cluster_id = "id", individual_id = NULL,
-treatment = "treatment", covariates = NULL, outcome = "y_bin",
+treatment = "treatment", outcome = "y_bin",
 data = geeCRT::sampleSWCRTLarge)
 }

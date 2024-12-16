@@ -10,7 +10,7 @@ plot_design(dat)
 \item{dat}{A dataframe containing the stepped wedge trial data.}
 }
 \value{
-A list with the number of clusters, number of periods, a summary of the data, and a plot of the stepped wedge design.
+A list with the number of clusters, number of time points, a summary of the data, and a plot of the stepped wedge design.
 }
 \description{
 Plot stepped wedge design
