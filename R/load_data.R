@@ -77,7 +77,7 @@ load_data <- function(
 
       # Assign column(s) to val
       val <- data[, var]
-      
+
       # Validate: `time`
       if (arg %in% c("time")) {
         if (!is.numeric(val)) {
@@ -124,7 +124,7 @@ load_data <- function(
 
 
   # Create data object
-  dat <- cbind(
+  dat <- data.frame(
     "outcome" = .outcome,
     "time" = .time,
     "cluster_id" = .cluster_id,
