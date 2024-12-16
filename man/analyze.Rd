@@ -10,7 +10,7 @@ analyze(
   estimand,
   exp_time = "IT",
   cal_time = "categorical",
-  family = gaussian,
+  family = stats::gaussian,
   re = c("clust", "time"),
   corstr = "exchangeable"
 )

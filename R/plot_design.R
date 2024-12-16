@@ -54,9 +54,5 @@ plot_design <- function(dat)
     # move legend to bottom
     ggplot2::theme(legend.position = "bottom")
 
-  return(list(num_clusters = num_clusters,
-              num_times = num_times,
-              num_sequences = num_sequences,
-              summary = summary,
-              design_plot = design_plot))
+  return(list(design_plot = design_plot))
 }

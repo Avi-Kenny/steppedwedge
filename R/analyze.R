@@ -15,7 +15,7 @@
 #' @examples
 #' # TO DO
 analyze <- function(dat, method="mixed", estimand, exp_time="IT",
-                    cal_time="categorical", family=gaussian,
+                    cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable") {
 
   cluster_id <- NULL
@@ -277,7 +277,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     # Fit GEE model
     formula <- paste0("outcome ~ ", f_cal, "treatment")
     model_it_GEE <- geepack::geeglm(
-      as.formula(formula),
+      stats::as.formula(formula),
       data = dat,
       family = family,
       id = cluster_id,
@@ -310,7 +310,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     # Fit GEE model
     formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time)")
     model_eti_GEE <- geepack::geeglm(
-      as.formula(formula),
+      stats::as.formula(formula),
       data = dat,
       family = family,
       id = cluster_id,
