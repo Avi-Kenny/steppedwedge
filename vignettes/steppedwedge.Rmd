@@ -33,7 +33,6 @@ dat <- load_data(
   cluster_id = "cluster",
   individual_id = NULL,
   treatment = "trt",
-  covariates = NULL,
   outcome = "outcome_bin",
   data = sw_data_example
 )

@@ -4,7 +4,6 @@
 #' @param cluster_id A character string; the name of the numeric variable identifying the cluster.
 #' @param individual_id A character string (optional); the name of the numeric variable identifying the individual.
 #' @param treatment A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.
-#' @param covariates A character vector; the names of the covariate columns. Columns values should be either numeric, binary, or factors. Character columns will be converted into factors.
 #' @param outcome A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.
 #' @param data A dataframe containing the stepped wedge trial data.
 #' @param time_type A character string describing how time is accounted for: 'discrete' (default) or 'continuous'
@@ -14,18 +13,18 @@
 #'
 #' @examples
 #' load_data(time = "period", cluster_id = "id", individual_id = NULL,
-#' treatment = "treatment", covariates = NULL, outcome = "y_bin",
+#' treatment = "treatment", outcome = "y_bin",
 #' data = geeCRT::sampleSWCRTLarge)
 load_data <- function(
-    time, cluster_id, individual_id = NULL, treatment, covariates = NULL,
+    time, cluster_id, individual_id = NULL, treatment,
     outcome, time_type = "discrete", data
 ) {
 
-  ########## David - work on individual_id and covariates as optional inputs ######
+  ########## David - work on individual_id as optional inputs ######
 
   # To prevent R CMD CHECK notes # David question
-  .covariates <- .time <- .cluster_id <- .individual_id <- first_exposure <- NULL
-  rm(.covariates,.time,.cluster_id,.individual_id,first_exposure)
+  .time <- .cluster_id <- .individual_id <- first_exposure <- NULL
+  rm(.time,.cluster_id,.individual_id,first_exposure)
 
   # Input validation
   {
@@ -43,7 +42,7 @@ load_data <- function(
     }
 
     for (arg in c("time", "cluster_id", "treatment",
-                  "covariates", "individual_id", "outcome")) {
+                  "individual_id", "outcome")) {
 
       var <- get(arg)
 
@@ -52,18 +51,7 @@ load_data <- function(
       is_string <- methods::is(var, "character")
       length_one <- as.logical(length(var) == 1)
       in_df <- all(as.logical(var %in% names(data)))
-      if (arg == "covariates") {
-        if (!is.null(covariates) && !(is_string && in_df)) {
-          stop(
-            paste0(
-              "`",
-              arg,
-              "` must be a vector of character strings spe",
-              "cifying one or more variables in `data`."
-            )
-          )
-        }
-      } else if (arg == "individual_id") {
+      if (arg == "individual_id") {
         if (!is.null(individual_id) && !(is_string && length_one && in_df)) {
           stop(
             paste0(
@@ -88,13 +76,8 @@ load_data <- function(
       }
 
       # Assign column(s) to val
-      if (arg == "covariates") {
-        val <- data[, var, drop = F]
-        val2 <- list()
-      } else {
-        val <- data[, var]
-      }
-
+      val <- data[, var]
+      
       # Validate: `time`
       if (arg %in% c("time")) {
         if (!is.numeric(val)) {
@@ -140,17 +123,8 @@ load_data <- function(
   .treatment <- as.integer(.treatment)
 
 
-  .dim_x <- length(.covariates)
-
-
-  # David question - do we want to rename covariates?
-  # Rename covariate dataframe to c("x1", "x2", ...)
-  # names(.covariates) <- paste0("x", c(1:.dim_x))
-
-
   # Create data object
   dat <- cbind(
-    .covariates,
     "outcome" = .outcome,
     "time" = .time,
     "cluster_id" = .cluster_id,
