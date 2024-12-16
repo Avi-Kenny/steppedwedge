@@ -40,11 +40,12 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">analyze</span><span class="op">(</span></span>
 <span>  <span class="va">dat</span>,</span>
-<span>  <span class="va">method</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  <span class="va">estimand</span>,</span>
-<span>  <span class="va">time_varying_assumption</span>,</span>
-<span>  <span class="va">family</span>,</span>
-<span>  <span class="va">link</span>,</span>
+<span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  cal_time <span class="op">=</span> <span class="st">"categorical"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">gaussian</span>,</span>
+<span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span>,</span>
 <span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -65,20 +66,24 @@
 <dd><p>A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.</p></dd>
 
 
-<dt id="arg-time-varying-assumption">time_varying_assumption<a class="anchor" aria-label="anchor" href="#arg-time-varying-assumption"></a></dt>
-<dd><p>A character string; either "IT" for immediate treatment effect, "ETI", for Exposure time indicator, or "NCS", for Natural cubic spline.</p></dd>
+<dt id="arg-exp-time">exp_time<a class="anchor" aria-label="anchor" href="#arg-exp-time"></a></dt>
+<dd><p>One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.</p></dd>
+
+
+<dt id="arg-cal-time">cal_time<a class="anchor" aria-label="anchor" href="#arg-cal-time"></a></dt>
+<dd><p>One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.</p></dd>
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>A character string; see documentation for `glm()`.</p></dd>
+<dd><p>A family object; see documentation for `glm()`.</p></dd>
 
 
-<dt id="arg-link">link<a class="anchor" aria-label="anchor" href="#arg-link"></a></dt>
-<dd><p>A character string; see documentation for `glm()`.</p></dd>
+<dt id="arg-re">re<a class="anchor" aria-label="anchor" href="#arg-re"></a></dt>
+<dd><p>A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)</p></dd>
 
 
 <dt id="arg-corstr">corstr<a class="anchor" aria-label="anchor" href="#arg-corstr"></a></dt>
-<dd><p>A character string; see documentation for `geepack::geeglm()`.</p></dd>
+<dd><p>One of c("independence", "exchangeable", "ar1"); only relevant if method="mixed" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.</p></dd>
 
 </dl></div>
     <div class="section level2">

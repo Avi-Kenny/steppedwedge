@@ -65,7 +65,8 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://avi-kenny.github.io/steppedwedge/">steppedwedge</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://avi-kenny.github.io/steppedwedge/">steppedwedge</a></span><span class="op">)</span></span></code></pre></div>
 <p>The <code>load_data</code> function takes in raw data and creates a
 data object that can be accepted by the <code>plot_design</code> and
 <code>analyze</code> functions. We use the made-up dataframe
@@ -73,7 +74,6 @@ data object that can be accepted by the <code>plot_design</code> and
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   cluster period trt outcome_bin outcome_cont</span></span>
 <span><span class="co">#&gt; 1       1      1   0           0    2.0629668</span></span>
@@ -98,7 +98,7 @@ stepped wedge design and a summary of the variables.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_design.html">plot_design</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">plot_dat</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_dat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $num_clusters</span></span>
 <span><span class="co">#&gt; [1] 15</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -131,9 +131,9 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
-<span>  time_varying_assumption <span class="op">=</span> <span class="st">"IT"</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
-<span>  link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1</span><span class="op">)</span></span>
@@ -141,7 +141,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
 <span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(time) + treatment + (1 | cluster_id)</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + treatment + (1 | cluster_id)</span></span>
 <span><span class="co">#&gt;    Data: dat</span></span>
 <span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
 <span><span class="co">#&gt;  2054.801  2099.652 -1019.401  2038.801      2003 </span></span>
@@ -150,10 +150,10 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt;  cluster_id (Intercept) 0       </span></span>
 <span><span class="co">#&gt; Number of obs: 2011, groups:  cluster_id, 15</span></span>
 <span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt;   (Intercept)  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
-<span><span class="co">#&gt;      -1.31117        0.07874        0.15508        0.09773       -0.13764  </span></span>
+<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
+<span><span class="co">#&gt;       -1.3112        -1.2324        -1.1561        -1.2134        -1.4488  </span></span>
 <span><span class="co">#&gt; factor(time)6      treatment  </span></span>
-<span><span class="co">#&gt;       0.11375       -0.19690  </span></span>
+<span><span class="co">#&gt;       -1.1974        -0.1969  </span></span>
 <span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model_type</span></span>
@@ -166,10 +166,13 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; [1] -0.1969021</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.1515775</span></span>
+<span><span class="co">#&gt; [1] 0.1515805</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.4939939  0.1001898</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.4939999  0.1001958</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $converged</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -177,22 +180,23 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"GEE"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
-<span>  time_varying_assumption <span class="op">=</span> <span class="st">"IT"</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
-<span>  link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
+<span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; geepack::geeglm(formula = outcome ~ factor(time) + treatment, </span></span>
-<span><span class="co">#&gt;     family = family_obj, data = dat, id = cluster_id, corstr = corstr)</span></span>
+<span><span class="co">#&gt; geepack::geeglm(formula = as.formula(formula), family = family, </span></span>
+<span><span class="co">#&gt;     data = dat, id = cluster_id, corstr = corstr)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;   (Intercept) factor(time)2 factor(time)3 factor(time)4 factor(time)5 </span></span>
-<span><span class="co">#&gt;   -1.30124846    0.05519872    0.14804502    0.07418674   -0.15673203 </span></span>
+<span><span class="co">#&gt; factor(time)1 factor(time)2 factor(time)3 factor(time)4 factor(time)5 </span></span>
+<span><span class="co">#&gt;    -1.3012485    -1.2460497    -1.1532034    -1.2270617    -1.4579805 </span></span>
 <span><span class="co">#&gt; factor(time)6     treatment </span></span>
-<span><span class="co">#&gt;    0.12102708   -0.20139810 </span></span>
+<span><span class="co">#&gt;    -1.1802214    -0.2013981 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Degrees of Freedom: 2011 Total (i.e. Null);  2004 Residual</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -229,9 +233,9 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
-<span>  time_varying_assumption <span class="op">=</span> <span class="st">"ETI"</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
-<span>  link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span>  exp_time <span class="op">=</span> <span class="st">"ETI"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_3</span><span class="op">)</span></span>
@@ -239,23 +243,23 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
 <span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(time) + factor(exposure_time) + (1 | cluster_id)</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + factor(exposure_time) + (1 | cluster_id)</span></span>
 <span><span class="co">#&gt;    Data: dat</span></span>
 <span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
 <span><span class="co">#&gt;  2057.742  2125.019 -1016.871  2033.742      1999 </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups     Name        Std.Dev. </span></span>
-<span><span class="co">#&gt;  cluster_id (Intercept) 1.025e-07</span></span>
+<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  cluster_id (Intercept) 0       </span></span>
 <span><span class="co">#&gt; Number of obs: 2011, groups:  cluster_id, 15</span></span>
 <span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt;            (Intercept)           factor(time)2           factor(time)3  </span></span>
-<span><span class="co">#&gt;               -1.31117                 0.08613                 0.19082  </span></span>
+<span><span class="co">#&gt;          factor(time)1           factor(time)2           factor(time)3  </span></span>
+<span><span class="co">#&gt;                -1.3112                 -1.2250                 -1.1204  </span></span>
 <span><span class="co">#&gt;          factor(time)4           factor(time)5           factor(time)6  </span></span>
-<span><span class="co">#&gt;                0.04589                -0.17506                 0.14254  </span></span>
+<span><span class="co">#&gt;                -1.2653                 -1.4862                 -1.1686  </span></span>
 <span><span class="co">#&gt; factor(exposure_time)1  factor(exposure_time)2  factor(exposure_time)3  </span></span>
-<span><span class="co">#&gt;               -0.24845                -0.32298                 0.15013  </span></span>
+<span><span class="co">#&gt;                -0.2484                 -0.3230                  0.1501  </span></span>
 <span><span class="co">#&gt; factor(exposure_time)4  factor(exposure_time)5  </span></span>
-<span><span class="co">#&gt;               -0.25090                -0.44081  </span></span>
+<span><span class="co">#&gt;                -0.2509                 -0.4408  </span></span>
 <span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model_type</span></span>
@@ -268,10 +272,13 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span><span class="co">#&gt; [1] -0.2225999</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.1801769</span></span>
+<span><span class="co">#&gt; [1] 0.1801772</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.5757467  0.1305469</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.5757473  0.1305475</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $converged</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
   </main>
 </div>
 
