@@ -7,7 +7,7 @@
 #' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
 #' @param family A family object; see documentation for `glm()`.
 #' @param re A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)
-#' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant if method="mixed" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.
+#' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant if method="GEE" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.
 #'
 #' @return A list with ___
 #' @export
