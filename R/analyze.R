@@ -68,14 +68,14 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
   # Parse formula terms for random effects
   f_re <- ""
   if ("clust" %in% re) {
-    f_re <- paste0(f_re, "(1|cluster_id) + ")
+    f_re <- paste0(f_re, " + (1|cluster_id)")
   }
   if ("time" %in% re) {
     dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
-    f_re <- paste0(f_re, "(1|ij) + ")
+    f_re <- paste0(f_re, " + (1|ij)")
   }
   if ("ind" %in% re) {
-    f_re <- paste0(f_re, "(1|individual_id) + ")
+    f_re <- paste0(f_re, " + (1|individual_id)")
   }
   if ("tx" %in% re) {
     stop("Random treatment effects not yet implemented")
@@ -89,10 +89,10 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0("outcome ~ ", f_cal, "treatment + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "treatment", f_re)
       model_it_mixed <- lme4::lmer(formula, data=dat)
     } else {
-      formula <- paste0("outcome ~ ", f_cal, "treatment + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "treatment", f_re)
       model_it_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
@@ -123,10 +123,10 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time) + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time)", f_re)
       model_eti_mixed <- lme4::lmer(formula, data=dat)
     } else {
-      formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time) + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time)", f_re)
       model_eti_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
@@ -192,12 +192,10 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time) + 
-                        (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
       model_teh_mixed <- lme4::lmer(formula, data=dat)
     } else {
-      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time) +
-                        (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
       model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
     
@@ -270,10 +268,10 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4 + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4", f_re)
       model_ncs_mixed <- lme4::lmer(formula, data=dat)
     } else {
-      formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4 + (1|cluster_id)")
+      formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4", f_re)
       model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
 
