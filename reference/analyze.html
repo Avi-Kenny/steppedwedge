@@ -67,7 +67,7 @@
 
 
 <dt id="arg-exp-time">exp_time<a class="anchor" aria-label="anchor" href="#arg-exp-time"></a></dt>
-<dd><p>One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.</p></dd>
+<dd><p>One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend. "TEH" includes a random slope term in the model, allowing the treatment effect to vary by timepoint.</p></dd>
 
 
 <dt id="arg-cal-time">cal_time<a class="anchor" aria-label="anchor" href="#arg-cal-time"></a></dt>
@@ -83,7 +83,7 @@
 
 
 <dt id="arg-corstr">corstr<a class="anchor" aria-label="anchor" href="#arg-corstr"></a></dt>
-<dd><p>One of c("independence", "exchangeable", "ar1"); only relevant if method="mixed" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.</p></dd>
+<dd><p>One of c("independence", "exchangeable", "ar1"); only relevant if method="GEE" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.</p></dd>
 
 </dl></div>
     <div class="section level2">
