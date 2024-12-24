@@ -3,7 +3,7 @@
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
 #' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
-#' @param exp_time One of c("IT", "ETI", "NCS"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend.
+#' @param exp_time One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend. "TEH" includes a random slope term in the model, allowing the treatment effect to vary by timepoint.
 #' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
 #' @param family A family object; see documentation for `glm()`.
 #' @param re A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)
@@ -24,7 +24,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
   if (!(cal_time %in% c("categorical", "NCS", "linear", "none"))) {
     stop("`cal_time` misspecified.")
   }
-  if (!(exp_time %in% c("IT", "ETI", "NCS"))) {
+  if (!(exp_time %in% c("IT", "ETI", "NCS", "TEH"))) {
     stop("`exp_time` misspecified.")
   }
   if (!all(re %in% c("clust", "time", "ind", "tx"))) {
@@ -182,6 +182,77 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     }
 
+  } else if(method == "mixed" & exp_time == "TEH") {
+    
+    
+    #####################################################.
+    ##### Treatment Effect Heterogeneity (TEH) mixed model #####
+    #####################################################.
+    
+
+    # Fit mixed model
+    if(family$family == "gaussian" & family$link == "identity") {
+      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time) + 
+                        (1|cluster_id)")
+      model_teh_mixed <- lme4::lmer(formula, data=dat)
+    } else {
+      formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time) +
+                        (1|cluster_id)")
+      model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
+    }
+    
+    summary_teh <- summary(model_teh_mixed)
+    
+    
+    # Specify the indices of summary_teh corresponding to the exposure time variables
+    indices <- grep("exposure_time", rownames(summary_teh$coefficients))
+    index_max <- length(indices)
+    
+    # Extract coefficient estimates and covariance matrix corresponding to exposure
+    #     time variables
+    coeffs <- summary_teh$coefficients[,1][indices] # column 1 contains the estimates
+    cov_mtx <- stats::vcov(model_teh_mixed)[indices,indices]
+    
+    if(estimand == "TATE") {
+      
+      # Estimate the TATE
+      M <- matrix(rep(1/index_max), index_max, nrow=1)
+      tate_est <- (M %*% coeffs)[1]
+      tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+      
+      results <- list(
+        model = model_teh_mixed,
+        model_type = "teh_mixed",
+        estimand = "TATE",
+        te_est = tate_est,
+        te_se = tate_se,
+        te_ci = tate_ci,
+        converged = performance::check_convergence(model_teh_mixed)[1]
+      )
+      
+    } else if(estimand == "LTE") {
+      
+      # Estimate the LTE
+      lte_est <- as.numeric(coeffs[index_max])
+      lte_se <- sqrt(cov_mtx[index_max,index_max])
+      lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      
+      results <- list(
+        model = model_teh_mixed,
+        model_type = "teh_mixed",
+        estimand = "LTE",
+        te_est = lte_est,
+        te_se = lte_se,
+        te_ci = lte_ci,
+        converged = performance::check_convergence(model_teh_mixed)[1]
+      )
+      #
+      # # Estimate the effect curve
+      # curve_teh <- as.numeric(c(0, coeffs))
+      
+    }
+    
   } else if(method == "mixed" & exp_time == "NCS") {
 
 
