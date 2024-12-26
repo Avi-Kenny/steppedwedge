@@ -211,7 +211,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; $te_ci</span></span>
 <span><span class="co">#&gt; [1] -0.35874021 -0.04405599</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
-estimand, without assuming an Immediate Treatment (IT) effect.</p>
+estimand, using an Exposure Time Indicator (ETI) model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
@@ -267,6 +267,167 @@ estimand, without assuming an Immediate Treatment (IT) effect.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $converged</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>Mixed model, with Time Average Treatment Effect (TATE) as the
+estimand, using a Natural Cubic Splines (NCS) model.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  exp_time <span class="op">=</span> <span class="st">"NCS"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $model</span></span>
+<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
+<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
+<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + b1 + b2 + b3 + b4 + (1 | cluster_id) +  </span></span>
+<span><span class="co">#&gt;     (1 | ij)</span></span>
+<span><span class="co">#&gt;    Data: dat</span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
+<span><span class="co">#&gt;  2059.624  2126.901 -1017.812  2035.624      1999 </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups     Name        Std.Dev. </span></span>
+<span><span class="co">#&gt;  ij         (Intercept) 3.972e-07</span></span>
+<span><span class="co">#&gt;  cluster_id (Intercept) 0.000e+00</span></span>
+<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
+<span><span class="co">#&gt; Fixed Effects:</span></span>
+<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
+<span><span class="co">#&gt;     -1.311174      -1.216164      -1.129472      -1.237023      -1.488449  </span></span>
+<span><span class="co">#&gt; factor(time)6             b1             b2             b3             b4  </span></span>
+<span><span class="co">#&gt;     -1.163324      -0.001176       0.203676      -0.751609      -0.251060  </span></span>
+<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $model_type</span></span>
+<span><span class="co">#&gt; [1] "ncs_mixed"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $estimand</span></span>
+<span><span class="co">#&gt; [1] "TATE"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_est</span></span>
+<span><span class="co">#&gt; [1] -0.231144</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_se</span></span>
+<span><span class="co">#&gt; [1] 0.1801249</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_ci</span></span>
+<span><span class="co">#&gt; [1] -0.5841887  0.1219008</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $converged</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>Mixed model, with Time Average Treament Effect (TATE) as the
+estimand, using a Treatment Effect Heterogeneity over exposure time
+(TEH) model.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  exp_time <span class="op">=</span> <span class="st">"TEH"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $model</span></span>
+<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
+<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
+<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
+<span><span class="co">#&gt; Formula: </span></span>
+<span><span class="co">#&gt; outcome ~ factor(time) - 1 + treatment + (0 + treatment | exposure_time) +  </span></span>
+<span><span class="co">#&gt;     (1 | cluster_id) + (1 | ij)</span></span>
+<span><span class="co">#&gt;    Data: dat</span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
+<span><span class="co">#&gt;  2058.801  2114.865 -1019.401  2038.801      2001 </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups        Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  ij            (Intercept) 0       </span></span>
+<span><span class="co">#&gt;  cluster_id    (Intercept) 0       </span></span>
+<span><span class="co">#&gt;  exposure_time treatment   0       </span></span>
+<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15; exposure_time, 6</span></span>
+<span><span class="co">#&gt; Fixed Effects:</span></span>
+<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
+<span><span class="co">#&gt;       -1.3112        -1.2324        -1.1561        -1.2134        -1.4488  </span></span>
+<span><span class="co">#&gt; factor(time)6      treatment  </span></span>
+<span><span class="co">#&gt;       -1.1974        -0.1969  </span></span>
+<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $model_type</span></span>
+<span><span class="co">#&gt; [1] "teh_mixed"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $estimand</span></span>
+<span><span class="co">#&gt; [1] "TATE"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_est</span></span>
+<span><span class="co">#&gt; [1] -0.1969021</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_se</span></span>
+<span><span class="co">#&gt; [1] 0.1515697</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_ci</span></span>
+<span><span class="co">#&gt; [1] -0.4939786  0.1001745</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $converged</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
+</h2>
+<p>Mixed model, with Time Average Treament Effect (TATE) as the
+estimand, using a Natural Cubic Splines (NCS) model.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  exp_time <span class="op">=</span> <span class="st">"NCS"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">gaussian</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_6</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $model</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + b1 + b2 + b3 + b4 + (1 | cluster_id) +  </span></span>
+<span><span class="co">#&gt;     (1 | ij)</span></span>
+<span><span class="co">#&gt;    Data: dat</span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 2106.325</span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  ij         (Intercept) 0.0193  </span></span>
+<span><span class="co">#&gt;  cluster_id (Intercept) 0.0000  </span></span>
+<span><span class="co">#&gt;  Residual               0.4040  </span></span>
+<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
+<span><span class="co">#&gt; Fixed Effects:</span></span>
+<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
+<span><span class="co">#&gt;     0.2122328      0.2288284      0.2429516      0.2251247      0.1866313  </span></span>
+<span><span class="co">#&gt; factor(time)6             b1             b2             b3             b4  </span></span>
+<span><span class="co">#&gt;     0.2366950     -0.0004316      0.0306920     -0.1182628     -0.0373855  </span></span>
+<span><span class="co">#&gt; optimizer (nloptwrap) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $model_type</span></span>
+<span><span class="co">#&gt; [1] "ncs_mixed"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $estimand</span></span>
+<span><span class="co">#&gt; [1] "TATE"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_est</span></span>
+<span><span class="co">#&gt; [1] -0.03648381</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_se</span></span>
+<span><span class="co">#&gt; [1] 0.02953074</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $te_ci</span></span>
+<span><span class="co">#&gt; [1] -0.09436405  0.02139644</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $converged</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</div>
   </main>
 </div>
 
