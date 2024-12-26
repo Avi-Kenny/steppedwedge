@@ -215,8 +215,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       
       # Estimate the TATE
       M <- matrix(rep(1/index_max), index_max, nrow=1)
-      tate_est <- (M %*% coeffs)[1]
-      tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
+      tate_est <- summary_teh$coefficients["treatment",1]
+      tate_se <- summary_teh$coefficients["treatment",2]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
       results <- list(
@@ -231,9 +231,19 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       
     } else if(estimand == "LTE") {
       
-      # Estimate the LTE
-      lte_est <- as.numeric(coeffs[index_max])
-      lte_se <- sqrt(cov_mtx[index_max,index_max])
+      # Estimate the LTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
+      exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
+      max_exp_timepoint <- max(exp_timepoints)
+      re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
+      re_treatment_lte <- re_treatment[rownames(re_treatment) == as.character(max_exp_timepoint), "treatment"]
+      lte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_lte
+      
+      # Estimate the SE of the LTE by combining the variances from the fixed effect component and the random effect for the final timepoint
+      re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
+      re_se <- sqrt(re_var)
+      re_se_lte <- re_se[length(re_se)]
+      
+      lte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_lte^2)
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
       
       results <- list(
@@ -285,6 +295,11 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     #     terms
     coeffs_spl <- summary_ncs$coefficients[,1][indices]
     cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
+    
+    # Get number of unique (non-zero) exposure times
+    exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
+    num_exp_timepoints <- length(exp_timepoints)
+    max_exp_timepoint <- max(exp_timepoints)
 
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
     B <- matrix(NA, nrow=(J-1), ncol=4)
@@ -298,7 +313,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     if(estimand == "TATE") {
       # Estimate the TATE over the interval [0,6]
-      M <- matrix(rep(1/index_max, index_max), nrow=1)
+      M <- matrix(rep(1/num_exp_timepoints, num_exp_timepoints), nrow=1)
       tate_est <- (M %*% coeffs_trans)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
@@ -315,8 +330,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     } else if(estimand == "LTE") {
 
       # Estimate the LTE
-      lte_est <- as.numeric(coeffs_trans[index_max])
-      lte_se <- sqrt(cov_mtx[index_max, index_max])
+      lte_est <- as.numeric(coeffs_trans[max_exp_timepoint])
+      lte_se <- sqrt(cov_mtx[max_exp_timepoint, max_exp_timepoint])
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
 
       results <- list(

@@ -86,7 +86,7 @@ print(analysis_2)
 ```
 
 
-Mixed model, with Time Average Treament Effect (TATE) as the estimand, without assuming an Immediate Treatment (IT) effect.
+Mixed model, with Time Average Treament Effect (TATE) as the estimand, using an Exposure Time Indicator (ETI) model.
 
 ```{r}
 
@@ -99,6 +99,60 @@ analysis_3 <- analyze(
 )
 
 print(analysis_3)
+
+```
+
+
+Mixed model, with Time Average Treatment Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
+
+```{r}
+
+analysis_4 <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  exp_time = "NCS",
+  family = binomial
+)
+
+print(analysis_4)
+
+```
+
+
+Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Treatment Effect Heterogeneity over exposure time (TEH) model.
+
+```{r}
+
+analysis_5 <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  exp_time = "TEH",
+  family = binomial
+)
+
+print(analysis_5)
+
+```
+
+## Continuous outcome
+
+Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
+
+```{r}
+
+analysis_6 <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  exp_time = "NCS",
+  family = gaussian
+)
+
+print(analysis_6)
+
+
 
 ```
 
