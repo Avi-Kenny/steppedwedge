@@ -60,10 +60,28 @@ analysis_1 <- analyze(
   method = "mixed",
   estimand = "TATE", 
   exp_time = "IT",
-  family = binomial
+  family = binomial,
+  re = c("clust", "time")
 )
 
 print(analysis_1)
+
+```
+
+Repeat the analysis, but including a random effect for cluster only, not for cluster-time interaction.
+
+```{r}
+
+analysis_1b <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand = "TATE", 
+  exp_time = "IT",
+  family = binomial,
+  re = "clust"
+)
+
+print(analysis_1b)
 
 ```
 
