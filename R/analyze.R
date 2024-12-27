@@ -447,6 +447,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     }
 
   }
+  
+  class(results) <- c("list", "sw_analysis")
 
   return(results)
 
