@@ -112,7 +112,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci,
-      converged = performance::check_convergence(model_it_mixed)[1]
+      converged = performance::check_convergence(model_it_mixed)[1],
+      converged2 = model_it_mixed@optinfo$conv$lme4$messages
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -157,7 +158,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
-        converged = performance::check_convergence(model_eti_mixed)[1]
+        converged = performance::check_convergence(model_eti_mixed)[1],
+        converged2 = model_eti_mixed@optinfo$conv$lme4$messages
       )
 
     } else if(estimand == "LTE") {
@@ -174,7 +176,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
-        converged = performance::check_convergence(model_eti_mixed)[1]
+        converged = performance::check_convergence(model_eti_mixed)[1],
+        converged2 = model_eti_mixed@optinfo$conv$lme4$messages
       )
       #
       # # Estimate the effect curve
@@ -226,7 +229,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
-        converged = performance::check_convergence(model_teh_mixed)[1]
+        converged = performance::check_convergence(model_teh_mixed)[1],
+        converged2 = model_teh_mixed@optinfo$conv$lme4$messages
       )
       
     } else if(estimand == "LTE") {
@@ -253,7 +257,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
-        converged = performance::check_convergence(model_teh_mixed)[1]
+        converged = performance::check_convergence(model_teh_mixed)[1],
+        converged2 = model_teh_mixed@optinfo$conv$lme4$messages
       )
       #
       # # Estimate the effect curve
@@ -325,7 +330,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
-        converged = performance::check_convergence(model_ncs_mixed)[1]
+        converged = performance::check_convergence(model_ncs_mixed)[1],
+        converged2 = model_ncs_mixed@optinfo$conv$lme4$messages
       )
     } else if(estimand == "LTE") {
 
@@ -341,7 +347,8 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
-        converged = performance::check_convergence(model_ncs_mixed)[1]
+        converged = performance::check_convergence(model_ncs_mixed)[1],
+        converged2 = model_ncs_mixed@optinfo$conv$lme4$messages
       )
     }
 
