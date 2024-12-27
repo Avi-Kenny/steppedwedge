@@ -119,8 +119,8 @@ load_data <- function(
 
 
   # Convert binary variables to integers (if specified as boolean)
-  .outcome <- as.integer(.outcome)
-  .treatment <- as.integer(.treatment)
+  if(typeof(.outcome) == "logical") {.outcome <- as.integer(.outcome)}
+  if(typeof(.treatment) == "logical") {.treatment <- as.integer(.treatment)}
 
 
   # Create data object
