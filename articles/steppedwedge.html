@@ -115,7 +115,8 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
-<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
+<span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
@@ -124,8 +125,27 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.494, 0.1</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span>
 <span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
-<p>Repeat the analysis, but using GEE rather than a mixed model.</p>
+<p>Repeat the analysis, but including a random effect for cluster only,
+not for cluster-time interaction.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_1b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
+<span>  re <span class="op">=</span> <span class="st">"clust"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1b</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.197</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.494, 0.1</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
+<p>Repeat the analysis, but using GEE rather than a mixed model.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -143,7 +163,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -161,7 +181,7 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treatment Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -180,7 +200,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Treatment Effect Heterogeneity over exposure time
 (TEH) model.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -201,7 +221,7 @@ estimand, using a Treatment Effect Heterogeneity over exposure time
 </h2>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
