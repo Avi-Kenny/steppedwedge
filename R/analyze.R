@@ -204,20 +204,9 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     
     summary_teh <- summary(model_teh_mixed)
     
-    
-    # Specify the indices of summary_teh corresponding to the exposure time variables
-    indices <- grep("exposure_time", rownames(summary_teh$coefficients))
-    index_max <- length(indices)
-    
-    # Extract coefficient estimates and covariance matrix corresponding to exposure
-    #     time variables
-    coeffs <- summary_teh$coefficients[,1][indices] # column 1 contains the estimates
-    cov_mtx <- stats::vcov(model_teh_mixed)[indices,indices]
-    
     if(estimand == "TATE") {
       
       # Estimate the TATE
-      M <- matrix(rep(1/index_max), index_max, nrow=1)
       tate_est <- summary_teh$coefficients["treatment",1]
       tate_se <- summary_teh$coefficients["treatment",2]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
