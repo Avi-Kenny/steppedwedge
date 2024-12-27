@@ -120,50 +120,10 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
-<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
-<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + treatment + (1 | cluster_id) + (1 |  </span></span>
-<span><span class="co">#&gt;     ij)</span></span>
-<span><span class="co">#&gt;    Data: dat</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
-<span><span class="co">#&gt;  2056.801  2107.259 -1019.401  2038.801      2002 </span></span>
-<span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  ij         (Intercept) 0       </span></span>
-<span><span class="co">#&gt;  cluster_id (Intercept) 0       </span></span>
-<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
-<span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
-<span><span class="co">#&gt;       -1.3112        -1.2324        -1.1561        -1.2134        -1.4488  </span></span>
-<span><span class="co">#&gt; factor(time)6      treatment  </span></span>
-<span><span class="co">#&gt;       -1.1974        -0.1969  </span></span>
-<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "it_mixed"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE/LTE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.1969021</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.15157</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.4939792  0.1001751</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged2</span></span>
-<span><span class="co">#&gt; [1] "boundary (singular) fit: see help('isSingular')"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.197</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.494, 0.1</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -177,48 +137,10 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; geepack::geeglm(formula = stats::as.formula(formula), family = family, </span></span>
-<span><span class="co">#&gt;     data = dat, id = cluster_id, corstr = corstr)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt; factor(time)1 factor(time)2 factor(time)3 factor(time)4 factor(time)5 </span></span>
-<span><span class="co">#&gt;    -1.3012485    -1.2460497    -1.1532034    -1.2270617    -1.4579805 </span></span>
-<span><span class="co">#&gt; factor(time)6     treatment </span></span>
-<span><span class="co">#&gt;    -1.1802214    -0.2013981 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Degrees of Freedom: 2011 Total (i.e. Null);  2004 Residual</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale Link:                   identity</span></span>
-<span><span class="co">#&gt; Estimated Scale Parameters:  [1] 1.002224</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Correlation:  Structure = exchangeable    Link = identity </span></span>
-<span><span class="co">#&gt; Estimated Correlation Parameters:</span></span>
-<span><span class="co">#&gt;        alpha </span></span>
-<span><span class="co">#&gt; -0.004809356 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of clusters:   15   Maximum cluster size: 153 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "it_GEE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE/LTE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.2013981</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.08027659</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.35874021 -0.04405599</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.201</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.359, -0.044</span></span>
+<span><span class="co">#&gt; Converged: </span></span>
+<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -233,55 +155,10 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
-<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
-<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: </span></span>
-<span><span class="co">#&gt; outcome ~ factor(time) - 1 + factor(exposure_time) + (1 | cluster_id) +  </span></span>
-<span><span class="co">#&gt;     (1 | ij)</span></span>
-<span><span class="co">#&gt;    Data: dat</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
-<span><span class="co">#&gt;  2059.742  2132.625 -1016.871  2033.742      1998 </span></span>
-<span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  ij         (Intercept) 2e-07   </span></span>
-<span><span class="co">#&gt;  cluster_id (Intercept) 0e+00   </span></span>
-<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
-<span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt;          factor(time)1           factor(time)2           factor(time)3  </span></span>
-<span><span class="co">#&gt;                -1.3112                 -1.2250                 -1.1204  </span></span>
-<span><span class="co">#&gt;          factor(time)4           factor(time)5           factor(time)6  </span></span>
-<span><span class="co">#&gt;                -1.2653                 -1.4862                 -1.1686  </span></span>
-<span><span class="co">#&gt; factor(exposure_time)1  factor(exposure_time)2  factor(exposure_time)3  </span></span>
-<span><span class="co">#&gt;                -0.2484                 -0.3230                  0.1501  </span></span>
-<span><span class="co">#&gt; factor(exposure_time)4  factor(exposure_time)5  </span></span>
-<span><span class="co">#&gt;                -0.2509                 -0.4408  </span></span>
-<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "eti_mixed"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.2225999</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.180177</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.5757468  0.1305470</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged2</span></span>
-<span><span class="co">#&gt; [1] "boundary (singular) fit: see help('isSingular')"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.223</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.576, 0.131</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treatment Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -296,50 +173,10 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
-<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
-<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + b1 + b2 + b3 + b4 + (1 | cluster_id) +  </span></span>
-<span><span class="co">#&gt;     (1 | ij)</span></span>
-<span><span class="co">#&gt;    Data: dat</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
-<span><span class="co">#&gt;  2059.624  2126.901 -1017.812  2035.624      1999 </span></span>
-<span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups     Name        Std.Dev. </span></span>
-<span><span class="co">#&gt;  ij         (Intercept) 3.972e-07</span></span>
-<span><span class="co">#&gt;  cluster_id (Intercept) 0.000e+00</span></span>
-<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
-<span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
-<span><span class="co">#&gt;     -1.311174      -1.216164      -1.129472      -1.237023      -1.488449  </span></span>
-<span><span class="co">#&gt; factor(time)6             b1             b2             b3             b4  </span></span>
-<span><span class="co">#&gt;     -1.163324      -0.001176       0.203676      -0.751609      -0.251060  </span></span>
-<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "ncs_mixed"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.231144</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.1801249</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.5841887  0.1219008</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged2</span></span>
-<span><span class="co">#&gt; [1] "boundary (singular) fit: see help('isSingular')"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.231</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.584, 0.122</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Treatment Effect Heterogeneity over exposure time
 (TEH) model.</p>
@@ -355,52 +192,10 @@ estimand, using a Treatment Effect Heterogeneity over exposure time
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
-<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
-<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
-<span><span class="co">#&gt; Formula: </span></span>
-<span><span class="co">#&gt; outcome ~ factor(time) - 1 + treatment + (0 + treatment | exposure_time) +  </span></span>
-<span><span class="co">#&gt;     (1 | cluster_id) + (1 | ij)</span></span>
-<span><span class="co">#&gt;    Data: dat</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  deviance  df.resid </span></span>
-<span><span class="co">#&gt;  2058.801  2114.865 -1019.401  2038.801      2001 </span></span>
-<span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups        Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  ij            (Intercept) 0       </span></span>
-<span><span class="co">#&gt;  cluster_id    (Intercept) 0       </span></span>
-<span><span class="co">#&gt;  exposure_time treatment   0       </span></span>
-<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15; exposure_time, 6</span></span>
-<span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
-<span><span class="co">#&gt;       -1.3112        -1.2324        -1.1561        -1.2134        -1.4488  </span></span>
-<span><span class="co">#&gt; factor(time)6      treatment  </span></span>
-<span><span class="co">#&gt;       -1.1974        -0.1969  </span></span>
-<span><span class="co">#&gt; optimizer (Nelder_Mead) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "teh_mixed"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.1969021</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.1515697</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.4939786  0.1001745</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged2</span></span>
-<span><span class="co">#&gt; [1] "boundary (singular) fit: see help('isSingular')"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.197</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.494, 0.1</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
 </h2>
@@ -418,48 +213,10 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $model</span></span>
-<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
-<span><span class="co">#&gt; Formula: outcome ~ factor(time) - 1 + b1 + b2 + b3 + b4 + (1 | cluster_id) +  </span></span>
-<span><span class="co">#&gt;     (1 | ij)</span></span>
-<span><span class="co">#&gt;    Data: dat</span></span>
-<span><span class="co">#&gt; REML criterion at convergence: 2106.325</span></span>
-<span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups     Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  ij         (Intercept) 0.0193  </span></span>
-<span><span class="co">#&gt;  cluster_id (Intercept) 0.0000  </span></span>
-<span><span class="co">#&gt;  Residual               0.4040  </span></span>
-<span><span class="co">#&gt; Number of obs: 2011, groups:  ij, 90; cluster_id, 15</span></span>
-<span><span class="co">#&gt; Fixed Effects:</span></span>
-<span><span class="co">#&gt; factor(time)1  factor(time)2  factor(time)3  factor(time)4  factor(time)5  </span></span>
-<span><span class="co">#&gt;     0.2122328      0.2288284      0.2429516      0.2251247      0.1866313  </span></span>
-<span><span class="co">#&gt; factor(time)6             b1             b2             b3             b4  </span></span>
-<span><span class="co">#&gt;     0.2366950     -0.0004316      0.0306920     -0.1182628     -0.0373855  </span></span>
-<span><span class="co">#&gt; optimizer (nloptwrap) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $model_type</span></span>
-<span><span class="co">#&gt; [1] "ncs_mixed"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $estimand</span></span>
-<span><span class="co">#&gt; [1] "TATE"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_est</span></span>
-<span><span class="co">#&gt; [1] -0.03648381</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_se</span></span>
-<span><span class="co">#&gt; [1] 0.02953074</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $te_ci</span></span>
-<span><span class="co">#&gt; [1] -0.09436405  0.02139644</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $converged2</span></span>
-<span><span class="co">#&gt; [1] "boundary (singular) fit: see help('isSingular')"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "list"        "sw_analysis"</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.036</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.094, 0.021</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span>
+<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
 </div>
   </main>
 </div>
