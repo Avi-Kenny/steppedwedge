@@ -12,6 +12,4 @@ print.sw_analysis <- function(x, ...) {
   cat("Treatment effect estimate: ", round(x$te_est, 3), "\n", sep = "")
   cat("Treatment effect 95% confidence interval: ", round(x$te_ci[1], 3), ", ", round(x$te_ci[2], 3), "\n", sep = "")
   cat("Converged: ", x$converged, "\n", sep = "")
-  msg <- ifelse(is.null(x$messages), "(none)", x$messages)
-  cat("Messages returned: ", x$messages, sep = "")
 }
