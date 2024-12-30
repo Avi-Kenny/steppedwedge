@@ -140,22 +140,30 @@ load_data <- function(
 
   print("DEBUGGING: START")
   dat2 <- dat
-  print("check 1a")
   # dat2 <- tibble::as_tibble(dat2)
-  type_sum.accel <- 999
-  print("check 1b")
-  dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
-  print("check 1c")
-  rm(type_sum.accel)
-  print("check 2")
+  print("check 1")
+  tryCatch(
+    expr = {
+      dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
+    },
+    error = function(e) {
+      print("check 2")
+      print(str(e))
+    },
+    warning = function(w) {
+      print("check 3")
+    },
+    finally = {
+      print("check 4")
+    }
+  )
+
+
+  print("check 5")
   dat2 <- dplyr::group_by(dat2, cluster_id, time)
-  print("check 3")
   dat2 <- dplyr::filter(dat2, dplyr::n() > 1)
-  print("check 4")
   if (nrow(dat2) > 0) {
-    print("check 5")
     stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
-    print("check 6")
   }
 
   # dat2 <- dat %>%
