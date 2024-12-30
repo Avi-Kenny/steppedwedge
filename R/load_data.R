@@ -141,7 +141,7 @@ load_data <- function(
   print("DEBUGGING: START")
   dat2 <- dat
   print("check 1a")
-  dat2 <- as.tibble(dat2)
+  dat2 <- tibble::as_tibble(dat2)
   print("check 1b")
   dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
   print("check 2")
