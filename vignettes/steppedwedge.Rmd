@@ -15,16 +15,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-
 library(steppedwedge)
-
 ```
 
 
 The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_design` and `analyze` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
 ```{r}
-
 data(sw_data_example)
 head(sw_data_example)
 
@@ -36,25 +33,21 @@ dat <- load_data(
   outcome = "outcome_bin",
   data = sw_data_example
 )
-
 ```
 
 
 The `plot_design` function produces a diagram of the stepped wedge design and a summary of the variables.
 
 ```{r, fig.width=9, fig.height=8, fig.align = "center"}
-
 plot_dat <- plot_design(dat)
 
 print(plot_dat)
-
 ```
 
 
 The `analyze` function analyzes the stepped wedge data. First, we analyze the data using a mixed effects model, with the Time Average Treament Effect (TATE) as the estimand, assuming an Immediate Treatment (IT) effect, passing the `family = "binomial"` and `link = "logit"` arguments to `glmer`. 
 
 ```{r}
-
 analysis_1 <- analyze(
   dat = dat,
   method = "mixed",
@@ -65,13 +58,11 @@ analysis_1 <- analyze(
 )
 
 print(analysis_1)
-
 ```
 
 Repeat the analysis, but including a random effect for cluster only, not for cluster-time interaction.
 
 ```{r}
-
 analysis_1b <- analyze(
   dat = dat,
   method = "mixed",
@@ -82,14 +73,12 @@ analysis_1b <- analyze(
 )
 
 print(analysis_1b)
-
 ```
 
 
 Repeat the analysis, but using GEE rather than a mixed model.
 
 ```{r}
-
 analysis_2 <- analyze(
   dat = dat,
   method = "GEE",
@@ -100,14 +89,12 @@ analysis_2 <- analyze(
 )
 
 print(analysis_2)
-
 ```
 
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using an Exposure Time Indicator (ETI) model.
 
 ```{r}
-
 analysis_3 <- analyze(
   dat = dat,
   method = "mixed",
@@ -117,14 +104,12 @@ analysis_3 <- analyze(
 )
 
 print(analysis_3)
-
 ```
 
 
 Mixed model, with Time Average Treatment Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
 
 ```{r}
-
 analysis_4 <- analyze(
   dat = dat,
   method = "mixed",
@@ -134,14 +119,12 @@ analysis_4 <- analyze(
 )
 
 print(analysis_4)
-
 ```
 
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Treatment Effect Heterogeneity over exposure time (TEH) model.
 
 ```{r}
-
 analysis_5 <- analyze(
   dat = dat,
   method = "mixed",
@@ -151,7 +134,6 @@ analysis_5 <- analyze(
 )
 
 print(analysis_5)
-
 ```
 
 ## Continuous outcome
@@ -159,7 +141,6 @@ print(analysis_5)
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
 
 ```{r}
-
 analysis_6 <- analyze(
   dat = dat,
   method = "mixed",
@@ -169,8 +150,4 @@ analysis_6 <- analyze(
 )
 
 print(analysis_6)
-
-
-
 ```
-
