@@ -144,15 +144,18 @@ load_data <- function(
   # if (any(!(dat2$avg_tx %in% c(0,1)))) {
   #   stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
   # }
+  print("check 1")
 
   # Handle missing values
   # Ignore everything related to covariates for now, only check necessary columns for missingness
   # Give warning if anything necessary missing (x/y records contain missing data and are being dropped)
   dat_no_missing <- dat[stats::complete.cases(dat$outcome, dat$time, dat$cluster_id, dat$treatment), ]
+  print("check 2")
 
   # Count number of rows dropped due to missing values
   num_dropped <- nrow(dat) - nrow(dat_no_missing)
   num_total <- nrow(dat)
+  print("check 3")
 
   # Order cluster id factor levels by roll-out sequence of intervention,
   # and calculate exposure time for each cluster-period
@@ -166,6 +169,7 @@ load_data <- function(
                                   time - first_exposure + 1,
                                   0)) %>%
     dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
+  print("check 4")
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))
