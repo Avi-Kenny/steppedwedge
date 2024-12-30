@@ -44,7 +44,10 @@ load_data <- function(
     for (arg in c("time", "cluster_id", "treatment",
                   "individual_id", "outcome")) {
 
+      print("check 1")
+      print(paste("arg:", arg))
       var <- get(arg)
+      print("check 2")
 
 
       # Variable is a character string specifying variable(s) in `data`
