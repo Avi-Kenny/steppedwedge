@@ -118,8 +118,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.104</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.54, 0.749</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span>
-<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but including a random effect for cluster only,
 not for cluster-time interaction.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -135,8 +134,7 @@ not for cluster-time interaction.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1b</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.189</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.19, 0.567</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span>
-<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
@@ -151,8 +149,7 @@ not for cluster-time interaction.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.176</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.286, 0.638</span></span>
-<span><span class="co">#&gt; Converged: </span></span>
-<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged:</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -167,8 +164,7 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.146</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.827, 1.118</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span>
-<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treatment Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -185,8 +181,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_4</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.119</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.846, 1.084</span></span>
-<span><span class="co">#&gt; Converged: FALSE</span></span>
-<span><span class="co">#&gt; Messages returned: Model failed to converge with max|grad| = 0.00438029 (tol = 0.002, component 1)</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: FALSE</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Treatment Effect Heterogeneity over exposure time
 (TEH) model.</p>
@@ -203,8 +198,7 @@ estimand, using a Treatment Effect Heterogeneity over exposure time
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.104</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.541, 0.749</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span>
-<span><span class="co">#&gt; Messages returned: boundary (singular) fit: see help('isSingular')</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
 </h2>
@@ -222,8 +216,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_6</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Treatment effect estimate: 0.01</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.128, 0.149</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span>
-<span><span class="co">#&gt; Messages returned:</span></span></code></pre></div>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
   </main>
 </div>
