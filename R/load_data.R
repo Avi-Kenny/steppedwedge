@@ -137,13 +137,13 @@ load_data <- function(
   # if (any(duplicated(dat[, c("cluster_id", "time")]) & duplicated(dat[, c("cluster_id", "time", "treatment")]))) {
   #   stop("For each unique combination of `cluster_id` and `time`, the value of `treatment` must be the same.")
   # }
-  # dat2 <- dat %>%
-  #   dplyr::group_by(cluster_id, time) %>%
-  #   dplyr::mutate(avg_tx=mean(treatment))
-  #
-  # if (any(!(dat2$avg_tx %in% c(0,1)))) {
-  #   stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
-  # }
+  dat2 <- dat %>%
+    dplyr::group_by(cluster_id, time) %>%
+    dplyr::mutate(avg_tx=mean(treatment))
+
+  if (any(!(dat2$avg_tx %in% c(0,1)))) {
+    stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+  }
 
   # Handle missing values
   # Ignore everything related to covariates for now, only check necessary columns for missingness
