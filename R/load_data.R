@@ -147,7 +147,7 @@ load_data <- function(
   dat2 <- dplyr::group_by(dat2, cluster_id, time)
   dat2 <- dplyr::filter(dat2, dplyr::n() > 1)
   if (nrow(dat2) > 0) {
-    stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+    # stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
   }
 
   # dat2 <- dat %>%
