@@ -19,6 +19,7 @@ library(steppedwedge)
 ```
 
 ```{r, include = FALSE}
+# Including this twice (once here with include=F) avoids a bug having to do with dplyr and pkgdown
 data(sw_data_example)
 dat <- load_data(
   time = "period",
