@@ -18,6 +18,17 @@ knitr::opts_chunk$set(
 library(steppedwedge)
 ```
 
+```{r, include = FALSE}
+data(sw_data_example)
+dat <- load_data(
+  time = "period",
+  cluster_id = "cluster",
+  individual_id = NULL,
+  treatment = "trt",
+  outcome = "outcome_bin",
+  data = sw_data_example
+)
+```
 
 The `load_data` function takes in raw data and creates a data object that can be accepted by the `plot_design` and `analyze` functions. We use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
