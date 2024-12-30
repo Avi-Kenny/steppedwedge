@@ -113,7 +113,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       te_se = te_se,
       te_ci = te_ci,
       converged = performance::check_convergence(model_it_mixed)[1],
-      converged2 = model_it_mixed@optinfo$conv$lme4$messages
+      messages = model_it_mixed@optinfo$conv$lme4$messages
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -159,7 +159,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
-        converged2 = model_eti_mixed@optinfo$conv$lme4$messages
+        messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
 
     } else if(estimand == "LTE") {
@@ -177,7 +177,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = lte_se,
         te_ci = lte_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
-        converged2 = model_eti_mixed@optinfo$conv$lme4$messages
+        messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
       #
       # # Estimate the effect curve
@@ -186,12 +186,12 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     }
 
   } else if(method == "mixed" & exp_time == "TEH") {
-    
-    
+
+
     #####################################################.
     ##### Treatment Effect Heterogeneity (TEH) mixed model #####
     #####################################################.
-    
+
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
@@ -201,16 +201,16 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
       model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
     }
-    
+
     summary_teh <- summary(model_teh_mixed)
-    
+
     if(estimand == "TATE") {
-      
+
       # Estimate the TATE
       tate_est <- summary_teh$coefficients["treatment",1]
       tate_se <- summary_teh$coefficients["treatment",2]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
-      
+
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
@@ -219,26 +219,26 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
-        converged2 = model_teh_mixed@optinfo$conv$lme4$messages
+        messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
-      
+
     } else if(estimand == "LTE") {
-      
+
       # Estimate the LTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
       exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
       max_exp_timepoint <- max(exp_timepoints)
       re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
       re_treatment_lte <- re_treatment[rownames(re_treatment) == as.character(max_exp_timepoint), "treatment"]
       lte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_lte
-      
+
       # Estimate the SE of the LTE by combining the variances from the fixed effect component and the random effect for the final timepoint
       re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
       re_se <- sqrt(re_var)
       re_se_lte <- re_se[length(re_se)]
-      
+
       lte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_lte^2)
       lte_ci <- lte_est + c(-1.96,1.96) * lte_se
-      
+
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
@@ -247,14 +247,14 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = lte_se,
         te_ci = lte_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
-        converged2 = model_teh_mixed@optinfo$conv$lme4$messages
+        messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
       #
       # # Estimate the effect curve
       # curve_teh <- as.numeric(c(0, coeffs))
-      
+
     }
-    
+
   } else if(method == "mixed" & exp_time == "NCS") {
 
 
@@ -289,7 +289,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     #     terms
     coeffs_spl <- summary_ncs$coefficients[,1][indices]
     cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
-    
+
     # Get number of unique (non-zero) exposure times
     exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
     num_exp_timepoints <- length(exp_timepoints)
@@ -320,7 +320,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
-        converged2 = model_ncs_mixed@optinfo$conv$lme4$messages
+        messages = model_ncs_mixed@optinfo$conv$lme4$messages
       )
     } else if(estimand == "LTE") {
 
@@ -337,7 +337,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         te_se = lte_se,
         te_ci = lte_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
-        converged2 = model_ncs_mixed@optinfo$conv$lme4$messages
+        messages = model_ncs_mixed@optinfo$conv$lme4$messages
       )
     }
 
@@ -447,7 +447,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     }
 
   }
-  
+
   class(results) <- c("list", "sw_analysis")
 
   return(results)
