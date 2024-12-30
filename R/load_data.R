@@ -47,11 +47,9 @@ load_data <- function(
       var <- get(arg)
 
       # Variable is a character string specifying variable(s) in `data`
-      print("check 1")
       is_string <- methods::is(var, "character")
       length_one <- as.logical(length(var) == 1)
       in_df <- all(as.logical(var %in% names(data)))
-      print("check 2")
       if (arg == "individual_id") {
         if (!is.null(individual_id) && !(is_string && length_one && in_df)) {
           stop(
@@ -75,11 +73,9 @@ load_data <- function(
           )
         }
       }
-      print("check 3")
 
       # Assign column(s) to val
       val <- data[, var]
-      print("check 4")
 
       # Validate: `time`
       if (arg %in% c("time")) {
@@ -87,7 +83,6 @@ load_data <- function(
           stop(paste0("`", arg, "` must be numeric."))
         }
       }
-      print("check 5")
 
       # David question - what types do we want to allow for treatment and outcome?
       # Separate treatment (binary) and outcome (and detect whether binary/count/continuous)
@@ -115,9 +110,7 @@ load_data <- function(
         }
       }
 
-      print("check 6")
       assign(x = paste0(".", arg), value = val)
-      print("check 7")
 
     }
 
@@ -127,7 +120,6 @@ load_data <- function(
   # Convert binary variables to integers (if specified as boolean)
   if(typeof(.outcome) == "logical") {.outcome <- as.integer(.outcome)}
   if(typeof(.treatment) == "logical") {.treatment <- as.integer(.treatment)}
-  print("check 8")
 
 
   # Create data object
@@ -139,7 +131,6 @@ load_data <- function(
     "treatment" = .treatment,
     "time_type" = time_type
   )
-  print("check 9")
 
   # Test whether, for all observations with a particular value of cluster_id and time, the value of treatment is the same
   # If not, throw an error
@@ -147,15 +138,30 @@ load_data <- function(
   #   stop("For each unique combination of `cluster_id` and `time`, the value of `treatment` must be the same.")
   # }
 
-  dat2 <- dat %>%
-    dplyr::distinct(cluster_id, time, treatment) %>%
-    dplyr::group_by(cluster_id, time) %>%
-    dplyr::filter(dplyr::n() > 1)
-
+  print("DEBUGGING: START")
+  dat2 <- dat
+  print("check 1")
+  dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
+  print("check 2")
+  dat2 <- dplyr::group_by(dat2, cluster_id, time)
+  print("check 3")
+  dat2 <- dplyr::filter(dat2, dplyr::n() > 1)
+  print("check 4")
   if (nrow(dat2) > 0) {
+    print("check 5")
     stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+    print("check 6")
   }
-  print("check 10")
+
+  # dat2 <- dat %>%
+  #   dplyr::distinct(cluster_id, time, treatment) %>%
+  #   dplyr::group_by(cluster_id, time) %>%
+  #   dplyr::filter(dplyr::n() > 1)
+  #
+  # if (nrow(dat2) > 0) {
+  #   stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+  # }
+  print("DEBUGGING: END")
 
   # Handle missing values
   # Ignore everything related to covariates for now, only check necessary columns for missingness
@@ -178,7 +184,6 @@ load_data <- function(
                                   time - first_exposure + 1,
                                   0)) %>%
     dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
-  print("check 11")
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))
@@ -187,7 +192,6 @@ load_data <- function(
   attr(dat_return, "n_clusters") <- n_clusters
   attr(dat_return, "n_times") <- n_times
   attr(dat_return, "n_sequences") <- n_sequences
-  print("check 12")
 
   class(dat_return) <- c("data.frame", "sw_dat")
 
@@ -208,7 +212,6 @@ load_data <- function(
       " rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`."
     )
   )
-  print("check 13")
 
   return(dat_return)
 
