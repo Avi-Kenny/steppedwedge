@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   steppedwedge: steppedwedge.html
-last_built: 2024-12-30T14:58Z
+last_built: 2024-12-30T15:26Z
 urls:
   reference: https://avi-kenny.github.io/steppedwedge/reference
   article: https://avi-kenny.github.io/steppedwedge/articles

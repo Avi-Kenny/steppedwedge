@@ -74,12 +74,12 @@ data object that can be accepted by the <code>plot_design</code> and
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   cluster period trt      prob outcome_bin outcome_cont</span></span>
-<span><span class="co">#&gt; 1       1      1   0 0.2687284           1  -1.05306411</span></span>
-<span><span class="co">#&gt; 2       1      1   0 0.2687284           1  -0.02333027</span></span>
-<span><span class="co">#&gt; 3       1      1   0 0.2687284           0   0.44821454</span></span>
-<span><span class="co">#&gt; 4       1      1   0 0.2687284           0   0.94435983</span></span>
-<span><span class="co">#&gt; 5       1      1   0 0.2687284           0  -0.48427045</span></span>
-<span><span class="co">#&gt; 6       1      1   0 0.2687284           0   0.30641843</span></span>
+<span><span class="co">#&gt; 1       1      1   0 0.5667807           0  -3.02179837</span></span>
+<span><span class="co">#&gt; 2       1      1   0 0.5667807           0  -0.07145287</span></span>
+<span><span class="co">#&gt; 3       1      1   0 0.5667807           1   0.96807617</span></span>
+<span><span class="co">#&gt; 4       1      1   0 0.5667807           0   0.29456948</span></span>
+<span><span class="co">#&gt; 5       1      1   0 0.5667807           1  -0.83921584</span></span>
+<span><span class="co">#&gt; 6       1      1   0 0.5667807           1  -0.42335941</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
 <span>  time <span class="op">=</span> <span class="st">"period"</span>,</span>
@@ -89,6 +89,21 @@ data object that can be accepted by the <code>plot_design</code> and
 <span>  outcome <span class="op">=</span> <span class="st">"outcome_bin"</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "check 1"</span></span>
+<span><span class="co">#&gt; [1] "arg: time"</span></span>
+<span><span class="co">#&gt; [1] "check 2"</span></span>
+<span><span class="co">#&gt; [1] "check 1"</span></span>
+<span><span class="co">#&gt; [1] "arg: cluster_id"</span></span>
+<span><span class="co">#&gt; [1] "check 2"</span></span>
+<span><span class="co">#&gt; [1] "check 1"</span></span>
+<span><span class="co">#&gt; [1] "arg: treatment"</span></span>
+<span><span class="co">#&gt; [1] "check 2"</span></span>
+<span><span class="co">#&gt; [1] "check 1"</span></span>
+<span><span class="co">#&gt; [1] "arg: individual_id"</span></span>
+<span><span class="co">#&gt; [1] "check 2"</span></span>
+<span><span class="co">#&gt; [1] "check 1"</span></span>
+<span><span class="co">#&gt; [1] "arg: outcome"</span></span>
+<span><span class="co">#&gt; [1] "check 2"</span></span>
 <span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
 <span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span>
 <span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points. 0/2011 rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`.</span></span></code></pre></div>
@@ -116,8 +131,8 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.104</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.54, 0.749</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.189</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.448, 0.07</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but including a random effect for cluster only,
 not for cluster-time interaction.</p>
@@ -132,8 +147,8 @@ not for cluster-time interaction.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1b</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.189</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.19, 0.567</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.189</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.448, 0.07</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -147,8 +162,8 @@ not for cluster-time interaction.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.176</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.286, 0.638</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.188</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.438, 0.061</span></span>
 <span><span class="co">#&gt; Converged:</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
@@ -160,10 +175,11 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span>  exp_time <span class="op">=</span> <span class="st">"ETI"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.146</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.827, 1.118</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.184</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.496, 0.129</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treatment Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
@@ -175,13 +191,12 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span>  exp_time <span class="op">=</span> <span class="st">"NCS"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00438029 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.119</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.846, 1.084</span></span>
-<span><span class="co">#&gt; Converged: FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; Treatment effect estimate: -0.186</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.498, 0.125</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Treatment Effect Heterogeneity over exposure time
 (TEH) model.</p>
@@ -196,8 +211,8 @@ estimand, using a Treatment Effect Heterogeneity over exposure time
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.104</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.541, 0.749</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.189</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.448, 0.07</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
@@ -214,8 +229,8 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.01</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.128, 0.149</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: -0.047</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.127, 0.034</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
   </main>
