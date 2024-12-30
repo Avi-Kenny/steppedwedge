@@ -142,24 +142,8 @@ load_data <- function(
   dat2 <- dat
   # dat2 <- tibble::as_tibble(dat2)
   print("check 1")
-  tryCatch(
-    expr = {
-      dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
-    },
-    error = function(e) {
-      print("check 2")
-      print(str(e))
-    },
-    warning = function(w) {
-      print("check 3")
-    },
-    finally = {
-      print("check 4")
-    }
-  )
-
-
-  print("check 5")
+  # dat2 <- dplyr::distinct(dat2, cluster_id, time, treatment)
+  print("check 2")
   dat2 <- dplyr::group_by(dat2, cluster_id, time)
   dat2 <- dplyr::filter(dat2, dplyr::n() > 1)
   if (nrow(dat2) > 0) {
