@@ -1,10 +1,11 @@
 set.seed(2278)
+expit <- function(x) { 1 / (1+exp(-x))}
 
 sw_data_example <- data.frame(cluster = 1:15) %>%
   # expand data_sw with period 1 through 6 for each cluster
   tidyr::expand(cluster, period = 1:6) %>%
   # generate cluster period sizes
-  dplyr::mutate(cp_size = sample(15:30, n(), replace = TRUE))
+  dplyr::mutate(cp_size = sample(15:30, dplyr::n(), replace = TRUE))
 
 sw_data_example %<>%
   # create individual observations for each cluster period
@@ -14,7 +15,7 @@ sw_data_example %<>%
   # assign treatment indicator
   dplyr::mutate(trt = ifelse(period > seq, 1, 0)) %>%
   # generate cluster random effect
-  group_by(cluster) %>%
+  dplyr::group_by(cluster) %>%
   dplyr::mutate(cluster_re = rnorm(n = 1, mean = 0, sd = 0.1)) %>%
   # generate cluster-time random effect
   dplyr::group_by(cluster, period) %>%
@@ -22,12 +23,12 @@ sw_data_example %<>%
   dplyr::ungroup() %>%
   # generate binary outcomes
   dplyr::rowwise() %>%
-  dplyr::mutate(prob = max(c(0, min(c(1, 0.2 + cluster_re + cluster_time_re))))) %>%
+  dplyr::mutate(prob = expit(0.2 + cluster_re + cluster_time_re)) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(outcome_bin = rbinom(n = n(), size = 1, prob = prob)) %>%
+  dplyr::mutate(outcome_bin = rbinom(n = dplyr::n(), size = 1, prob = prob)) %>%
   # generate continuous outcomes
-  dplyr::mutate(outcome_cont = rnorm(n = n(), mean = 0, sd = 1) + cluster_re + cluster_time_re) %>%
-  select(-c(seq, dplyr::ends_with("_re"))) %>%
+  dplyr::mutate(outcome_cont = rnorm(n = dplyr::n(), mean = (cluster_re+cluster_time_re), sd = 1)) %>%
+  dplyr::select(-c(seq, dplyr::ends_with("_re"))) %>%
   # convert to non-tibble dataframe
   data.frame()
 
