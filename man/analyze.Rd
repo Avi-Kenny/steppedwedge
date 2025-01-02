@@ -2,12 +2,13 @@
 % Please edit documentation in R/analyze.R
 \name{analyze}
 \alias{analyze}
-\title{Title}
+\title{Analyze a stepped wedge dataset}
 \usage{
 analyze(
   dat,
   method = "mixed",
-  estimand_type,
+  estimand_type = "TATE",
+  estimand_time = c(1, attr(dat, "n_seq")),
   exp_time = "IT",
   cal_time = "categorical",
   family = stats::gaussian,
@@ -18,26 +19,54 @@ analyze(
 \arguments{
 \item{dat}{A dataframe containing the stepped wedge trial data.}
 
-\item{method}{A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.}
+\item{method}{A character string; either "mixed", for a mixed-effects model,
+or "GEE", for generalized estimating equations.}
 
-\item{estimand_type}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
+\item{estimand_type}{One of c("TATE", "PTE"); "TATE" represents the
+time-averaged treatment effect and "PTE" represents the point treatment
+effect.}
 
-\item{exp_time}{One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend. "TEH" includes a random slope term in the model, allowing the treatment effect to vary by timepoint.}
+\item{estimand_time}{An integer vector of length 1 or 2. When
+estimand_type="TATE", `estimand_time` must be a numeric vector of length
+2, representing the start and end times of the exposure time period to
+average over. When estimand_type="PTE", `estimand_time` must be a numeric
+vector of length 1, representing the time period of interest. See
+examples.}
 
-\item{cal_time}{One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.}
+\item{exp_time}{One of c("IT", "ETI", "NCS", "TEH"); model for exposure time.
+"IT" encodes an immediate treatment model with a single treatment effect
+parameter. "ETI" is an exposure time indicator model, including one
+indicator variable for each exposure time point. "NCS" uses a natural
+cubic spline model for the exposure time trend. "TEH" includes a random
+slope term in the model, allowing the treatment effect to vary by
+timepoint.}
+
+\item{cal_time}{One of c("categorical", "NCS", "linear", "none"); model for
+calendar time. "categorical" uses indicator variables for discrete time
+points, as in the Hussey and Hughes model. "NCS" uses a natural cubic
+spline, useful for datasets with continuous time. "linear" uses a single
+slope parameter. "none" assumes that there is no underlying calendar time
+trend.}
 
 \item{family}{A family object; see documentation for `glm()`.}
 
-\item{re}{A character vector of random effects to include; only relevant if method="mixed" is used. Possible random effects include "clust" (random intercept for cluster), "time" (random intercept for cluster-time interaction), "ind" (random intercept for individuals; appropriate when a cohort design is used), "tx" (random treatment effect)}
+\item{re}{A character vector of random effects to include; only relevant if
+method="mixed" is used. Possible random effects include "clust" (random
+intercept for cluster), "time" (random intercept for cluster-time
+interaction), "ind" (random intercept for individuals; appropriate when a
+cohort design is used), "tx" (random treatment effect)}
 
-\item{corstr}{One of c("independence", "exchangeable", "ar1"); only relevant if method="GEE" is used. Defines the GEE working correlation structure; see the documentation for `geepack::geeglm()`.}
+\item{corstr}{One of c("independence", "exchangeable", "ar1"); only relevant
+if method="GEE" is used. Defines the GEE working correlation structure;
+see the documentation for `geepack::geeglm()`.}
 }
 \value{
 A list with ___
 }
 \description{
-Title
+Analyze a stepped wedge dataset
 }
 \examples{
-# TO DO
+# TO DO: example with estimand_type="TATE" and estimand_time=c(1,4)
+# TO DO: example with estimand_type="PTE" and estimand_time=3
 }

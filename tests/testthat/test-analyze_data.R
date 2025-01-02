@@ -31,7 +31,7 @@ test_that("Input validation works", {
 test_that("Correct model type and estimand_type for IT mixed model", {
   result <- analyze(dat=sw_data, method="mixed", estimand_type="TATE", exp_time="IT", family="gaussian")
   expect_equal(result$model_type, "it_mixed")
-  expect_equal(result$estimand_type, "TATE/LTE")
+  expect_equal(result$estimand_type, "TATE (IT)")
 })
 
 test_that("Correct model type and estimand_type for ETI mixed model, TATE", {
@@ -40,16 +40,16 @@ test_that("Correct model type and estimand_type for ETI mixed model, TATE", {
   expect_equal(result$estimand_type, "TATE")
 })
 
-test_that("Correct model type and estimand_type for ETI mixed model, LTE", {
-  result <- analyze(sw_data, method="mixed", estimand_type="LTE", exp_time="ETI", family="gaussian")
+test_that("Correct model type and estimand_type for ETI mixed model, PTE", {
+  result <- analyze(sw_data, method="mixed", estimand_type="PTE", exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_mixed")
-  expect_equal(result$estimand_type, "LTE")
+  expect_equal(result$estimand_type, "PTE")
 })
 
 test_that("Correct model type and estimand_type for IT GEE model, TATE", {
   result <- analyze(sw_data, method="GEE", estimand_type="TATE", exp_time="IT", family="gaussian")
   expect_equal(result$model_type, "it_GEE")
-  expect_equal(result$estimand_type, "TATE/LTE")
+  expect_equal(result$estimand_type, "TATE (IT)")
 })
 
 test_that("Correct model type and estimand_type for ETI GEE model, TATE", {
@@ -58,10 +58,10 @@ test_that("Correct model type and estimand_type for ETI GEE model, TATE", {
   expect_equal(result$estimand_type, "TATE")
 })
 
-test_that("Correct model type and estimand_type for ETI GEE model, LTE", {
-  result <- analyze(sw_data, method="GEE", estimand_type="LTE", exp_time="ETI", family="gaussian")
+test_that("Correct model type and estimand_type for ETI GEE model, PTE", {
+  result <- analyze(sw_data, method="GEE", estimand_type="PTE", exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_GEE")
-  expect_equal(result$estimand_type, "LTE")
+  expect_equal(result$estimand_type, "PTE")
 })
 
 
