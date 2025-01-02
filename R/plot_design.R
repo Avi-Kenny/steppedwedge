@@ -20,7 +20,7 @@ plot_design <- function(dat)
 
   num_clusters <- attr(dat, "n_clusters")
   num_times <- attr(dat, "n_times")
-  num_sequences <- attr(dat, "n_sequences")
+  num_seq <- attr(dat, "n_seq")
   dat <- data.frame(dat)
   # num_clusters <- length(unique(dat$cluster_id))
 

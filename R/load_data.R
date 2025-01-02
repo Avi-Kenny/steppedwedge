@@ -170,10 +170,10 @@ load_data <- function(
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))
   n_times <- length(unique(dat_return$time))
-  n_sequences <- length(unique(dat_return$first_exposure))
+  n_seq <- length(unique(dat_return$first_exposure))
   attr(dat_return, "n_clusters") <- n_clusters
   attr(dat_return, "n_times") <- n_times
-  attr(dat_return, "n_sequences") <- n_sequences
+  attr(dat_return, "n_seq") <- n_seq
 
   class(dat_return) <- c("data.frame", "sw_dat")
 
@@ -184,7 +184,7 @@ load_data <- function(
       " time design with ",
       n_clusters,
       " clusters, ",
-      n_sequences,
+      n_seq,
       " sequences, and ",
       n_times,
       " time points. ",

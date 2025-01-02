@@ -28,7 +28,7 @@ test_that("load_data works correctly", {
   # Check attributes
   expect_equal(attr(result, "n_clusters"), 2)
   expect_equal(attr(result, "n_times"), 3)
-  expect_equal(attr(result, "n_sequences"), 2)
+  expect_equal(attr(result, "n_seq"), 2)
 
   # Check data content
   expect_equal(nrow(result), 18)
