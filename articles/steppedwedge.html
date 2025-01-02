@@ -107,7 +107,7 @@ Treatment (IT) effect, passing the <code>family = "binomial"</code> and
 <code class="sourceCode R"><span><span class="va">analysis_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
 <span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span></span>
@@ -123,7 +123,7 @@ not for cluster-time interaction.</p>
 <code class="sourceCode R"><span><span class="va">analysis_1b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
 <span>  re <span class="op">=</span> <span class="st">"clust"</span></span>
@@ -138,7 +138,7 @@ not for cluster-time interaction.</p>
 <code class="sourceCode R"><span><span class="va">analysis_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"GEE"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
 <span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span></span>
@@ -154,7 +154,7 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <code class="sourceCode R"><span><span class="va">analysis_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"ETI"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span></span>
 <span><span class="op">)</span></span>
@@ -170,7 +170,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <code class="sourceCode R"><span><span class="va">analysis_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"NCS"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span></span>
 <span><span class="op">)</span></span>
@@ -187,7 +187,7 @@ estimand, using a Treatment Effect Heterogeneity over exposure time
 <code class="sourceCode R"><span><span class="va">analysis_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"TEH"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">binomial</span></span>
 <span><span class="op">)</span></span>
@@ -206,7 +206,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <code class="sourceCode R"><span><span class="va">analysis_6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
 <span>  exp_time <span class="op">=</span> <span class="st">"NCS"</span>,</span>
 <span>  family <span class="op">=</span> <span class="va">gaussian</span></span>
 <span><span class="op">)</span></span>
