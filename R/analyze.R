@@ -2,7 +2,7 @@
 #'
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.
-#' @param estimand A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
+#' @param estimand_type A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.
 #' @param exp_time One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend. "TEH" includes a random slope term in the model, allowing the treatment effect to vary by timepoint.
 #' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for calendar time. "categorical" uses indicator variables for discrete time points, as in the Hussey and Hughes model. "NCS" uses a natural cubic spline, useful for datasets with continuous time. "linear" uses a single slope parameter. "none" assumes that there is no underlying calendar time trend.
 #' @param family A family object; see documentation for `glm()`.
@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' # TO DO
-analyze <- function(dat, method="mixed", estimand, exp_time="IT",
+analyze <- function(dat, method="mixed", estimand_type, exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable") {
 
@@ -81,7 +81,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     stop("Random treatment effects not yet implemented")
   }
 
-  if(method == "mixed" & estimand %in% c("TATE", "LTE") & exp_time == "IT") {
+  if(method == "mixed" & estimand_type %in% c("TATE", "LTE") & exp_time == "IT") {
 
     ################################################.
     ##### Immediate Treatment (IT) mixed model #####
@@ -108,7 +108,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     results <- list(
       model = model_it_mixed,
       model_type = "it_mixed",
-      estimand = "TATE/LTE",
+      estimand_type = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci,
@@ -143,7 +143,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
 
-    if(estimand == "TATE") {
+    if(estimand_type == "TATE") {
 
       # Estimate the TATE
       M <- matrix(rep(1/index_max), index_max, nrow=1)
@@ -154,7 +154,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_eti_mixed,
         model_type = "eti_mixed",
-        estimand = "TATE",
+        estimand_type = "TATE",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
@@ -162,7 +162,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
 
-    } else if(estimand == "LTE") {
+    } else if(estimand_type == "LTE") {
 
       # Estimate the LTE
       lte_est <- as.numeric(coeffs[index_max])
@@ -172,7 +172,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_eti_mixed,
         model_type = "eti_mixed",
-        estimand = "LTE",
+        estimand_type = "LTE",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
@@ -204,7 +204,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
 
     summary_teh <- summary(model_teh_mixed)
 
-    if(estimand == "TATE") {
+    if(estimand_type == "TATE") {
 
       # Estimate the TATE
       tate_est <- summary_teh$coefficients["treatment",1]
@@ -214,7 +214,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
-        estimand = "TATE",
+        estimand_type = "TATE",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
@@ -222,7 +222,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
         messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
 
-    } else if(estimand == "LTE") {
+    } else if(estimand_type == "LTE") {
 
       # Estimate the LTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
       exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
@@ -242,7 +242,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
-        estimand = "LTE",
+        estimand_type = "LTE",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
@@ -305,7 +305,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
 
-    if(estimand == "TATE") {
+    if(estimand_type == "TATE") {
       # Estimate the TATE over the interval [0,6]
       M <- matrix(rep(1/num_exp_timepoints, num_exp_timepoints), nrow=1)
       tate_est <- (M %*% coeffs_trans)[1]
@@ -315,14 +315,14 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_ncs_mixed,
         model_type = "ncs_mixed",
-        estimand = "TATE",
+        estimand_type = "TATE",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages
       )
-    } else if(estimand == "LTE") {
+    } else if(estimand_type == "LTE") {
 
       # Estimate the LTE
       lte_est <- as.numeric(coeffs_trans[max_exp_timepoint])
@@ -332,7 +332,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_ncs_mixed,
         model_type = "ncs_mixed",
-        estimand = "LTE",
+        estimand_type = "LTE",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci,
@@ -346,7 +346,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     # # Estimate the effect curve
     # curve_ncs <- c(0, coeffs_trans)
 
-  } else if(method == "GEE" & estimand %in% c("TATE", "LTE") & exp_time == "IT") {
+  } else if(method == "GEE" & estimand_type %in% c("TATE", "LTE") & exp_time == "IT") {
 
 
     ##############################################.
@@ -375,7 +375,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     results <- list(
       model = model_it_GEE,
       model_type = "it_GEE",
-      estimand = "TATE/LTE",
+      estimand_type = "TATE/LTE",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci
@@ -408,7 +408,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     cov_mtx <- stats::vcov(model_eti_GEE)[indices,indices]
 
-    if(estimand == "TATE") {
+    if(estimand_type == "TATE") {
 
       # Estimate the TATE
       M <- matrix(rep(1/index_max), index_max, nrow=1)
@@ -419,13 +419,13 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_eti_GEE,
         model_type = "eti_GEE",
-        estimand = "TATE",
+        estimand_type = "TATE",
         te_est = tate_est,
         te_se = tate_se,
         te_ci = tate_ci
       )
 
-    } else if(estimand == "LTE") {
+    } else if(estimand_type == "LTE") {
 
       # Estimate the LTE
       lte_est <- as.numeric(coeffs[index_max])
@@ -435,7 +435,7 @@ analyze <- function(dat, method="mixed", estimand, exp_time="IT",
       results <- list(
         model = model_eti_GEE,
         model_type = "eti_GEE",
-        estimand = "LTE",
+        estimand_type = "LTE",
         te_est = lte_est,
         te_se = lte_se,
         te_ci = lte_ci

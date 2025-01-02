@@ -7,7 +7,7 @@
 analyze(
   dat,
   method = "mixed",
-  estimand,
+  estimand_type,
   exp_time = "IT",
   cal_time = "categorical",
   family = stats::gaussian,
@@ -20,7 +20,7 @@ analyze(
 
 \item{method}{A character string; either "mixed", for a mixed-effects model, or "GEE", for generalized estimating equations.}
 
-\item{estimand}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
+\item{estimand_type}{A character string; either "TATE", for time-averaged treatment effect, or "LTE", for long-term treatment effect.}
 
 \item{exp_time}{One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT" encodes an immediate treatment model with a single treatment effect parameter. "ETI" is an exposure time indicator model, including one indicator variable for each exposure time point. "NCS" uses a natural cubic spline model for the exposure time trend. "TEH" includes a random slope term in the model, allowing the treatment effect to vary by timepoint.}
 

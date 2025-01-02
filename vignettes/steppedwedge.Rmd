@@ -63,7 +63,7 @@ The `analyze` function analyzes the stepped wedge data. First, we analyze the da
 analysis_1 <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "IT",
   family = binomial,
   re = c("clust", "time")
@@ -78,7 +78,7 @@ Repeat the analysis, but including a random effect for cluster only, not for clu
 analysis_1b <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "IT",
   family = binomial,
   re = "clust"
@@ -94,7 +94,7 @@ Repeat the analysis, but using GEE rather than a mixed model.
 analysis_2 <- analyze(
   dat = dat,
   method = "GEE",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "IT",
   family = binomial,
   corstr = "exchangeable"
@@ -110,7 +110,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand, using an 
 analysis_3 <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "ETI",
   family = binomial
 )
@@ -125,7 +125,7 @@ Mixed model, with Time Average Treatment Effect (TATE) as the estimand, using a 
 analysis_4 <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "NCS",
   family = binomial
 )
@@ -140,7 +140,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a T
 analysis_5 <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "TEH",
   family = binomial
 )
@@ -156,7 +156,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a N
 analysis_6 <- analyze(
   dat = dat,
   method = "mixed",
-  estimand = "TATE", 
+  estimand_type = "TATE", 
   exp_time = "NCS",
   family = gaussian
 )
