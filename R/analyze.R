@@ -1,4 +1,4 @@
-#' Title
+#' Analyze a stepped wedge dataset
 #'
 #' @param dat A dataframe containing the stepped wedge trial data.
 #' @param method A character string; either "mixed", for a mixed-effects model,
@@ -109,7 +109,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     stop("Random treatment effects not yet implemented")
   }
 
-  if(method == "mixed" & estimand_type %in% c("TATE", "LTE") & exp_time == "IT") {
+  if(method == "mixed" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 
     ################################################.
     ##### Immediate Treatment (IT) mixed model #####
@@ -127,7 +127,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     summary_it <- summary(model_it_mixed)
 
     # Extract an estimate and confidence interval for the estimated treatment
-    #     effect; recall that the TATE estimator for any interval and the PTE/LTE
+    #     effect; recall that the TATE estimator for any interval and the PTE
     #     estimators are all equivalent when using the immediate treatment model
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
@@ -190,20 +190,20 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
 
-    } else if(estimand_type == "LTE") {
+    } else if(estimand_type == "PTE") {
 
-      # Estimate the LTE
-      lte_est <- as.numeric(coeffs[index_max])
-      lte_se <- sqrt(cov_mtx[index_max,index_max])
-      lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      # Estimate the PTE
+      pte_est <- as.numeric(coeffs[index_max])
+      pte_se <- sqrt(cov_mtx[index_max,index_max])
+      pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
         model = model_eti_mixed,
         model_type = "eti_mixed",
-        estimand_type = "LTE",
-        te_est = lte_est,
-        te_se = lte_se,
-        te_ci = lte_ci,
+        estimand_type = "PTE",
+        te_est = pte_est,
+        te_se = pte_se,
+        te_ci = pte_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
@@ -250,30 +250,30 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
 
-    } else if(estimand_type == "LTE") {
+    } else if(estimand_type == "PTE") {
 
-      # Estimate the LTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
+      # Estimate the PTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
       exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
       max_exp_timepoint <- max(exp_timepoints)
       re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
-      re_treatment_lte <- re_treatment[rownames(re_treatment) == as.character(max_exp_timepoint), "treatment"]
-      lte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_lte
+      re_treatment_pte <- re_treatment[rownames(re_treatment) == as.character(max_exp_timepoint), "treatment"]
+      pte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_pte
 
-      # Estimate the SE of the LTE by combining the variances from the fixed effect component and the random effect for the final timepoint
+      # Estimate the SE of the PTE by combining the variances from the fixed effect component and the random effect for the final timepoint
       re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
       re_se <- sqrt(re_var)
-      re_se_lte <- re_se[length(re_se)]
+      re_se_pte <- re_se[length(re_se)]
 
-      lte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_lte^2)
-      lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      pte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_pte^2)
+      pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
-        estimand_type = "LTE",
-        te_est = lte_est,
-        te_se = lte_se,
-        te_ci = lte_ci,
+        estimand_type = "PTE",
+        te_est = pte_est,
+        te_se = pte_se,
+        te_ci = pte_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
@@ -350,20 +350,20 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages
       )
-    } else if(estimand_type == "LTE") {
+    } else if(estimand_type == "PTE") {
 
-      # Estimate the LTE
-      lte_est <- as.numeric(coeffs_trans[max_exp_timepoint])
-      lte_se <- sqrt(cov_mtx[max_exp_timepoint, max_exp_timepoint])
-      lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      # Estimate the PTE
+      pte_est <- as.numeric(coeffs_trans[max_exp_timepoint])
+      pte_se <- sqrt(cov_mtx[max_exp_timepoint, max_exp_timepoint])
+      pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
         model = model_ncs_mixed,
         model_type = "ncs_mixed",
-        estimand_type = "LTE",
-        te_est = lte_est,
-        te_se = lte_se,
-        te_ci = lte_ci,
+        estimand_type = "PTE",
+        te_est = pte_est,
+        te_se = pte_se,
+        te_ci = pte_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages
       )
@@ -374,7 +374,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # # Estimate the effect curve
     # curve_ncs <- c(0, coeffs_trans)
 
-  } else if(method == "GEE" & estimand_type %in% c("TATE", "LTE") & exp_time == "IT") {
+  } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 
 
     ##############################################.
@@ -394,7 +394,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     summary_it <- summary(model_it_GEE)
 
     # Extract an estimate and confidence interval for the estimated treatment
-    #     effect; recall that the TATE estimator for any interval and the PTE/LTE
+    #     effect; recall that the TATE estimator for any interval and the PTE
     #     estimators are all equivalent when using the immediate treatment model
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
@@ -403,7 +403,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     results <- list(
       model = model_it_GEE,
       model_type = "it_GEE",
-      estimand_type = "TATE/LTE",
+      estimand_type = "TATE (IT)",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci
@@ -453,20 +453,20 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci
       )
 
-    } else if(estimand_type == "LTE") {
+    } else if(estimand_type == "PTE") {
 
-      # Estimate the LTE
-      lte_est <- as.numeric(coeffs[index_max])
-      lte_se <- sqrt(cov_mtx[index_max,index_max])
-      lte_ci <- lte_est + c(-1.96,1.96) * lte_se
+      # Estimate the PTE
+      pte_est <- as.numeric(coeffs[index_max])
+      pte_se <- sqrt(cov_mtx[index_max,index_max])
+      pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
         model = model_eti_GEE,
         model_type = "eti_GEE",
-        estimand_type = "LTE",
-        te_est = lte_est,
-        te_se = lte_se,
-        te_ci = lte_ci
+        estimand_type = "PTE",
+        te_est = pte_est,
+        te_se = pte_se,
+        te_ci = pte_ci
       )
       #
       # # Estimate the effect curve
@@ -481,6 +481,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   return(results)
 
   # # Display results
-  # display_results("TATE/LTE", te_est, te_ci)
+  # display_results("TATE (IT)", te_est, te_ci)
 
 }
