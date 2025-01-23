@@ -20,7 +20,7 @@ sw_data <- load_data(
 # Invalid input
 
 test_that("Input validation works", {
-  expect_error(analyze(dat=sample_data, estimand_type="TATE"),
+  expect_error(analyze(dat=sample_data, estimand_type="TATE", estimand_time = c(1, 2)),
                "`dat` must be of class `sw_dat`.")
 })
 
@@ -29,37 +29,43 @@ test_that("Input validation works", {
 # Model type and estimand_type returned correctly
 
 test_that("Correct model type and estimand_type for IT mixed model", {
-  result <- analyze(dat=sw_data, method="mixed", estimand_type="TATE", exp_time="IT", family="gaussian")
+  result <- analyze(dat=sw_data, method="mixed", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="IT", family="gaussian")
   expect_equal(result$model_type, "it_mixed")
   expect_equal(result$estimand_type, "TATE (IT)")
 })
 
 test_that("Correct model type and estimand_type for ETI mixed model, TATE", {
-  result <- analyze(sw_data, method="mixed", estimand_type="TATE", exp_time="ETI", family="gaussian")
+  result <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_mixed")
   expect_equal(result$estimand_type, "TATE")
 })
 
 test_that("Correct model type and estimand_type for ETI mixed model, PTE", {
-  result <- analyze(sw_data, method="mixed", estimand_type="PTE", exp_time="ETI", family="gaussian")
+  result <- analyze(sw_data, method="mixed", estimand_type="PTE",
+                    estimand_time = 2, exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_mixed")
   expect_equal(result$estimand_type, "PTE")
 })
 
 test_that("Correct model type and estimand_type for IT GEE model, TATE", {
-  result <- analyze(sw_data, method="GEE", estimand_type="TATE", exp_time="IT", family="gaussian")
+  result <- analyze(sw_data, method="GEE", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="IT", family="gaussian")
   expect_equal(result$model_type, "it_GEE")
   expect_equal(result$estimand_type, "TATE (IT)")
 })
 
 test_that("Correct model type and estimand_type for ETI GEE model, TATE", {
-  result <- analyze(sw_data, method="GEE", estimand_type="TATE", exp_time="ETI", family="gaussian")
+  result <- analyze(sw_data, method="GEE", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_GEE")
   expect_equal(result$estimand_type, "TATE")
 })
 
 test_that("Correct model type and estimand_type for ETI GEE model, PTE", {
-  result <- analyze(sw_data, method="GEE", estimand_type="PTE", exp_time="ETI", family="gaussian")
+  result <- analyze(sw_data, method="GEE", estimand_type="PTE",
+                    estimand_time = 2, exp_time="ETI", family="gaussian")
   expect_equal(result$model_type, "eti_GEE")
   expect_equal(result$estimand_type, "PTE")
 })
@@ -68,7 +74,8 @@ test_that("Correct model type and estimand_type for ETI GEE model, PTE", {
 # Model coefficients returned correctly
 
 test_that("Model coefficients are returned correctly", {
-  result <- analyze(sw_data, method="mixed", estimand_type="TATE", exp_time="IT", family="gaussian")
+  result <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="IT", family="gaussian")
   expect_true("te_est" %in% names(result))
   expect_true("te_se" %in% names(result))
   expect_true("te_ci" %in% names(result))
@@ -77,8 +84,10 @@ test_that("Model coefficients are returned correctly", {
 # Different family and link functions
 
 test_that("Function handles different family and link functions", {
-  result_binomial <- analyze(sw_data, method="mixed", estimand_type="TATE", exp_time="IT", family="binomial")
-  result_gaussian <- analyze(sw_data, method="mixed", estimand_type="TATE", exp_time="IT", family="gaussian")
+  result_binomial <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                             estimand_time = c(1, 2), exp_time="IT", family="binomial")
+  result_gaussian <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                             estimand_time = c(1, 2), exp_time="IT", family="gaussian")
   expect_true(result_binomial$model@resp$family$family == "binomial")
   expect_true(methods::is(result_gaussian$model,"lmerMod"))
 })
