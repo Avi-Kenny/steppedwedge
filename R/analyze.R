@@ -59,6 +59,14 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (!all(re %in% c("clust", "time", "ind", "tx"))) {
     stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
   }
+  if (estimand_type == "TATE" & 
+      !(length(estimand_time) == 2 & is.numeric(estimand_time))) {
+    stop("`estimand_time` must be a numeric vector of length 2")
+  }
+  if (estimand_type == "PTE" & 
+      !(length(estimand_time) == 1 & is.numeric(estimand_time))) {
+    stop("`estimand_time` must be a numeric vector of length 1")
+  }
 
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
 
