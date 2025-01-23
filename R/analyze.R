@@ -265,13 +265,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
       max_exp_timepoint <- max(exp_timepoints)
       re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
-      re_treatment_pte <- re_treatment[rownames(re_treatment) == as.character(max_exp_timepoint), "treatment"]
+      re_treatment_pte <- re_treatment[rownames(re_treatment) == as.character(estimand_time), "treatment"]
       pte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_pte
 
       # Estimate the SE of the PTE by combining the variances from the fixed effect component and the random effect for the final timepoint
       re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
       re_se <- sqrt(re_var)
-      re_se_pte <- re_se[length(re_se)]
+      re_se_pte <- re_se[estimand_time]
 
       pte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_pte^2)
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
