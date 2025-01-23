@@ -13,7 +13,8 @@ analyze(
   cal_time = "categorical",
   family = stats::gaussian,
   re = c("clust", "time"),
-  corstr = "exchangeable"
+  corstr = "exchangeable",
+  offset = NULL
 )
 }
 \arguments{
@@ -48,7 +49,7 @@ spline, useful for datasets with continuous time. "linear" uses a single
 slope parameter. "none" assumes that there is no underlying calendar time
 trend.}
 
-\item{family}{A family object; see documentation for `glm()`.}
+\item{family}{A family object; see documentation for `glm`.}
 
 \item{re}{A character vector of random effects to include; only relevant if
 method="mixed" is used. Possible random effects include "clust" (random
@@ -58,7 +59,9 @@ cohort design is used), "tx" (random treatment effect)}
 
 \item{corstr}{One of c("independence", "exchangeable", "ar1"); only relevant
 if method="GEE" is used. Defines the GEE working correlation structure;
-see the documentation for `geepack::geeglm()`.}
+see the documentation for `geepack::geeglm`.}
+
+\item{offset}{A linear predictor offset term; see docs for `lme4::lmer`.}
 }
 \value{
 A list with ___

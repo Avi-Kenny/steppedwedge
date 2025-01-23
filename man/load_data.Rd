@@ -15,17 +15,24 @@ load_data(
 )
 }
 \arguments{
-\item{time}{A character string; the name of the numeric variable representing time. Time can be either discrete or continuous.}
+\item{time}{A character string; the name of the numeric variable representing
+time. Time can be either discrete or continuous.}
 
-\item{cluster_id}{A character string; the name of the numeric variable identifying the cluster.}
+\item{cluster_id}{A character string; the name of the numeric variable
+identifying the cluster.}
 
-\item{individual_id}{A character string (optional); the name of the numeric variable identifying the individual.}
+\item{individual_id}{A character string (optional); the name of the numeric
+variable identifying the individual.}
 
-\item{treatment}{A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.}
+\item{treatment}{A character string; the name of the binary variable
+indicating treatment. Values must be either integers (0/1) or Boolean
+(T/F).}
 
-\item{outcome}{A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.}
+\item{outcome}{A character string; the name of the numeric or binary variable
+indicating outcome. Values must be either numeric or Boolean (T/F).}
 
-\item{time_type}{A character string describing how time is accounted for: 'discrete' (default) or 'continuous'}
+\item{time_type}{One of c("discrete", "continuous"); whether the model treats
+time as discrete or continuous.}
 
 \item{data}{A dataframe containing the stepped wedge trial data.}
 }
