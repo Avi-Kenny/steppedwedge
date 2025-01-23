@@ -47,7 +47,8 @@
 <span>  cal_time <span class="op">=</span> <span class="st">"categorical"</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,</span>
 <span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span>,</span>
-<span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span></span>
+<span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span>,</span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,7 +100,7 @@ trend.</p></dd>
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>A family object; see documentation for `glm()`.</p></dd>
+<dd><p>A family object; see documentation for `glm`.</p></dd>
 
 
 <dt id="arg-re">re<a class="anchor" aria-label="anchor" href="#arg-re"></a></dt>
@@ -113,7 +114,11 @@ cohort design is used), "tx" (random treatment effect)</p></dd>
 <dt id="arg-corstr">corstr<a class="anchor" aria-label="anchor" href="#arg-corstr"></a></dt>
 <dd><p>One of c("independence", "exchangeable", "ar1"); only relevant
 if method="GEE" is used. Defines the GEE working correlation structure;
-see the documentation for `geepack::geeglm()`.</p></dd>
+see the documentation for `geepack::geeglm`.</p></dd>
+
+
+<dt id="arg-offset">offset<a class="anchor" aria-label="anchor" href="#arg-offset"></a></dt>
+<dd><p>A linear predictor offset term; see docs for `lme4::lmer`.</p></dd>
 
 </dl></div>
     <div class="section level2">
