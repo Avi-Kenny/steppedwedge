@@ -25,7 +25,7 @@
 #'     spline, useful for datasets with continuous time. "linear" uses a single
 #'     slope parameter. "none" assumes that there is no underlying calendar time
 #'     trend.
-#' @param family A family object; see documentation for `glm()`.
+#' @param family A family object; see documentation for `glm`.
 #' @param re A character vector of random effects to include; only relevant if
 #'     method="mixed" is used. Possible random effects include "clust" (random
 #'     intercept for cluster), "time" (random intercept for cluster-time
@@ -33,7 +33,8 @@
 #'     cohort design is used), "tx" (random treatment effect)
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
-#'     see the documentation for `geepack::geeglm()`.
+#'     see the documentation for `geepack::geeglm`.
+#' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
 #'
 #' @return A list with ___
 #' @export
@@ -44,7 +45,7 @@
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
-                    re=c("clust", "time"), corstr="exchangeable") {
+                    re=c("clust", "time"), corstr="exchangeable", offset=NULL) {
 
   cluster_id <- NULL
   rm(cluster_id)
@@ -118,10 +119,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "treatment", f_re)
-      model_it_mixed <- lme4::lmer(formula, data=dat)
+      model_it_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "treatment", f_re)
-      model_it_mixed <- lme4::glmer(formula, family=family, data=dat)
+      model_it_mixed <- lme4::glmer(formula, family=family, data=dat,
+                                    offset=offset)
     }
 
     summary_it <- summary(model_it_mixed)
@@ -153,10 +155,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time)", f_re)
-      model_eti_mixed <- lme4::lmer(formula, data=dat)
+      model_eti_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "factor(exposure_time)", f_re)
-      model_eti_mixed <- lme4::glmer(formula, family=family, data=dat)
+      model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
+                                     offset=offset)
     }
 
     summary_eti <- summary(model_eti_mixed)
@@ -224,10 +227,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
-      model_teh_mixed <- lme4::lmer(formula, data=dat)
+      model_teh_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
-      model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
+      model_teh_mixed <- lme4::glmer(formula, family=family, data=dat,
+                                     offset=offset)
     }
 
     summary_teh <- summary(model_teh_mixed)
@@ -301,10 +305,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
       formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4", f_re)
-      model_ncs_mixed <- lme4::lmer(formula, data=dat)
+      model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
       formula <- paste0("outcome ~ ", f_cal, "b1 + b2 + b3 + b4", f_re)
-      model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat)
+      model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat,
+                                     offset=offset)
     }
 
     summary_ncs <- summary(model_ncs_mixed)
