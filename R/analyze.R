@@ -344,8 +344,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
 
     if(estimand_type == "TATE") {
-      # Estimate the TATE over the interval [0,6]
-      M <- matrix(rep(1/num_exp_timepoints, num_exp_timepoints), nrow=1)
+      # Estimate the TATE
+      num_estimand_timepoints <- estimand_time[2] - estimand_time[1] + 1
+      M <- matrix(c(rep(0, estimand_time[1] - 1),
+                    rep(1 / num_estimand_timepoints, num_estimand_timepoints),
+                    rep(0, max_exp_timepoint - estimand_time[2])
+                    ), 
+                  nrow = 1)
       tate_est <- (M %*% coeffs_trans)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
@@ -363,8 +368,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     } else if(estimand_type == "PTE") {
 
       # Estimate the PTE
-      pte_est <- as.numeric(coeffs_trans[max_exp_timepoint])
-      pte_se <- sqrt(cov_mtx[max_exp_timepoint, max_exp_timepoint])
+      pte_est <- as.numeric(coeffs_trans[estimand_time])
+      pte_se <- sqrt(cov_mtx[estimand_time, estimand_time])
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
