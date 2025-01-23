@@ -1,12 +1,19 @@
 #' Load and format data object
 #'
-#' @param time A character string; the name of the numeric variable representing time. Time can be either discrete or continuous.
-#' @param cluster_id A character string; the name of the numeric variable identifying the cluster.
-#' @param individual_id A character string (optional); the name of the numeric variable identifying the individual.
-#' @param treatment A character string; the name of the binary variable indicating treatment. Accepts either integer (0/1) or Boolean (T/F) values.
-#' @param outcome A character string; the name of the numeric or binary variable indicating outcome. Accepts either numeric or Boolean (T/F) values.
+#' @param time A character string; the name of the numeric variable representing
+#'     time. Time can be either discrete or continuous.
+#' @param cluster_id A character string; the name of the numeric variable
+#'     identifying the cluster.
+#' @param individual_id A character string (optional); the name of the numeric
+#'     variable identifying the individual.
+#' @param treatment A character string; the name of the binary variable
+#'     indicating treatment. Values must be either integers (0/1) or Boolean
+#'     (T/F).
+#' @param outcome A character string; the name of the numeric or binary variable
+#'     indicating outcome. Values must be either numeric or Boolean (T/F).
 #' @param data A dataframe containing the stepped wedge trial data.
-#' @param time_type A character string describing how time is accounted for: 'discrete' (default) or 'continuous'
+#' @param time_type One of c("discrete", "continuous"); whether the model treats
+#'     time as discrete or continuous.
 #'
 #' @return An object of class \code{sw_data}
 #' @export
