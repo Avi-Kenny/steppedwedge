@@ -201,8 +201,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     } else if(estimand_type == "PTE") {
 
       # Estimate the PTE
-      pte_est <- as.numeric(coeffs[index_max])
-      pte_se <- sqrt(cov_mtx[index_max,index_max])
+      pte_est <- as.numeric(coeffs[estimand_time])
+      pte_se <- sqrt(cov_mtx[estimand_time,estimand_time])
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
