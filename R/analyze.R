@@ -40,8 +40,22 @@
 #' @export
 #'
 #' @examples
-#' # TO DO: example with estimand_type="TATE" and estimand_time=c(1,4)
-#' # TO DO: example with estimand_type="PTE" and estimand_time=3
+#' # Load data
+#' test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+#' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+#' 
+#' # Analysis example 1: TATE estimand for exposure times 1 through 4
+#' results_tate <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+#' estimand_time = c(1, 4), exp_time = "ETI")
+#' 
+#' results_tate
+#' 
+#' # Analysis example 2: PTE estimand for exposure time 3
+#' results_pte <- analyze(dat = test_data, method = "mixed", estimand_type = "PTE",
+#' estimand_time = 3, exp_time = "ETI")
+#' 
+#' results_pte
+#' 
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
