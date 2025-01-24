@@ -18,5 +18,13 @@ A summary of the analysis object, including an estimate and 95% CI for the treat
 Title
 }
 \examples{
-# TO DO
+# Load data
+test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+treatment = "trt", outcome = "outcome_bin", data = sw_data_example)
+
+# Analysis example: TATE estimand for exposure times 1 through 4
+results_tate <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+estimand_time = c(1, 4), exp_time = "ETI", family = poisson)
+
+results_tate
 }
