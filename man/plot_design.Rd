@@ -10,11 +10,15 @@ plot_design(dat)
 \item{dat}{A dataframe containing the stepped wedge trial data.}
 }
 \value{
-A list with the number of clusters, number of time points, a summary of the data, and a plot of the stepped wedge design.
+A list with a plot of the stepped wedge design.
 }
 \description{
 Plot stepped wedge design
 }
 \examples{
-# TO DO
+# Load data
+test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+# Plot design
+plot_design(test_data)
 }
