@@ -476,7 +476,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     if(estimand_type == "TATE") {
 
       # Estimate the TATE
-      M <- matrix(rep(1/index_max), index_max, nrow=1)
+      num_estimand_timepoints <- estimand_time[2] - estimand_time[1] + 1
+      M <- matrix(c(rep(0, estimand_time[1] - 1),
+                    rep(1 / num_estimand_timepoints, num_estimand_timepoints),
+                    rep(0, index_max - estimand_time[2])
+      ),
+      nrow = 1)
       tate_est <- (M %*% coeffs)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
@@ -493,8 +498,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     } else if(estimand_type == "PTE") {
 
       # Estimate the PTE
-      pte_est <- as.numeric(coeffs[index_max])
-      pte_se <- sqrt(cov_mtx[index_max,index_max])
+      pte_est <- as.numeric(coeffs[estimand_time])
+      pte_se <- sqrt(cov_mtx[estimand_time,estimand_time])
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
 
       results <- list(
