@@ -43,19 +43,19 @@
 #' # Load data
 #' test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
-#' 
+#'
 #' # Analysis example 1: TATE estimand for exposure times 1 through 4
 #' results_tate <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 #' estimand_time = c(1, 4), exp_time = "ETI")
-#' 
+#'
 #' results_tate
-#' 
+#'
 #' # Analysis example 2: PTE estimand for exposure time 3
 #' results_pte <- analyze(dat = test_data, method = "mixed", estimand_type = "PTE",
 #' estimand_time = 3, exp_time = "ETI")
-#' 
+#'
 #' results_pte
-#' 
+#'
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
@@ -73,13 +73,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (!all(re %in% c("clust", "time", "ind", "tx"))) {
     stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
   }
-  if (estimand_type == "TATE" & 
+  if (estimand_type == "TATE" &
       !(length(estimand_time) == 2 & is.numeric(estimand_time))) {
-    stop("`estimand_time` must be a numeric vector of length 2")
+    stop('When estimand_type=="TATE", `estimand_time` must be a numeric vector of length 2')
   }
-  if (estimand_type == "PTE" & 
+  if (estimand_type == "PTE" &
       !(length(estimand_time) == 1 & is.numeric(estimand_time))) {
-    stop("`estimand_time` must be a numeric vector of length 1")
+    stop('When estimand_type=="PTE", `estimand_time` must be a numeric vector of length 1')
   }
 
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
@@ -203,7 +203,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       M <- matrix(c(rep(0, estimand_time[1] - 1),
                     rep(1 / num_estimand_timepoints, num_estimand_timepoints),
                     rep(0, index_max - estimand_time[2])
-                  ), 
+                  ),
                   nrow = 1)
       tate_est <- (M %*% coeffs)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
@@ -371,7 +371,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       M <- matrix(c(rep(0, estimand_time[1] - 1),
                     rep(1 / num_estimand_timepoints, num_estimand_timepoints),
                     rep(0, max_exp_timepoint - estimand_time[2])
-                    ), 
+                    ),
                   nrow = 1)
       tate_est <- (M %*% coeffs_trans)[1]
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
