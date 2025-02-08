@@ -75,8 +75,12 @@ indicating treatment. Values must be either integers (0/1) or Boolean
 
 
 <dt id="arg-outcome">outcome<a class="anchor" aria-label="anchor" href="#arg-outcome"></a></dt>
-<dd><p>A character string; the name of the numeric or binary variable
-indicating outcome. Values must be either numeric or Boolean (T/F).</p></dd>
+<dd><p>Either a character string or a vector of two character strings;
+for a numeric or binary outcome, the single character string indicates
+the name of the numeric or binary outcome variable; for binomial outcome
+data, the vector of two character strings indicates the "# of successes"
+variable and the "# of trials" variable, respectively. Values in the
+outcome variable(s) must be either numeric or Boolean (T/F).</p></dd>
 
 
 <dt id="arg-time-type">time_type<a class="anchor" aria-label="anchor" href="#arg-time-type"></a></dt>
