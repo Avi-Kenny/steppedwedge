@@ -9,8 +9,12 @@
 #' @param treatment A character string; the name of the binary variable
 #'     indicating treatment. Values must be either integers (0/1) or Boolean
 #'     (T/F).
-#' @param outcome A character string; the name of the numeric or binary variable
-#'     indicating outcome. Values must be either numeric or Boolean (T/F).
+#' @param outcome Either a character string or a vector of two character strings;
+#'     for a numeric or binary outcome, the single character string indicates
+#'     the name of the numeric or binary outcome variable; for binomial outcome 
+#'     data, the vector of two character strings indicates the "# of successes"
+#'     variable and the "# of trials" variable, respectively. Values in the 
+#'     outcome variable(s) must be either numeric or Boolean (T/F).
 #' @param data A dataframe containing the stepped wedge trial data.
 #' @param time_type One of c("discrete", "continuous"); whether the model treats
 #'     time as discrete or continuous.
@@ -29,9 +33,15 @@ load_data <- function(
 
   ########## David - work on individual_id as optional inputs ######
 
-  # To prevent R CMD CHECK notes # David question
+  # To prevent R CMD CHECK notes
   .time <- .cluster_id <- .individual_id <- first_exposure <- NULL
   rm(.time,.cluster_id,.individual_id,first_exposure)
+  
+  outcome_length <- length(outcome)
+  outcome_binomial <- dplyr::case_when(
+    outcome_length == 1 ~ FALSE,
+    outcome_length == 2 ~ TRUE
+  )
 
   # Input validation
   {
@@ -181,6 +191,7 @@ load_data <- function(
   attr(dat_return, "n_clusters") <- n_clusters
   attr(dat_return, "n_times") <- n_times
   attr(dat_return, "n_seq") <- n_seq
+  attr(dat_return, "binomial") <- outcome_binomial
 
   class(dat_return) <- c("data.frame", "sw_dat")
 

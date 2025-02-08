@@ -131,6 +131,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if ("tx" %in% re) {
     stop("Random treatment effects not yet implemented")
   }
+  
+  # Parse formula terms for outcome
+  f_out <- ifelse(attr(dat, "binomial") == TRUE, 
+                  "cbind(s, m - s) ~ ", 
+                  "outcome ~ ")
 
   if(method == "mixed" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 

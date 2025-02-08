@@ -28,8 +28,12 @@ variable identifying the individual.}
 indicating treatment. Values must be either integers (0/1) or Boolean
 (T/F).}
 
-\item{outcome}{A character string; the name of the numeric or binary variable
-indicating outcome. Values must be either numeric or Boolean (T/F).}
+\item{outcome}{Either a character string or a vector of two character strings;
+for a numeric or binary outcome, the single character string indicates
+the name of the numeric or binary outcome variable; for binomial outcome 
+data, the vector of two character strings indicates the "# of successes"
+variable and the "# of trials" variable, respectively. Values in the 
+outcome variable(s) must be either numeric or Boolean (T/F).}
 
 \item{time_type}{One of c("discrete", "continuous"); whether the model treats
 time as discrete or continuous.}
