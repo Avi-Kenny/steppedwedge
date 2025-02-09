@@ -42,6 +42,14 @@ load_data <- function(
     outcome_length == 1 ~ FALSE,
     outcome_length == 2 ~ TRUE
   )
+  if (outcome_binomial == TRUE) {
+    successes <- outcome[1]
+    trials <- outcome[2]
+    outcome <- NULL
+  } else {
+    successes <- NULL
+    trials <- NULL
+  }
 
   # Input validation
   {
@@ -57,9 +65,9 @@ load_data <- function(
         "`time_type` must be a character string specifying `discrete` or `continuous`."
       ))
     }
-
+    
     for (arg in c("time", "cluster_id", "treatment",
-                  "individual_id", "outcome")) {
+                  "individual_id", "outcome", "successes", "trials")) {
 
       var <- get(arg)
 
@@ -69,6 +77,17 @@ load_data <- function(
       in_df <- all(as.logical(var %in% names(data)))
       if (arg == "individual_id") {
         if (!is.null(individual_id) && !(is_string && length_one && in_df)) {
+          stop(
+            paste0(
+              "`",
+              arg,
+              "` must be a character string specifying a s",
+              "ingle variable in `data`."
+            )
+          )
+        }
+      } else if (arg %in% c("outcome", "successes", "trials")) {
+        if (!is.null(var) && !(is_string && length_one && in_df)) {
           stop(
             paste0(
               "`",
@@ -115,8 +134,8 @@ load_data <- function(
         }
       }
 
-      # Validate: `outcome`
-      if (arg %in% c("outcome")) {
+      # Validate: `outcome` for non-binomial data
+      if (arg %in% c("outcome") & outcome_binomial == FALSE) {
         if (any(!(val %in% c(0, 1, F, T) | is.numeric(val)))) {
           stop(paste0(
             "`",
@@ -126,9 +145,29 @@ load_data <- function(
           ))
         }
       }
-
+      
+      # Validate: `successes` and `trials` for binomial data
+      if (arg %in% c("successes", "trials") & outcome_binomial == TRUE) {
+        if (any(!is.numeric(val))) {
+          stop(paste0(
+            "`",
+            arg,
+            "` must only contain numeric values."
+          ))
+        }
+      }
+      
       assign(x = paste0(".", arg), value = val)
 
+    }
+    
+    # Validate: `successes` <= `trials` for each observation
+    if (outcome_binomial == TRUE) {
+      if (any(successes > trials)) {
+        stop(paste0(
+          "`successes` must be less than or equal to `trials` for all observations."
+        ))
+      }
     }
 
   }
@@ -142,6 +181,8 @@ load_data <- function(
   # Create data object
   dat <- data.frame(
     "outcome" = .outcome,
+    "successes" = .successes,
+    "trials" = .trials,
     "time" = .time,
     "cluster_id" = .cluster_id,
     "individual_id" = .individual_id,
