@@ -2,7 +2,7 @@
 % Please edit documentation in R/print_sw_analysis.R
 \name{print.sw_analysis}
 \alias{print.sw_analysis}
-\title{Title}
+\title{Summarize a list returned by steppedwedge::analysis()}
 \usage{
 \method{print}{sw_analysis}(x, ...)
 }
@@ -15,7 +15,7 @@
 A summary of the analysis object, including an estimate and 95% CI for the treatment effect, and messages on convergence.
 }
 \description{
-Title
+Summarize a list returned by steppedwedge::analysis()
 }
 \examples{
 # Load data

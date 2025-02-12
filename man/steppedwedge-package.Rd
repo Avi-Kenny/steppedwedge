@@ -14,12 +14,13 @@ Provide various functions and tools to help fit models for estimating treatment 
 Useful links:
 \itemize{
   \item \url{https://avi-kenny.github.io/steppedwedge/}
+  \item \url{https://github.com/Avi-Kenny/steppedwedge}
   \item Report bugs at \url{https://github.com/Avi-Kenny/steppedwedge/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Avi Kenny \email{avi.kenny@gmail.com}
+\strong{Maintainer}: Avi Kenny \email{avi.kenny@gmail.com} [copyright holder]
 
 Authors:
 \itemize{
