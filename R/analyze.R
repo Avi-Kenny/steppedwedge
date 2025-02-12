@@ -101,12 +101,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_cal <- ""
   } else if (cal_time=="NCS") {
 
-    knots_cal <- seq(min(dat$time), max(dat$time), length.out=5) # Make this configurable
+    knots_cal <- seq(min(dat$time), max(dat$time), length.out=4) # Make this configurable
     basis_cal <- splines::ns(
       x = dat$time,
-      knots = knots_cal[2:4],
-      intercept = FALSE,
-      Boundary.knots = knots_cal[c(1,5)]
+      knots = knots_cal[2:3],
+      intercept = TRUE,
+      Boundary.knots = knots_cal[c(1,4)]
     )
     dat$j_1 <- basis_cal[,1]
     dat$j_2 <- basis_cal[,2]
@@ -114,7 +114,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     dat$j_4 <- basis_cal[,4]
     rm(knots_cal,basis_cal)
 
-    f_cal <- "j_1 + j_2 + j_3 + j_4 + "
+    f_cal <- "j_1 + j_2 + j_3 + j_4 - 1 + "
 
   }
 
@@ -133,10 +133,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if ("tx" %in% re) {
     stop("Random treatment effects not yet implemented")
   }
-  
+
   # Parse formula terms for outcome
-  f_out <- ifelse(attr(dat, "binomial") == TRUE, 
-                  "cbind(successes, trials - successes) ~ ", 
+  f_out <- ifelse(attr(dat, "binomial") == TRUE,
+                  "cbind(successes, trials - successes) ~ ",
                   "outcome ~ ")
 
   if(method == "mixed" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
@@ -330,7 +330,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Create the spline basis (4 degrees of freedom)
     J <- length(unique(dat$time))
-    ns_basis <- splines::ns(c(0:(J-1)), knots=c((J-1)/4,(2*(J-1))/4,(3*(J-1))/4))
+    knots_exp <- seq(0, J-1, length.out=4) # Make this configurable
+    ns_basis <- splines::ns(
+      x = c(0:(J-1)),
+      knots = knots_exp[2:3],
+      intercept = TRUE
+    )
     dat$b1 <- ns_basis[dat$exposure_time+1,1]
     dat$b2 <- ns_basis[dat$exposure_time+1,2]
     dat$b3 <- ns_basis[dat$exposure_time+1,3]
