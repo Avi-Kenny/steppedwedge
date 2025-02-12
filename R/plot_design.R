@@ -7,16 +7,15 @@
 #'
 #' @examples
 #' # Load data
-#' test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+#' example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
 #' # Plot design
-#' plot_design(test_data)
+#' plot_design(example_data)
 plot_design <- function(dat)
 {
 
   # Prevent R CMD CHECK note
-  aes <- cluster_id <- first_exposure <- n <- time <- treatment <- NULL
-  x <- geeCRT::sampleSWCRTLarge
+  aes <- cluster_id <- first_exposure <- n <- time <- treatment <- x <- NULL
   rm(aes,cluster_id,first_exposure,n,time,treatment,x)
 
   # Input validation

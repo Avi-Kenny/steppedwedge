@@ -23,19 +23,19 @@
 #' @export
 #'
 #' @examples
-#' load_data(time = "period", cluster_id = "id", individual_id = NULL,
-#' treatment = "treatment", outcome = "y_bin",
-#' data = geeCRT::sampleSWCRTLarge)
+#' example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+#' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+#' base::summary(example_data)
+#' 
+#' 
 load_data <- function(
     time, cluster_id, individual_id = NULL, treatment,
     outcome, time_type = "discrete", data
 ) {
 
-  ########## David - work on individual_id as optional inputs ######
-
   # To prevent R CMD CHECK notes
-  .time <- .cluster_id <- .individual_id <- first_exposure <- NULL
-  rm(.time,.cluster_id,.individual_id,first_exposure)
+  .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- NULL
+  rm(.time,.cluster_id,.individual_id,.successes,.trials,first_exposure)
   
   outcome_length <- length(outcome)
   outcome_binomial <- dplyr::case_when(
@@ -55,7 +55,6 @@ load_data <- function(
   {
 
     if (!methods::is(data,"data.frame")) { stop("`data` must be a data frame.") }
-    # David question - added this error message for tibble dataframe
     if (methods::is(data,"tbl_df")) { stop("`data` must be a non-tibble data frame.") }
     if (nrow(data)==0) { stop("`data` is an empty data frame.") }
 
@@ -120,8 +119,6 @@ load_data <- function(
         }
       }
 
-      # David question - what types do we want to allow for treatment and outcome?
-      # Separate treatment (binary) and outcome (and detect whether binary/count/continuous)
       # Validate: `treatment`
       if (arg %in% c("treatment")) {
         if (any(!(val %in% c(0, 1, F, T, NA)))) {

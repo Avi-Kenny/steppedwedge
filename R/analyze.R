@@ -36,7 +36,9 @@
 #'     see the documentation for `geepack::geeglm`.
 #' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
 #'
-#' @return A list with ___
+#' @return A list with the model object, model type as a string, estimand type
+#' as a string, numeric treatment effect estimate, numeric treatment effect standard error, and
+#' treatment effect 95% confidence interval as a numeric vector of length 2
 #' @export
 #'
 #' @examples

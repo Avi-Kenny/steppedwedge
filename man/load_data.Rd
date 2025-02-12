@@ -47,7 +47,9 @@ An object of class \code{sw_data}
 Load and format data object
 }
 \examples{
-load_data(time = "period", cluster_id = "id", individual_id = NULL,
-treatment = "treatment", outcome = "y_bin",
-data = geeCRT::sampleSWCRTLarge)
+example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+base::summary(example_data)
+
+
 }
