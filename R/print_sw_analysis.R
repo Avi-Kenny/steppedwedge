@@ -1,4 +1,4 @@
-#' Title
+#' Summarize a list returned by steppedwedge::analysis()
 #'
 #' @param x A list returned by steppedwedge::analysis()
 #' @param ... Additional arguments
