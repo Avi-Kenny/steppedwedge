@@ -376,6 +376,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_df_exp)]
     ))
+    
+    class(B) <- "matrix"
 
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
