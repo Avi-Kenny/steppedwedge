@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Provide various functions and tools to help fit models for estimating treatment effects in stepped wedge cluster randomized trials.
+Provide various functions and tools to help fit models for estimating treatment effects in stepped wedge cluster randomized trials. Implements methods described in Kenny, Voldal, Xia, and Heagerty (2022) "Analysis of stepped wedge cluster randomized trials in the presence of a time-varying treatment effect", \doi{10.1002/sim.9511}.
 }
 \seealso{
 Useful links:
