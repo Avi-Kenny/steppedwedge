@@ -330,26 +330,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Create the spline basis (4 degrees of freedom)
     n_df_exp <- 4
-    # J <- length(unique(dat$time)) # Temporarily reverting back to old code
     S <- max(dat$exposure_time)
     knots_exp <- seq(0, S, length.out=n_df_exp) # Make this configurable
     ns_basis <- splines::ns(
-      x = dat$exposure_time, # New code
-      # x = c(0:S), # Temporarily reverting back to old code
+      x = dat$exposure_time,
       knots = knots_exp[2:3],
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_df_exp)]
     )
-    dat$b1 <- ns_basis[,1] * dat$treatment # New code
+    dat$b1 <- ns_basis[,1] * dat$treatment
     dat$b2 <- ns_basis[,2] * dat$treatment
     dat$b3 <- ns_basis[,3] * dat$treatment
     dat$b4 <- ns_basis[,4] * dat$treatment
-    # dat$b1 <- ns_basis[dat$exposure_time+1,1] * dat$treatment # Temporarily reverting back to old code
-    # dat$b2 <- ns_basis[dat$exposure_time+1,2] * dat$treatment
-    # dat$b3 <- ns_basis[dat$exposure_time+1,3] * dat$treatment
-    # dat$b4 <- ns_basis[dat$exposure_time+1,4] * dat$treatment
-
-    # browser() # !!!!!
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
@@ -387,13 +379,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     )
     B <- as.matrix(ns_basis2[c(2:(round(S) + 1)),])
 
-    # for (i in c(1:round(S))) {
-    #   for (j in c(1:n_df_exp)) {
-    #     B[i,j] <- ns_basis2[i+1,j]
-    #   }
-    # }
-
-    # browser() # !!!!!
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
 
