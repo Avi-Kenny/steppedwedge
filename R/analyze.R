@@ -370,7 +370,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     max_exp_timepoint <- max(exp_timepoints)
 
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
-    ns_basis2 <- as.matrix(splines::ns(
+    B <- as.matrix(splines::ns(
       x = c(1:S),
       knots = knots_exp[2:3],
       intercept = TRUE,
