@@ -370,14 +370,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     max_exp_timepoint <- max(exp_timepoints)
 
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
-    # B <- matrix(NA, nrow=round(S), ncol=n_df_exp)
-    ns_basis2 <- splines::ns(
-      x = c(0:S),
+    ns_basis2 <- as.matrix(splines::ns(
+      x = c(1:S),
       knots = knots_exp[2:3],
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_df_exp)]
-    )
-    B <- as.matrix(ns_basis2[c(2:(round(S) + 1)),])
+    ))
 
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
