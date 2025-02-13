@@ -385,7 +385,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_df_exp)]
     )
-    B <- as.matrix(ns_basis2[c(2:round(S)),])
+    B <- as.matrix(ns_basis2[c(2:(round(S) + 1)),])
 
     # for (i in c(1:round(S))) {
     #   for (j in c(1:n_df_exp)) {
