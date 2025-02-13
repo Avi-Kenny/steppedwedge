@@ -11,9 +11,9 @@
 #'     (T/F).
 #' @param outcome Either a character string or a vector of two character strings;
 #'     for a numeric or binary outcome, the single character string indicates
-#'     the name of the numeric or binary outcome variable; for binomial outcome 
+#'     the name of the numeric or binary outcome variable; for binomial outcome
 #'     data, the vector of two character strings indicates the "# of successes"
-#'     variable and the "# of trials" variable, respectively. Values in the 
+#'     variable and the "# of trials" variable, respectively. Values in the
 #'     outcome variable(s) must be either numeric or Boolean (T/F).
 #' @param data A dataframe containing the stepped wedge trial data.
 #' @param time_type One of c("discrete", "continuous"); whether the model treats
@@ -26,8 +26,8 @@
 #' example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
 #' base::summary(example_data)
-#' 
-#' 
+#'
+#'
 load_data <- function(
     time, cluster_id, individual_id = NULL, treatment,
     outcome, time_type = "discrete", data
@@ -36,7 +36,7 @@ load_data <- function(
   # To prevent R CMD CHECK notes
   .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- NULL
   rm(.time,.cluster_id,.individual_id,.successes,.trials,first_exposure)
-  
+
   outcome_length <- length(outcome)
   outcome_binomial <- dplyr::case_when(
     outcome_length == 1 ~ FALSE,
@@ -64,7 +64,7 @@ load_data <- function(
         "`time_type` must be a character string specifying `discrete` or `continuous`."
       ))
     }
-    
+
     for (arg in c("time", "cluster_id", "treatment",
                   "individual_id", "outcome", "successes", "trials")) {
 
@@ -142,7 +142,7 @@ load_data <- function(
           ))
         }
       }
-      
+
       # Validate: `successes` and `trials` for binomial data
       if (arg %in% c("successes", "trials") & outcome_binomial == TRUE) {
         if (any(!is.numeric(val))) {
@@ -153,11 +153,11 @@ load_data <- function(
           ))
         }
       }
-      
+
       assign(x = paste0(".", arg), value = val)
 
     }
-    
+
     # Validate: `successes` <= `trials` for each observation
     if (outcome_binomial == TRUE) {
       if (any(successes > trials)) {
@@ -233,23 +233,25 @@ load_data <- function(
 
   class(dat_return) <- c("data.frame", "sw_dat")
 
-  message(
-    paste0(
-      "Stepped wedge dataset loaded. ",
-      stringr::str_to_title(time_type),
-      " time design with ",
-      n_clusters,
-      " clusters, ",
-      n_seq,
-      " sequences, and ",
-      n_times,
-      " time points. ",
-      num_dropped,
-      "/",
-      num_total,
+  msg <- paste0(
+    "Stepped wedge dataset loaded. ",
+    stringr::str_to_title(time_type),
+    " time design with ",
+    n_clusters,
+    " clusters, ",
+    n_seq,
+    " sequences, and ",
+    n_times,
+    " time points."
+  )
+  if (num_dropped>0) {
+    msg <- paste0(
+      msg, " Note: ", num_dropped, "/", num_total,
       " rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`."
     )
-  )
+  }
+
+  message(msg)
 
   return(dat_return)
 
