@@ -539,7 +539,4 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
   return(results)
 
-  # # Display results
-  # display_results("TATE (IT)", te_est, te_ci)
-
 }

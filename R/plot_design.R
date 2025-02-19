@@ -25,8 +25,7 @@ plot_design <- function(dat)
   num_times <- attr(dat, "n_times")
   num_seq <- attr(dat, "n_seq")
   dat <- data.frame(dat)
-  # num_clusters <- length(unique(dat$cluster_id))
-
+  
   num_times <- length(unique(dat$time))
   # Create a data frame with positions and shading status
   sw_data <- dat %>%
