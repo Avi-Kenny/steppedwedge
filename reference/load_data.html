@@ -100,29 +100,11 @@ time as discrete or continuous.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">example_data</span> <span class="op">&lt;-</span> <span class="fu">load_data</span><span class="op">(</span>time <span class="op">=</span><span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"cluster"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>treatment <span class="op">=</span> <span class="st">"trt"</span>, outcome <span class="op">=</span> <span class="st">"outcome_cont"</span>, data <span class="op">=</span> <span class="va">sw_data_example</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.</span>
-<span class="r-in"><span><span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     outcome               time         cluster_id     treatment     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :-3.440186   Min.   :1.000   4      : 153   Min.   :0.0000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.:-0.714369   1st Qu.:2.000   13     : 146   1st Qu.:0.0000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Median : 0.028862   Median :3.000   6      : 139   Median :0.0000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   : 0.008113   Mean   :3.437   7      : 138   Mean   :0.4863  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.: 0.700841   3rd Qu.:5.000   11     : 137   3rd Qu.:1.0000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   : 3.959173   Max.   :6.000   10     : 136   Max.   :1.0000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                      (Other):1162                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   time_type         first_exposure exposure_time  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Length:2011        Min.   :2.00   Min.   :0.000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Class :character   1st Qu.:3.00   1st Qu.:0.000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mode  :character   Median :4.00   Median :0.000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Mean   :3.99   Mean   :1.141  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     3rd Qu.:5.00   3rd Qu.:2.000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Max.   :6.00   Max.   :5.000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                   </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">example_data</span> <span class="op">&lt;-</span> <span class="fu">load_data</span><span class="op">(</span>time <span class="op">=</span><span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"cluster"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>treatment <span class="op">=</span> <span class="st">"trt"</span>, outcome <span class="op">=</span> <span class="st">"outcome_cont"</span>, data <span class="op">=</span> <span class="va">sw_data_example</span><span class="op">)</span></span>
+<span><span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
+<span></span>
+<span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
