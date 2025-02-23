@@ -13,7 +13,7 @@ An R package for analyzing data from stepped wedge cluster randomized trials
 
 ## Overview
 
-**steppedwedge** is an open-source R package designed for analyzing data from stepped wedge cluster randomized trials. Functions are given for checking/visualizing datasets and estimating various treatment effect parameters, including the immediate treatment effect (ITE), exposure time averaged treatment effect (ETATE), calendar time averaged treatment effect (CTATE).
+**steppedwedge** is an open-source R package designed for analyzing data from stepped wedge cluster randomized trials. Functions are given for checking/visualizing datasets and estimating various treatment effect parameters, including the immediate treatment effect (ITE), the time averaged treatment effect (TATE), and the point treatment effect (PTE).
 
 ## Installation
 
