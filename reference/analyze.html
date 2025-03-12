@@ -43,6 +43,8 @@
 <span>  <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
+<span>  n_knots_exp <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  n_knots_cal <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">dat</span>, <span class="st">"n_seq"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  cal_time <span class="op">=</span> <span class="st">"categorical"</span>,</span>
@@ -70,6 +72,18 @@ or "GEE", for generalized estimating equations.</p></dd>
 <dd><p>One of c("TATE", "PTE"); "TATE" represents the
 time-averaged treatment effect and "PTE" represents the point treatment
 effect.</p></dd>
+
+
+<dt id="arg-n-knots-exp">n_knots_exp<a class="anchor" aria-label="anchor" href="#arg-n-knots-exp"></a></dt>
+<dd><p>An integer vector of length 1; only relevant when
+exp_time="NCS". Specifies the number of knots to use for exposure time,
+including boundary knots.</p></dd>
+
+
+<dt id="arg-n-knots-cal">n_knots_cal<a class="anchor" aria-label="anchor" href="#arg-n-knots-cal"></a></dt>
+<dd><p>An integer vector of length 1; only relevant when
+exp_time="NCS". Specifies the number of knots to use for calendar time,
+including boundary knots.</p></dd>
 
 
 <dt id="arg-estimand-time">estimand_time<a class="anchor" aria-label="anchor" href="#arg-estimand-time"></a></dt>
