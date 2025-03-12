@@ -8,6 +8,8 @@ analyze(
   dat,
   method = "mixed",
   estimand_type = "TATE",
+  n_knots_exp = 4,
+  n_knots_cal = 4,
   estimand_time = c(1, attr(dat, "n_seq")),
   exp_time = "IT",
   cal_time = "categorical",
@@ -26,6 +28,14 @@ or "GEE", for generalized estimating equations.}
 \item{estimand_type}{One of c("TATE", "PTE"); "TATE" represents the
 time-averaged treatment effect and "PTE" represents the point treatment
 effect.}
+
+\item{n_knots_exp}{An integer vector of length 1; only relevant when 
+exp_time="NCS". Specifies the number of knots to use for exposure time, 
+including boundary knots.}
+
+\item{n_knots_cal}{An integer vector of length 1; only relevant when 
+exp_time="NCS". Specifies the number of knots to use for calendar time, 
+including boundary knots.}
 
 \item{estimand_time}{An integer vector of length 1 or 2. When
 estimand_type="TATE", `estimand_time` must be a numeric vector of length

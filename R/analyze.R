@@ -35,6 +35,12 @@
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
 #' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
+#' @param n_knots_exp An integer vector of length 1; only relevant when 
+#'     exp_time="NCS". Specifies the number of knots to use for exposure time, 
+#'     including boundary knots.
+#' @param n_knots_cal An integer vector of length 1; only relevant when 
+#'     exp_time="NCS". Specifies the number of knots to use for calendar time, 
+#'     including boundary knots.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error, and
@@ -58,7 +64,8 @@
 #'
 #' results_pte
 #'
-analyze <- function(dat, method="mixed", estimand_type="TATE",
+analyze <- function(dat, method="mixed", estimand_type="TATE", 
+                    n_knots_exp=4, n_knots_cal=4,
                     estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable", offset=NULL) {
@@ -101,21 +108,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_cal <- ""
   } else if (cal_time=="NCS") {
 
-    knots_cal <- seq(min(dat$time), max(dat$time), length.out=4) # Make this configurable
+    knots_cal <- seq(min(dat$time), max(dat$time), length.out=n_knots_cal) # Make this configurable
     basis_cal <- splines::ns(
       x = dat$time,
-      knots = knots_cal[2:3],
+      knots = knots_cal[2:(n_knots_cal-1)],
       intercept = TRUE,
-      Boundary.knots = knots_cal[c(1,4)]
+      Boundary.knots = knots_cal[c(1,n_knots_cal)]
     )
-    dat$j_1 <- basis_cal[,1]
-    dat$j_2 <- basis_cal[,2]
-    dat$j_3 <- basis_cal[,3]
-    dat$j_4 <- basis_cal[,4]
+    dat$j <- rep(NA, nrow(dat))
+    for (i in 1:n_knots_cal) {
+      dat[[paste0("j_", i)]] <- basis_cal[,i]
+    }
     rm(knots_cal,basis_cal)
-
-    f_cal <- "j_1 + j_2 + j_3 + j_4 - 1 + "
-
   }
 
   # Parse formula terms for random effects
@@ -327,28 +331,28 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ############################################.
     ##### Natural Cubic Spline (NCS) mixed model #####
     ############################################.
-
-    # Create the spline basis (4 degrees of freedom)
-    n_df_exp <- 4
+    
+    # Create the spline basis
     S <- max(dat$exposure_time)
-    knots_exp <- seq(0, S, length.out=n_df_exp) # Make this configurable
+    knots_exp <- seq(0, S, length.out=n_knots_exp) # Make this configurable
     ns_basis <- splines::ns(
       x = dat$exposure_time,
-      knots = knots_exp[2:3],
+      knots = knots_exp[2:(n_knots_exp-1)],
       intercept = TRUE,
-      Boundary.knots = knots_exp[c(1,n_df_exp)]
+      Boundary.knots = knots_exp[c(1,n_knots_exp)]
     )
-    dat$b1 <- ns_basis[,1] * dat$treatment
-    dat$b2 <- ns_basis[,2] * dat$treatment
-    dat$b3 <- ns_basis[,3] * dat$treatment
-    dat$b4 <- ns_basis[,4] * dat$treatment
+    
+    dat$b <- rep(NA, nrow(dat))
+    for (i in 1:n_knots_exp) {
+      dat[[paste0("b", i)]] <- ns_basis[,i] * dat$treatment
+    }
 
     # Fit mixed model
+    formula <- paste0(f_out, f_cal, paste0("b", 1:n_knots_exp, collapse = " + "), f_re)
+    
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0(f_out, f_cal, "b1 + b2 + b3 + b4", f_re)
       model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
-      formula <- paste0(f_out, f_cal, "b1 + b2 + b3 + b4", f_re)
       model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat,
                                      offset=offset)
     }
@@ -360,7 +364,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     index_max <- length(indices)
 
     # Extract coefficient estimates and covariance matrix corresponding to spline
-    #     terms
+    # terms
     coeffs_spl <- summary_ncs$coefficients[,1][indices]
     cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
 
@@ -372,9 +376,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
     B <- as.matrix(splines::ns(
       x = c(1:S),
-      knots = knots_exp[2:3],
+      knots = knots_exp[2:(n_knots_exp-1)],
       intercept = TRUE,
-      Boundary.knots = knots_exp[c(1,n_df_exp)]
+      Boundary.knots = knots_exp[c(1,n_knots_exp)]
     ))
     
     class(B) <- "matrix"
