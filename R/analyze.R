@@ -167,6 +167,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
+    
+    # Estimate the effect curve
+    curve_it <- c(0, rep(te_est, length(unique(dat$exposure_time)) - 1))
 
     results <- list(
       model = model_it_mixed,
@@ -206,6 +209,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     #     time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
+    
+    # Estimate the effect curve
+    curve_eti <- as.numeric(c(0, coeffs))
 
     if(estimand_type == "TATE") {
 
@@ -248,9 +254,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages
       )
-      #
-      # # Estimate the effect curve
-      # curve_eti <- as.numeric(c(0, coeffs))
 
     }
 
@@ -319,9 +322,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages
       )
-      #
-      # # Estimate the effect curve
-      # curve_teh <- as.numeric(c(0, coeffs))
 
     }
 
