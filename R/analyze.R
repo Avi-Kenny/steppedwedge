@@ -35,11 +35,11 @@
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
 #' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
-#' @param n_knots_exp An integer vector of length 1; only relevant when 
-#'     exp_time="NCS". Specifies the number of knots to use for exposure time, 
+#' @param n_knots_exp An integer vector of length 1; only relevant when
+#'     exp_time="NCS". Specifies the number of knots to use for exposure time,
 #'     including boundary knots.
-#' @param n_knots_cal An integer vector of length 1; only relevant when 
-#'     exp_time="NCS". Specifies the number of knots to use for calendar time, 
+#' @param n_knots_cal An integer vector of length 1; only relevant when
+#'     exp_time="NCS". Specifies the number of knots to use for calendar time,
 #'     including boundary knots.
 #'
 #' @return A list with the model object, model type as a string, estimand type
@@ -65,11 +65,11 @@
 #'
 #' results_pte
 #'
-analyze <- function(dat, method="mixed", estimand_type="TATE", 
-                    n_knots_exp=4, n_knots_cal=4,
+analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
-                    re=c("clust", "time"), corstr="exchangeable", offset=NULL) {
+                    re=c("clust", "time"), corstr="exchangeable", offset=NULL,
+                    n_knots_exp=4, n_knots_cal=4) {
 
   cluster_id <- NULL
   rm(cluster_id)
@@ -168,11 +168,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     te_est <- summary_it$coefficients["treatment",1]
     te_se <- summary_it$coefficients["treatment",2]
     te_ci <- te_est + c(-1.96,1.96) * te_se
-    
+
     # Estimate the effect curve
     effect_curve_df <- data.frame(
       model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time), 
+      exp_time = unique(dat$exposure_time),
       te = c(0, rep(te_est, length(unique(dat$exposure_time)) - 1)),
       ci_upper = c(0, rep(te_ci[1], length(unique(dat$exposure_time)) - 1)),
       ci_lower = c(0, rep(te_ci[2], length(unique(dat$exposure_time)) - 1))
@@ -218,15 +218,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     se_eti <- summary_eti$coefficients[,2][indices] # column 2 contains the standard errors
     cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
-    
+
     # Calculate the CI for treatment effect at each exposure time
     ci_lower_eti <- coeffs - 1.96 * se_eti
     ci_upper_eti <- coeffs + 1.96 * se_eti
-    
+
     # Estimate the effect curve
     effect_curve_df <- data.frame(
       model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time), 
+      exp_time = unique(dat$exposure_time),
       te = as.numeric(c(0, coeffs)),
       ci_lower = as.numeric(c(0, ci_lower_eti)),
       ci_upper = as.numeric(c(0, ci_upper_eti))
@@ -297,25 +297,25 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
 
     summary_teh <- summary(model_teh_mixed)
-    
+
     # Extract random slopes for treatment and their variances from mixed model
     exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
     max_exp_timepoint <- max(exp_timepoints)
     re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
-    
+
     re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
     re_se <- sqrt(re_var)
-    
+
     # Extract fixed treatment effect from mixed model
     fe_treatment <- summary_teh$coefficients["treatment",1]
-    
+
     # Estimate the effect curve
     effect_curve_df <- data.frame(
       model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time), 
+      exp_time = unique(dat$exposure_time),
       te = c(0, rep(fe_treatment, length(exp_timepoints))) + re_treatment$treatment
     )
-    
+
     if(estimand_type == "TATE") {
 
       # Estimate the TATE
@@ -367,7 +367,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ############################################.
     ##### Natural Cubic Spline (NCS) mixed model #####
     ############################################.
-    
+
     # Create the spline basis
     S <- max(dat$exposure_time)
     knots_exp <- seq(0, S, length.out=n_knots_exp) # Make this configurable
@@ -377,7 +377,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_knots_exp)]
     )
-    
+
     dat$b <- rep(NA, nrow(dat))
     for (i in 1:n_knots_exp) {
       dat[[paste0("b", i)]] <- ns_basis[,i] * dat$treatment
@@ -385,7 +385,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Fit mixed model
     formula <- paste0(f_out, f_cal, paste0("b", 1:n_knots_exp, collapse = " + "), f_re)
-    
+
     if(family$family == "gaussian" & family$link == "identity") {
       model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
@@ -416,22 +416,22 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       intercept = TRUE,
       Boundary.knots = knots_exp[c(1,n_knots_exp)]
     ))
-    
+
     class(B) <- "matrix"
 
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
     se_ncs <- sqrt(diag(matrix(cov_mtx, nrow = nrow(cov_mtx))))
-    
-    
+
+
     # Calculate the CI for treatment effect at each exposure time
     ci_lower_ncs <- coeffs_trans - 1.96 * se_ncs
     ci_upper_ncs <- coeffs_trans + 1.96 * se_ncs
-    
+
     # Estimate the effect curve
     effect_curve_df <- data.frame(
       model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time), 
+      exp_time = unique(dat$exposure_time),
       te = c(0, coeffs_trans),
       ci_lower = c(0, ci_lower_ncs),
       ci_upper = c(0, ci_upper_ncs)
