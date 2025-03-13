@@ -35,12 +35,14 @@
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
 #' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
-#' @param n_knots_exp An integer vector of length 1; only relevant when
-#'     exp_time="NCS". Specifies the number of knots to use for exposure time,
-#'     including boundary knots.
-#' @param n_knots_cal An integer vector of length 1; only relevant when
-#'     exp_time="NCS". Specifies the number of knots to use for calendar time,
-#'     including boundary knots.
+#' @param n_knots_exp An integer; only relevant when exp_time="NCS". Specifies
+#'     the number of knots to use for exposure time, including boundary knots.
+#'     The spline basis includes an intercept, and the degree of the basis is
+#'     equal to the number of knots.
+#' @param n_knots_cal An integer; only relevant when exp_time="NCS". Specifies
+#'     the number of knots to use for calendar time, including boundary knots.
+#'     The spline basis includes an intercept, and the degree of the basis is
+#'     equal to the number of knots.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
@@ -109,7 +111,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_cal <- ""
   } else if (cal_time=="NCS") {
 
-    knots_cal <- seq(min(dat$time), max(dat$time), length.out=n_knots_cal) # Make this configurable
+    knots_cal <- seq(min(dat$time), max(dat$time), length.out=n_knots_cal)
     basis_cal <- splines::ns(
       x = dat$time,
       knots = knots_cal[2:(n_knots_cal-1)],
@@ -370,7 +372,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Create the spline basis
     S <- max(dat$exposure_time)
-    knots_exp <- seq(0, S, length.out=n_knots_exp) # Make this configurable
+    knots_exp <- seq(0, S, length.out=n_knots_exp)
     ns_basis <- splines::ns(
       x = dat$exposure_time,
       knots = knots_exp[2:(n_knots_exp-1)],

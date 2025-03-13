@@ -65,13 +65,15 @@ see the documentation for `geepack::geeglm`.}
 
 \item{offset}{A linear predictor offset term; see docs for `lme4::lmer`.}
 
-\item{n_knots_exp}{An integer vector of length 1; only relevant when
-exp_time="NCS". Specifies the number of knots to use for exposure time,
-including boundary knots.}
+\item{n_knots_exp}{An integer; only relevant when exp_time="NCS". Specifies
+the number of knots to use for exposure time, including boundary knots.
+The spline basis includes an intercept, and the degree of the basis is
+equal to the number of knots.}
 
-\item{n_knots_cal}{An integer vector of length 1; only relevant when
-exp_time="NCS". Specifies the number of knots to use for calendar time,
-including boundary knots.}
+\item{n_knots_cal}{An integer; only relevant when exp_time="NCS". Specifies
+the number of knots to use for calendar time, including boundary knots.
+The spline basis includes an intercept, and the degree of the basis is
+equal to the number of knots.}
 }
 \value{
 A list with the model object, model type as a string, estimand type
