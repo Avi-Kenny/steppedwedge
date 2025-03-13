@@ -43,8 +43,9 @@
 #'     including boundary knots.
 #'
 #' @return A list with the model object, model type as a string, estimand type
-#' as a string, numeric treatment effect estimate, numeric treatment effect standard error, and
-#' treatment effect 95% confidence interval as a numeric vector of length 2
+#' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
+#' treatment effect 95% confidence interval as a numeric vector of length 2, and
+#' dataframe with treatment effect at each exposure timepoint.
 #' @export
 #'
 #' @examples
@@ -169,7 +170,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     te_ci <- te_est + c(-1.96,1.96) * te_se
     
     # Estimate the effect curve
-    curve_it <- c(0, rep(te_est, length(unique(dat$exposure_time)) - 1))
+    effect_curve_df <- data.frame(
+      model = paste0(exp_time, "--", method),
+      exp_time = unique(dat$exposure_time), 
+      te = c(0, rep(te_est, length(unique(dat$exposure_time)) - 1)),
+      ci_upper = c(0, rep(te_ci[1], length(unique(dat$exposure_time)) - 1)),
+      ci_lower = c(0, rep(te_ci[2], length(unique(dat$exposure_time)) - 1))
+    )
 
     results <- list(
       model = model_it_mixed,
@@ -179,7 +186,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_se = te_se,
       te_ci = te_ci,
       converged = performance::check_convergence(model_it_mixed)[1],
-      messages = model_it_mixed@optinfo$conv$lme4$messages
+      messages = model_it_mixed@optinfo$conv$lme4$messages,
+      effect_curve_df = effect_curve_df
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -208,10 +216,21 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Extract coefficient estimates and covariance matrix corresponding to exposure
     #     time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
+    se_eti <- summary_eti$coefficients[,2][indices] # column 2 contains the standard errors
     cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
     
+    # Calculate the CI for treatment effect at each exposure time
+    ci_lower_eti <- coeffs - 1.96 * se_eti
+    ci_upper_eti <- coeffs + 1.96 * se_eti
+    
     # Estimate the effect curve
-    curve_eti <- as.numeric(c(0, coeffs))
+    effect_curve_df <- data.frame(
+      model = paste0(exp_time, "--", method),
+      exp_time = unique(dat$exposure_time), 
+      te = as.numeric(c(0, coeffs)),
+      ci_lower = as.numeric(c(0, ci_lower_eti)),
+      ci_upper = as.numeric(c(0, ci_upper_eti))
+    )
 
     if(estimand_type == "TATE") {
 
@@ -234,7 +253,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
-        messages = model_eti_mixed@optinfo$conv$lme4$messages
+        messages = model_eti_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
 
     } else if(estimand_type == "PTE") {
@@ -252,7 +272,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = pte_se,
         te_ci = pte_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
-        messages = model_eti_mixed@optinfo$conv$lme4$messages
+        messages = model_eti_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
 
     }
@@ -276,7 +297,25 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
 
     summary_teh <- summary(model_teh_mixed)
-
+    
+    # Extract random slopes for treatment and their variances from mixed model
+    exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
+    max_exp_timepoint <- max(exp_timepoints)
+    re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
+    
+    re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
+    re_se <- sqrt(re_var)
+    
+    # Extract fixed treatment effect from mixed model
+    fe_treatment <- summary_teh$coefficients["treatment",1]
+    
+    # Estimate the effect curve
+    effect_curve_df <- data.frame(
+      model = paste0(exp_time, "--", method),
+      exp_time = unique(dat$exposure_time), 
+      te = c(0, rep(fe_treatment, length(exp_timepoints))) + re_treatment$treatment
+    )
+    
     if(estimand_type == "TATE") {
 
       # Estimate the TATE
@@ -292,21 +331,17 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
-        messages = model_teh_mixed@optinfo$conv$lme4$messages
+        messages = model_teh_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
 
     } else if(estimand_type == "PTE") {
 
       # Estimate the PTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
-      exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
-      max_exp_timepoint <- max(exp_timepoints)
-      re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
       re_treatment_pte <- re_treatment[rownames(re_treatment) == as.character(estimand_time), "treatment"]
       pte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_pte
 
       # Estimate the SE of the PTE by combining the variances from the fixed effect component and the random effect for the final timepoint
-      re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
-      re_se <- sqrt(re_var)
       re_se_pte <- re_se[estimand_time]
 
       pte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_pte^2)
@@ -320,7 +355,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = pte_se,
         te_ci = pte_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
-        messages = model_teh_mixed@optinfo$conv$lme4$messages
+        messages = model_teh_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
 
     }
@@ -385,6 +421,21 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
+    se_ncs <- sqrt(diag(matrix(cov_mtx, nrow = nrow(cov_mtx))))
+    
+    
+    # Calculate the CI for treatment effect at each exposure time
+    ci_lower_ncs <- coeffs_trans - 1.96 * se_ncs
+    ci_upper_ncs <- coeffs_trans + 1.96 * se_ncs
+    
+    # Estimate the effect curve
+    effect_curve_df <- data.frame(
+      model = paste0(exp_time, "--", method),
+      exp_time = unique(dat$exposure_time), 
+      te = c(0, coeffs_trans),
+      ci_lower = c(0, ci_lower_ncs),
+      ci_upper = c(0, ci_upper_ncs)
+    )
 
     if(estimand_type == "TATE") {
       # Estimate the TATE
@@ -406,7 +457,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = tate_se,
         te_ci = tate_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
-        messages = model_ncs_mixed@optinfo$conv$lme4$messages
+        messages = model_ncs_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
     } else if(estimand_type == "PTE") {
 
@@ -423,14 +475,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = pte_se,
         te_ci = pte_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
-        messages = model_ncs_mixed@optinfo$conv$lme4$messages
+        messages = model_ncs_mixed@optinfo$conv$lme4$messages,
+        effect_curve_df = effect_curve_df
       )
     }
-
-
-
-    # # Estimate the effect curve
-    # curve_ncs <- c(0, coeffs_trans)
 
   } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 

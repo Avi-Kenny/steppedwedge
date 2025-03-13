@@ -75,8 +75,9 @@ see the documentation for `geepack::geeglm`.}
 }
 \value{
 A list with the model object, model type as a string, estimand type
-as a string, numeric treatment effect estimate, numeric treatment effect standard error, and
-treatment effect 95% confidence interval as a numeric vector of length 2
+as a string, numeric treatment effect estimate, numeric treatment effect standard error,
+treatment effect 95% confidence interval as a numeric vector of length 2, and
+dataframe with treatment effect at each exposure timepoint.
 }
 \description{
 Analyze a stepped wedge dataset
