@@ -125,15 +125,17 @@ see the documentation for `geepack::geeglm`.</p></dd>
 
 
 <dt id="arg-n-knots-exp">n_knots_exp<a class="anchor" aria-label="anchor" href="#arg-n-knots-exp"></a></dt>
-<dd><p>An integer vector of length 1; only relevant when
-exp_time="NCS". Specifies the number of knots to use for exposure time,
-including boundary knots.</p></dd>
+<dd><p>An integer; only relevant when exp_time="NCS". Specifies
+the number of knots to use for exposure time, including boundary knots.
+The spline basis includes an intercept, and the degree of the basis is
+equal to the number of knots.</p></dd>
 
 
 <dt id="arg-n-knots-cal">n_knots_cal<a class="anchor" aria-label="anchor" href="#arg-n-knots-cal"></a></dt>
-<dd><p>An integer vector of length 1; only relevant when
-exp_time="NCS". Specifies the number of knots to use for calendar time,
-including boundary knots.</p></dd>
+<dd><p>An integer; only relevant when exp_time="NCS". Specifies
+the number of knots to use for calendar time, including boundary knots.
+The spline basis includes an intercept, and the degree of the basis is
+equal to the number of knots.</p></dd>
 
 </dl></div>
     <div class="section level2">
