@@ -172,12 +172,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     te_ci <- te_est + c(-1.96,1.96) * te_se
 
     # Estimate the effect curve
-    effect_curve_df <- data.frame(
-      model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time),
-      te = c(0, rep(te_est, length(unique(dat$exposure_time)) - 1)),
-      ci_upper = c(0, rep(te_ci[1], length(unique(dat$exposure_time)) - 1)),
-      ci_lower = c(0, rep(te_ci[2], length(unique(dat$exposure_time)) - 1))
+    exp_times <- sort(unique(dat$exposure_time))
+    exp_times <- exp_times[exp_times!=0]
+    effect_curve <- list(
+      exp_time = exp_times,
+      est = rep(te_est, length(exp_times)),
+      se = rep(te_se, length(exp_times)),
+      vcov = NA,
+      ci_upper = rep(te_ci[1], length(exp_times)),
+      ci_lower = rep(te_ci[2], length(exp_times))
     )
 
     results <- list(
@@ -189,7 +192,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_ci = te_ci,
       converged = performance::check_convergence(model_it_mixed)[1],
       messages = model_it_mixed@optinfo$conv$lme4$messages,
-      effect_curve_df = effect_curve_df
+      effect_curve = effect_curve
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -226,12 +229,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ci_upper_eti <- coeffs + 1.96 * se_eti
 
     # Estimate the effect curve
-    effect_curve_df <- data.frame(
-      model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time),
-      te = as.numeric(c(0, coeffs)),
-      ci_lower = as.numeric(c(0, ci_lower_eti)),
-      ci_upper = as.numeric(c(0, ci_upper_eti))
+    effect_curve <- list(
+      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      est = as.numeric(coeffs),
+      se = se_eti,
+      vcov = cov_mtx,
+      ci_lower = as.numeric(ci_lower_eti),
+      ci_upper = as.numeric(ci_upper_eti)
     )
 
     if(estimand_type == "TATE") {
@@ -256,7 +260,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
 
     } else if(estimand_type == "PTE") {
@@ -275,7 +279,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
 
     }
@@ -312,10 +316,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     fe_treatment <- summary_teh$coefficients["treatment",1]
 
     # Estimate the effect curve
-    effect_curve_df <- data.frame(
-      model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time),
-      te = c(0, rep(fe_treatment, length(exp_timepoints))) + re_treatment$treatment
+    effect_curve <- list(
+      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      est = rep(fe_treatment, length(exp_timepoints)) + re_treatment$treatment, # Let's double-check this; this may have broken
+      se = NA,
+      vcov = NA,
+      ci_upper = NA,
+      ci_lower = NA
     )
 
     if(estimand_type == "TATE") {
@@ -334,7 +341,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
 
     } else if(estimand_type == "PTE") {
@@ -358,7 +365,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
 
     }
@@ -431,12 +438,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ci_upper_ncs <- coeffs_trans + 1.96 * se_ncs
 
     # Estimate the effect curve
-    effect_curve_df <- data.frame(
-      model = paste0(exp_time, "--", method),
-      exp_time = unique(dat$exposure_time),
-      te = c(0, coeffs_trans),
-      ci_lower = c(0, ci_lower_ncs),
-      ci_upper = c(0, ci_upper_ncs)
+    effect_curve <- list(
+      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      est = coeffs_trans,
+      se = se_ncs,
+      vcov = cov_mtx,
+      ci_lower = ci_lower_ncs,
+      ci_upper = ci_upper_ncs
     )
 
     if(estimand_type == "TATE") {
@@ -460,7 +468,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
     } else if(estimand_type == "PTE") {
 
@@ -478,7 +486,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
-        effect_curve_df = effect_curve_df
+        effect_curve = effect_curve
       )
     }
 
