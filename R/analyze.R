@@ -541,6 +541,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ##### Exposure Time Indicator (ETI) GEE model #####
     ###################################################.
     
+    for (i in c(1:length(exp_times))) {
+      dat[[paste0("exp_",exp_times[i])]] <- as.integer(dat$exposure_time==exp_times[i])
+    }
+    
+    f_exp <- paste0("exp_", exp_times, collapse = " + ")
+    
     # Fit GEE model
     formula <- paste0(f_out, f_cal, f_exp)
     model_eti_GEE <- geepack::geeglm(
