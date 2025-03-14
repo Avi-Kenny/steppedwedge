@@ -145,6 +145,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   f_out <- ifelse(attr(dat, "binomial") == TRUE,
                   "cbind(successes, trials - successes) ~ ",
                   "outcome ~ ")
+  
+  # Save vector of (non-zero) exposure times
+  exp_times <- sort(unique(dat$exposure_time))
+  exp_times <- exp_times[exp_times!=0]
 
   if(method == "mixed" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 
@@ -200,13 +204,19 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     #####################################################.
     ##### Exposure Time Indicator (ETI) mixed model #####
     #####################################################.
+    
+    for (i in c(1:length(exp_times))) {
+      dat[[paste0("exp_",exp_times[i])]] <- as.integer(dat$exposure_time==exp_times[i])
+    }
+    
+    f_exp <- paste0("exp_", exp_times, collapse = " + ")
 
     # Fit mixed model
     if(family$family == "gaussian" & family$link == "identity") {
-      formula <- paste0(f_out, f_cal, "factor(exposure_time)", f_re)
+      formula <- paste0(f_out, f_cal, f_exp, f_re)
       model_eti_mixed <- lme4::lmer(formula, data=dat, offset=offset)
     } else {
-      formula <- paste0(f_out, f_cal, "factor(exposure_time)", f_re)
+      formula <- paste0(f_out, f_cal, f_exp, f_re)
       model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
                                      offset=offset)
     }
@@ -215,7 +225,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
 
     # Specify the indices of summary_eti corresponding to the exposure time variables
-    indices <- grep("exposure_time", rownames(summary_eti$coefficients))
+    indices <- grep("exp_", rownames(summary_eti$coefficients))
     index_max <- length(indices)
 
     # Extract coefficient estimates and covariance matrix corresponding to exposure
@@ -230,7 +240,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      exp_time = exp_times,
       est = as.numeric(coeffs),
       se = se_eti,
       vcov = cov_mtx,
@@ -317,7 +327,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      exp_time = exp_times,
       est = rep(fe_treatment, length(exp_timepoints)) + re_treatment$treatment, # Let's double-check this; this may have broken
       se = NA,
       vcov = NA,
@@ -439,7 +449,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = unique(dat$exposure_time)[unique(dat$exposure_time)!=0],
+      exp_time = exp_times,
       est = coeffs_trans,
       se = se_ncs,
       vcov = cov_mtx,
@@ -530,9 +540,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ###################################################.
     ##### Exposure Time Indicator (ETI) GEE model #####
     ###################################################.
-
+    
     # Fit GEE model
-    formula <- paste0(f_out, f_cal, "factor(exposure_time)")
+    formula <- paste0(f_out, f_cal, f_exp)
     model_eti_GEE <- geepack::geeglm(
       stats::as.formula(formula),
       data = dat,
@@ -544,7 +554,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
 
     # Specify the indices of summary_eti corresponding to the exposure time variables
-    indices <- grep("exposure_time", rownames(summary_eti$coefficients))
+    indices <- grep("exp_", rownames(summary_eti$coefficients))
     index_max <- length(indices)
 
     # Extract coefficient estimates and covariance matrix corresponding to exposure
