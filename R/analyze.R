@@ -317,7 +317,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Extract random slopes for treatment and their variances from mixed model
     exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
     max_exp_timepoint <- max(exp_timepoints)
-    re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time
+    re_treatment <- lme4::ranef(model_teh_mixed)$exposure_time[rownames(lme4::ranef(model_teh_mixed)$exposure_time) != "0", "treatment"]
 
     re_var <- attr(lme4::ranef(model_teh_mixed, condVar = TRUE)$exposure_time, "postVar")[1,1,]
     re_se <- sqrt(re_var)
@@ -328,7 +328,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = exp_times,
-      est = rep(fe_treatment, length(exp_timepoints)) + re_treatment$treatment, # Let's double-check this; this may have broken
+      est = rep(fe_treatment, length(exp_timepoints)) + re_treatment, # Let's double-check this; this may have broken
       se = NA,
       vcov = NA,
       ci_upper = NA,

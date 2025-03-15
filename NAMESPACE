@@ -2,7 +2,9 @@
 
 S3method(print,sw_analysis)
 export(analyze)
+export(as_table)
 export(load_data)
 export(plot_design)
+export(plot_effect_curves)
 importFrom(magrittr,"%<>%")
 importFrom(magrittr,"%>%")
