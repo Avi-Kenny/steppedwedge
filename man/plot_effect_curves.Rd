@@ -33,10 +33,10 @@ IT_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "IT")
 ETI_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "ETI")
-NCS_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
-estimand_time = c(1, 4), exp_time = "NCS")
+NCS_4_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+estimand_time = c(1, 4), exp_time = "NCS", n_knots_exp = 4)
 TEH_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "TEH")
-plot_effect_curves(IT_model, IT_model, NCS_model, TEH_model, facet_nrow = 1)
+plot_effect_curves(IT_model, NCS_4_model, ETI_model, TEH_model, facet_nrow = 1)
 }
 }
