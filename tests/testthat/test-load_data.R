@@ -117,13 +117,13 @@ test_that("load_data handles incorrect inputs correctly", {
   # More than one value of treatment within a given combination of cluster_id and time
   sample_data_multiple_treatment_values <- sample_data
   sample_data_multiple_treatment_values[1, "treatment"] <- 1
-  expect_error(load_data(
+  expect_warning(load_data(
     time = "period",
     cluster_id = "cluster_id",
     individual_id = "individual_id",
     treatment = "treatment",
     outcome = "y_bin",
     data = sample_data_multiple_treatment_values
-  ), "Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+  ), "The value of the `treatment` variable is not the same for all observations in each cluster-period.")
 })
 
