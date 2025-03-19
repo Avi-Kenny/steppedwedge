@@ -197,7 +197,7 @@ load_data <- function(
     dplyr::mutate(avg_tx=mean(treatment))
 
   if (any(!(dat2$avg_tx %in% c(0,1)))) {
-    stop("Value of `treatment` variable must be the same for all observations in a given cluster-period.")
+    warning("The value of the `treatment` variable is not the same for all observations in each cluster-period.")
   }
 
   # Handle missing values
