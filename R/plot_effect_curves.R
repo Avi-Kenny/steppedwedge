@@ -1,4 +1,4 @@
-#' Title
+#' Plot effect estimates by exposure time for one or more models.
 #'
 #' @param ... One or more objects of class \code{"sw_analysis"} returned by
 #'     \code{\link{analyze}}.
