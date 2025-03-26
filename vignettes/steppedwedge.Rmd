@@ -153,8 +153,18 @@ print(analysis_5)
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
 
 ```{r}
+
+dat_cont <- load_data(
+  time = "period",
+  cluster_id = "cluster",
+  individual_id = NULL,
+  treatment = "trt",
+  outcome = "outcome_cont",
+  data = sw_data_example
+)
+
 analysis_6 <- analyze(
-  dat = dat,
+  dat = dat_cont,
   method = "mixed",
   estimand_type = "TATE", 
   exp_time = "NCS",
@@ -162,4 +172,32 @@ analysis_6 <- analyze(
 )
 
 print(analysis_6)
+```
+
+## Plotting effect curves
+
+The `plot_effect_curve` function plots effect estimates by exposure time for one or more `analyze` objects. 
+
+```{r}
+
+IT_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE",
+  estimand_time = c(1, 4), exp_time = "IT"
+)
+ETI_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE", 
+  estimand_time = c(1, 4), exp_time = "ETI"
+)
+NCS_4_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE",
+  estimand_time = c(1, 4), exp_time = "NCS", n_knots_exp = 4
+)
+TEH_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE",
+  estimand_time = c(1, 4), exp_time = "TEH"
+)
+
+plot_effect_curves(IT_model, NCS_4_model, ETI_model, TEH_model, facet_nrow = 1)
+
+
 ```

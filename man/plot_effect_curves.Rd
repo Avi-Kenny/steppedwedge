@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_effect_curves.R
 \name{plot_effect_curves}
 \alias{plot_effect_curves}
-\title{Title}
+\title{Plot effect estimates by exposure time for one or more models.}
 \usage{
 plot_effect_curves(..., labels = NA, facet_nrow = 1)
 }
@@ -21,7 +21,7 @@ A plot of the effect curve for each \code{"sw_analysis"} object
     passed to the function.
 }
 \description{
-Title
+Plot effect estimates by exposure time for one or more models.
 }
 \examples{
 # Load data
