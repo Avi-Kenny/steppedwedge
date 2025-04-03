@@ -15,6 +15,8 @@
 #'     data, the vector of two character strings indicates the "# of successes"
 #'     variable and the "# of trials" variable, respectively. Values in the
 #'     outcome variable(s) must be either numeric or Boolean (T/F).
+#' @param offset A character string (optional); the name of the numeric
+#'     variable specifying the offset.
 #' @param data A dataframe containing the stepped wedge trial data.
 #' @param time_type One of c("discrete", "continuous"); whether the model treats
 #'     time as discrete or continuous.
@@ -24,18 +26,18 @@
 #'
 #' @examples
 #' example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
-#' treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+#' treatment = "trt", outcome = "outcome_cont", offset = NULL, data = sw_data_example)
 #' base::summary(example_data)
 #'
 #'
 load_data <- function(
     time, cluster_id, individual_id = NULL, treatment,
-    outcome, time_type = "discrete", data
+    outcome, offset = NULL, time_type = "discrete", data
 ) {
 
   # To prevent R CMD CHECK notes
-  .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- NULL
-  rm(.time,.cluster_id,.individual_id,.successes,.trials,first_exposure)
+  .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- .offset <- NULL
+  rm(.time,.cluster_id,.individual_id,.successes,.trials,first_exposure,.offset)
 
   outcome_length <- length(outcome)
   outcome_binomial <- dplyr::case_when(
@@ -65,7 +67,7 @@ load_data <- function(
       ))
     }
 
-    for (arg in c("time", "cluster_id", "treatment",
+    for (arg in c("time", "cluster_id", "treatment", "offset",
                   "individual_id", "outcome", "successes", "trials")) {
 
       var <- get(arg)
@@ -76,6 +78,17 @@ load_data <- function(
       in_df <- all(as.logical(var %in% names(data)))
       if (arg == "individual_id") {
         if (!is.null(individual_id) && !(is_string && length_one && in_df)) {
+          stop(
+            paste0(
+              "`",
+              arg,
+              "` must be a character string specifying a s",
+              "ingle variable in `data`."
+            )
+          )
+        }
+      } else if (arg == "offset") {
+        if (!is.null(offset) && !(is_string && length_one && in_df)) {
           stop(
             paste0(
               "`",
@@ -183,6 +196,7 @@ load_data <- function(
     "time" = .time,
     "cluster_id" = .cluster_id,
     "individual_id" = .individual_id,
+    "offset" = .offset,
     "treatment" = .treatment,
     "time_type" = time_type
   )

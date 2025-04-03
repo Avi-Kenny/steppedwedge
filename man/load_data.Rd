@@ -10,6 +10,7 @@ load_data(
   individual_id = NULL,
   treatment,
   outcome,
+  offset = NULL,
   time_type = "discrete",
   data
 )
@@ -35,6 +36,9 @@ data, the vector of two character strings indicates the "# of successes"
 variable and the "# of trials" variable, respectively. Values in the
 outcome variable(s) must be either numeric or Boolean (T/F).}
 
+\item{offset}{A character string (optional); the name of the numeric
+variable specifying the offset.}
+
 \item{time_type}{One of c("discrete", "continuous"); whether the model treats
 time as discrete or continuous.}
 
@@ -48,7 +52,7 @@ Load and format data object
 }
 \examples{
 example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
-treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
+treatment = "trt", outcome = "outcome_cont", offset = NULL, data = sw_data_example)
 base::summary(example_data)
 
 
