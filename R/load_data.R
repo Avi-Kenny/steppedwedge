@@ -15,6 +15,9 @@
 #'     data, the vector of two character strings indicates the "# of successes"
 #'     variable and the "# of trials" variable, respectively. Values in the
 #'     outcome variable(s) must be either numeric or Boolean (T/F).
+#' @param exposure_time A character string (optional); the name of the numeric
+#'     variable identifying the exposure time variable. If this is not provided,
+#'     the package will calculate exposure time automatically.
 #' @param offset A character string (optional); the name of the numeric
 #'     variable specifying the offset.
 #' @param data A dataframe containing the stepped wedge trial data.
@@ -31,8 +34,8 @@
 #'
 #'
 load_data <- function(
-    time, cluster_id, individual_id = NULL, treatment,
-    outcome, offset = NULL, time_type = "discrete", data
+    time, cluster_id, individual_id=NULL, treatment, outcome,
+    exposure_time=NULL, offset=NULL, time_type="discrete", data
 ) {
 
   # To prevent R CMD CHECK notes
@@ -67,7 +70,7 @@ load_data <- function(
       ))
     }
 
-    for (arg in c("time", "cluster_id", "treatment", "offset",
+    for (arg in c("time", "cluster_id", "treatment", "offset", "exposure_time",
                   "individual_id", "outcome", "successes", "trials")) {
 
       var <- get(arg)
@@ -98,6 +101,17 @@ load_data <- function(
             )
           )
         }
+      } else if (arg == "exposure_time") {
+        if (!is.null(exposure_time) && !(is_string && length_one && in_df)) {
+          stop(
+            paste0(
+              "`",
+              arg,
+              "` must be a character string specifying a s",
+              "ingle variable in `data`."
+            )
+          )
+        }
       } else if (arg %in% c("outcome", "successes", "trials")) {
         if (!is.null(var) && !(is_string && length_one && in_df)) {
           stop(
@@ -109,7 +123,7 @@ load_data <- function(
             )
           )
         }
-      } else {
+      } else if (arg %in% c("time", "cluster_id", "treatment")) {
         if (!(is_string && length_one && in_df)) {
           stop(
             paste0(
@@ -127,6 +141,13 @@ load_data <- function(
 
       # Validate: `time`
       if (arg %in% c("time")) {
+        if (!is.numeric(val)) {
+          stop(paste0("`", arg, "` must be numeric."))
+        }
+      }
+
+      # Validate: `exposure_time`
+      if (!is.null(exposure_time) && arg %in% c("exposure_time")) {
         if (!is.numeric(val)) {
           stop(paste0("`", arg, "` must be numeric."))
         }
@@ -198,6 +219,7 @@ load_data <- function(
     "individual_id" = .individual_id,
     "offset" = .offset,
     "treatment" = .treatment,
+    "exposure_time" = .exposure_time,
     "time_type" = time_type
   )
 
@@ -231,10 +253,14 @@ load_data <- function(
     dplyr::mutate(first_exposure = min(time[treatment == 1])) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure)) %>%
-    dplyr::mutate(exposure_time = ifelse(treatment == 1,
-                                  time - first_exposure + 1,
-                                  0)) %>%
     dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
+
+  # If exposure_time is not provided, calculate it
+  if (is.null(exposure_time)) {
+    dat_return %<>% dplyr::mutate(
+      exposure_time = ifelse(treatment==1, time-first_exposure+1, 0)
+    )
+  }
 
   # Add attributes and class to data object, return data object
   n_clusters <- length(unique(dat_return$cluster_id))

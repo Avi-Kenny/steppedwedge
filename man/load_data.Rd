@@ -10,6 +10,7 @@ load_data(
   individual_id = NULL,
   treatment,
   outcome,
+  exposure_time = NULL,
   offset = NULL,
   time_type = "discrete",
   data
@@ -35,6 +36,10 @@ the name of the numeric or binary outcome variable; for binomial outcome
 data, the vector of two character strings indicates the "# of successes"
 variable and the "# of trials" variable, respectively. Values in the
 outcome variable(s) must be either numeric or Boolean (T/F).}
+
+\item{exposure_time}{A character string (optional); the name of the numeric
+variable identifying the exposure time variable. If this is not provided,
+the package will calculate exposure time automatically.}
 
 \item{offset}{A character string (optional); the name of the numeric
 variable specifying the offset.}
