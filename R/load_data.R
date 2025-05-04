@@ -39,7 +39,7 @@ load_data <- function(
 ) {
 
   # To prevent R CMD CHECK notes
-  .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- .offset <- NULL
+  .time <- .cluster_id <- .individual_id <- .successes <- .trials <- first_exposure <- first_exposure_sort <- .exposure_time <- .offset <- NULL
   rm(.time,.cluster_id,.individual_id,.successes,.trials,first_exposure,.offset)
 
   outcome_length <- length(outcome)
@@ -253,7 +253,9 @@ load_data <- function(
     dplyr::mutate(first_exposure = ifelse(max(treatment) > 0, 
                                           min(time[treatment == 1]),
                                           NA)) %>%
-    dplyr::mutate(first_exposure_sort = tidyr::replace_na(first_exposure, 0)) %>%
+    dplyr::mutate(first_exposure_sort = ifelse(is.na(first_exposure), 
+                                               0, 
+                                               first_exposure)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure_sort)) %>%
     dplyr::select(-first_exposure_sort) %>%

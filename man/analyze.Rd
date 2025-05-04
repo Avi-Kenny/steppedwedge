@@ -8,7 +8,7 @@ analyze(
   dat,
   method = "mixed",
   estimand_type = "TATE",
-  estimand_time = c(1, attr(dat, "n_seq")),
+  estimand_time = c(1, max(dat$exposure_time)),
   exp_time = "IT",
   cal_time = "categorical",
   family = stats::gaussian,
