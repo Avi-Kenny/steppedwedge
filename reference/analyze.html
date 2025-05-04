@@ -43,7 +43,7 @@
 <span>  <span class="va">dat</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
-<span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">dat</span>, <span class="st">"n_seq"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">exposure_time</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  cal_time <span class="op">=</span> <span class="st">"categorical"</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,</span>
