@@ -249,10 +249,14 @@ load_data <- function(
   # and calculate exposure time for each cluster-period
   dat_return <- dat_no_missing %>%
     dplyr::group_by(cluster_id) %>%
-    # create variable for first sw_step where each index_ward has no_we_exposure == 1
-    dplyr::mutate(first_exposure = min(time[treatment == 1])) %>%
+    # create variable for first period where cluster has treatment == 1
+    dplyr::mutate(first_exposure = ifelse(max(treatment) > 0, 
+                                          min(time[treatment == 1]),
+                                          NA)) %>%
+    dplyr::mutate(first_exposure_sort = tidyr::replace_na(first_exposure, 0)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure)) %>%
+    dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure_sort)) %>%
+    dplyr::select(-first_exposure_sort) %>%
     dplyr::arrange(cluster_id) # necessary for some GEE analysis functions
 
   # If exposure_time is not provided, calculate it
