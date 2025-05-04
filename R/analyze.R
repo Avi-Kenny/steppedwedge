@@ -68,7 +68,7 @@
 #' results_pte
 #'
 analyze <- function(dat, method="mixed", estimand_type="TATE",
-                    estimand_time=c(1,attr(dat,"n_seq")), exp_time="IT",
+                    estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable", offset=NULL,
                     n_knots_exp=4, n_knots_cal=4) {
