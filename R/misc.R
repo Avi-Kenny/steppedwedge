@@ -27,6 +27,10 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
     group_facs <- lme4::getME(obj, "flist")
     group_facs[[which.min(group_n)]]
   }
+  check_nested <- function(inner_grp, outer_grp) {
+    n_outer <- tapply(outer_grp, inner_grp, function(x) length(unique(x)))
+    all(n_outer == 1)
+  }
   is_nested_lmerMod <- function(obj, cluster = get_outer_group(obj)) {
     group_facs <- lme4::getME(obj, "flist")
     nested <- vapply(group_facs, check_nested, outer_grp=cluster, FUN.VALUE=TRUE)
