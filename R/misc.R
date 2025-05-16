@@ -20,6 +20,19 @@
 #' @return A robust covariance matrix estimate
 #' @noRd
 vcovCR.glmerMod = function(obj, cluster, type="classic"){
+
+  # Helper functions (from clubSandwich)
+  get_outer_group <- function(obj) {
+    group_n <- lme4::getME(obj, "l_i")
+    group_facs <- lme4::getME(obj, "flist")
+    group_facs[[which.min(group_n)]]
+  }
+  is_nested_lmerMod <- function(obj, cluster = get_outer_group(obj)) {
+    group_facs <- lme4::getME(obj, "flist")
+    nested <- vapply(group_facs, check_nested, outer_grp=cluster, FUN.VALUE=TRUE)
+    all(nested)
+  }
+
   # Check if obj is a fitted model from lmer or glmer
   if ("merMod" %in% class(obj)) {
     stop("The 'obj' should be an object fitted using lmer or glmer.")
@@ -31,8 +44,8 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
     stop("If 'cluster' is manually input, it must be of class 'factor'.")
   }
   if (missing(cluster))
-    cluster <- clubSandwich:::get_outer_group(obj)
-  if (!clubSandwich:::is_nested_lmerMod(obj, cluster))
+    cluster <- get_outer_group(obj)
+  if (!is_nested_lmerMod(obj, cluster))
     stop("Non-nested random effects detected. Method is not available for such models.")
   ropt = substr(type,1,2)
   if (ropt=="FG") {
