@@ -8,6 +8,10 @@
 #'   - stats::vcov
 #'   - MASS::ginv
 #'   - expm::sqrtm
+#'   - stats::nobs
+#'   - lme4::fixef
+#'   - lme4::predict.merMod
+#'   - lme4::getME
 #'
 #' @param obj Model object
 #' @param cluster (Optional) cluster identifier
@@ -68,12 +72,12 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   #################
   # extract information from obj
   #################
-  n = nobs(obj)
+  n = stats::nobs(obj)
   clusternames = unique(cluster)
   m = length(clusternames)
   #
   X = stats::model.matrix(obj,type="fixed")
-  beta=matrix(fixef(obj),ncol=1)
+  beta=matrix(lme4::fixef(obj),ncol=1)
   np=dim(beta)[1]
   #
   Z = stats::model.matrix(obj,type="random")
@@ -83,16 +87,16 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   # The following allows processing of binomial data
   if (lme4::isLMM(obj)) nden=rep(1,length(Y)) else nden = obj@resp$n
   #
-  eta = predict(obj,type="link")
-  ginv_eta = predict(obj,type="response")
+  eta = lme4::predict.merMod(obj,type="link")
+  ginv_eta = lme4::predict.merMod(obj,type="response")
   #
   link = stats::family(obj)$link
   #
   sigma2 = stats::sigma(obj)^2
-  lambda = getME(obj,"Lambda")
+  lambda = lme4::getME(obj,"Lambda")
   R = as.matrix(lambda%*%t(lambda)*sigma2)
   WB_B <- R
-  if (isDiagonal(WB_B)) diagB=TRUE else diagB=FALSE
+  if (Matrix::isDiagonal(WB_B)) diagB=TRUE else diagB=FALSE
   ##################
   # Robust variance calculation
   ##################
@@ -148,7 +152,7 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
       # Since WB_A is identity, the following expressions are simplified from general Woodbury
       O = WB_C1 + WB_V%*%WB_U
       #      WB_A = diag(ng)
-      #      FF = WB_A - WB_U%*%ginv(matrix(as.numeric(O),dim(O)))%*%WB_V
+      #      FF = WB_A - WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V
       FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V)
       diag(FF) = diag(FF) + 1
       FVX = FF%*%Vinv%*%X[grp,]
@@ -168,7 +172,7 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
           O = WB_C1 + WB_V%*%WB_U
           #        WB_A = diag(ng)
           #        FF = WB_A - WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V
-          FF = -(WB_U%*%ginv(matrix(as.numeric(O),dim(O)))%*%WB_V)
+          FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V)
           diag(FF) = diag(FF) + 1
           VX = Vinv%*%X[grp,]
           FVX = FF%*%VX
