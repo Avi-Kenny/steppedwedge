@@ -31,7 +31,6 @@ Imports:
     performance (>= 0.12.4),
     Matrix (>= 1.7.1),
     MASS (>= 7.3.61),
-    clubSandwich (>= 0.6.0),
     expm (>= 1.0.0)
 URL: https://avi-kenny.github.io/steppedwedge/, 
     https://github.com/Avi-Kenny/steppedwedge

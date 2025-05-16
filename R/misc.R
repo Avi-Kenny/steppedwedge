@@ -104,8 +104,8 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   # The following allows processing of binomial data
   if (lme4::isLMM(obj)) nden=rep(1,length(Y)) else nden = obj@resp$n
   #
-  eta = lme4::predict.merMod(obj,type="link")
-  ginv_eta = lme4::predict.merMod(obj,type="response")
+  eta = stats::predict(obj,type="link")
+  ginv_eta = stats::predict(obj,type="response")
   #
   link = stats::family(obj)$link
   #
