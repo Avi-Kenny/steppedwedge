@@ -1,18 +1,5 @@
 #' Jim's robust variance esitmator
 #'
-#' @note Changed the following:
-#'   - stats::model.matrix
-#'   - lme4::isLMM
-#'   - stats::family
-#'   - stats::sigma
-#'   - stats::vcov
-#'   - MASS::ginv
-#'   - expm::sqrtm
-#'   - stats::nobs
-#'   - lme4::fixef
-#'   - lme4::predict.merMod
-#'   - lme4::getME
-#'
 #' @param obj Model object
 #' @param cluster (Optional) cluster identifier
 #' @param type One of c("classic","DF","KC","MD","FG")
@@ -21,7 +8,9 @@
 #' @noRd
 vcovCR.glmerMod = function(obj, cluster, type="classic"){
 
+  ######################
   # Helper functions (from clubSandwich)
+  ######################
   get_outer_group <- function(obj) {
     group_n <- lme4::getME(obj, "l_i")
     group_facs <- lme4::getME(obj, "flist")
@@ -36,7 +25,19 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
     nested <- vapply(group_facs, check_nested, outer_grp=cluster, FUN.VALUE=TRUE)
     all(nested)
   }
+  #################
+  # other helper functions
+  #################
+  mtx_DA <- function(D,A) {
+    matrix(rep(diag(D),ncol(A))*as.numeric(A), ncol=ncol(A))
+  }
+  mtx_AD <- function(A,D) {
+    matrix(rep(diag(D), each=nrow(A))*as.numeric(A), ncol=ncol(A))
+  }
 
+  ##################
+  # Function starts here
+  ##################
   # Check if obj is a fitted model from lmer or glmer
   if ("merMod" %in% class(obj)) {
     stop("The 'obj' should be an object fitted using lmer or glmer.")
@@ -51,6 +52,9 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
     cluster <- get_outer_group(obj)
   if (!is_nested_lmerMod(obj, cluster))
     stop("Non-nested random effects detected. Method is not available for such models.")
+  ######################
+  # decode options
+  #######################
   ropt = substr(type,1,2)
   if (ropt=="FG") {
     type1="FG"
@@ -70,21 +74,34 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
         exact = TRUE
       }
     } else {
-      type1 = type
-    }}
+      if (ropt=="MB") {
+        type1="MBN"
+        # defaults
+        DF = TRUE
+        d = 2
+        r = 1
+        text = substr(type,regexpr("\\(",type)[[1]]+1,regexpr("\\)",type)[[1]]-1)
+        if (text!=""){
+          mbnargs = lapply(strsplit(text,","),strsplit,"=")
+          numargs = length(mbnargs[[1]])
+          for (i in 1:numargs){
+            if (!(mbnargs[[1]][[i]][1] %in% c("DF","d","r"))) {
+              stop("Allowable arguments for MBN are 'DF','d','r'")
+            }
+            if (mbnargs[[1]][[i]][1]=="DF") {
+              assign(mbnargs[[1]][[i]][1],as.logical(mbnargs[[1]][[i]][2]))
+            } else {
+              assign(mbnargs[[1]][[i]][1],as.numeric(mbnargs[[1]][[i]][2]))
+            }
+          }
+        }
+      } else {
+        type1 = type
+      }}}
   # Check if type is one of the specific allowed values
-  allowed_types <- c("classic", "DF", "KC", "MD", "FG")
+  allowed_types <- c("classic", "DF", "KC", "MD", "FG", "MBN")
   if (!(type1 %in% allowed_types)) {
-    stop("The 'type' must be one of the following: 'classic', 'DF', 'KC', 'MD', 'FG'.")
-  }
-  #################
-  # helper functions
-  #################
-  mtx_DA <- function(D,A) {
-    matrix(rep(diag(D),ncol(A))*as.numeric(A), ncol=ncol(A))
-  }
-  mtx_AD <- function(A,D) {
-    matrix(rep(diag(D), each=nrow(A))*as.numeric(A), ncol=ncol(A))
+    stop("The 'type' must be one of the following: 'classic', 'DF', 'KC', 'MD', 'FG', 'MBN'.")
   }
   #################
   # extract information from obj
@@ -120,6 +137,7 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   XtVX = stats::vcov(obj)
   WB_C1 = solve(XtVX)
   sum=matrix(0,np,np)
+  # start loop over clusters
   for (g in clusternames){
     grp = (cluster == g & nden>0)
     ng = sum(grp)
@@ -204,15 +222,28 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
           #      XAA = X[grp,]%*%diag(1/sqrt(1-pmin(r,diag(Q))))
           sum = sum + t(XAA)%*%Vinv%*%ete%*%Vinv%*%XAA
         } else {
+          # classic and MBN
           VX = Vinv%*%X[grp,]
           sum = sum + t(VX)%*%ete%*%VX
         }}}
-    #
   }
+  # end loop over clusters
   c = 1
+  deltam = 0
+  phi = 0
   if (type1=="DF") {
-    if (m-np>0) c= m/(m-np) else cat("DF not valid because m-p <= 0; defaulting to classic")
+    if (m-np>0) c = m/(m-np) else cat("DF not valid because m-p <= 0; defaulting to classic")
   }
-  robustVar = c*XtVX%*%sum%*%XtVX
+  if (type1=="MBN") {
+    f = sum(nden)
+    if (DF) {c = (f-1)/(f-np) * (m/(m-1))}
+    if (m > (d+1)*np) {deltam = np/(m-np)} else {deltam = 1/d}
+    omega = XtVX %*% sum
+    evals = eigen(omega,symmetric=TRUE,only.values=TRUE)
+    if (m > np) {pstar = np} else {pstar = sum(evals$values>0)}
+    phi =  max(r,sum(evals$values)/pstar)
+  }
+  #
+  robustVar = c*XtVX%*%sum%*%XtVX + deltam*phi*XtVX
   robustVar
 }
