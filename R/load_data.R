@@ -191,16 +191,15 @@ load_data <- function(
       assign(x = paste0(".", arg), value = val)
 
     }
-
-    # Validate: `successes` <= `trials` for each observation
-    if (outcome_binomial == TRUE) {
-      if (any(successes > trials)) {
-        stop(paste0(
-          "`successes` must be less than or equal to `trials` for all observations."
-        ))
-      }
+  }
+  
+  # Validate: `successes` <= `trials` for each observation
+  if (outcome_binomial == TRUE) {
+    if (any(.successes > .trials)) {
+      stop(paste0(
+        "`successes` must be less than or equal to `trials` for all observations."
+      ))
     }
-
   }
 
 
