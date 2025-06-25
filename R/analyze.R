@@ -39,7 +39,7 @@
 #'     the number of knots to use for exposure time, including boundary knots.
 #'     The spline basis includes an intercept, and the degree of the basis is
 #'     equal to the number of knots.
-#' @param n_knots_cal An integer; only relevant when exp_time="NCS". Specifies
+#' @param n_knots_cal An integer; only relevant when cal_time="NCS". Specifies
 #'     the number of knots to use for calendar time, including boundary knots.
 #'     The spline basis includes an intercept, and the degree of the basis is
 #'     equal to the number of knots.
@@ -145,7 +145,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   f_out <- ifelse(attr(dat, "binomial") == TRUE,
                   "cbind(successes, trials - successes) ~ ",
                   "outcome ~ ")
-  
+
   # Save vector of (non-zero) exposure times
   exp_times <- sort(unique(dat$exposure_time))
   exp_times <- exp_times[exp_times!=0]
@@ -175,7 +175,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                                       offset=offset)
       }
     }
-      
+
 
     summary_it <- summary(model_it_mixed)
 
@@ -215,11 +215,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     #####################################################.
     ##### Exposure Time Indicator (ETI) mixed model #####
     #####################################################.
-    
+
     for (i in c(1:length(exp_times))) {
       dat[[paste0("exp_",exp_times[i])]] <- as.integer(dat$exposure_time==exp_times[i])
     }
-    
+
     f_exp <- paste0("exp_", exp_times, collapse = " + ")
 
     # Fit mixed model
@@ -239,9 +239,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         formula <- paste0(f_out, f_cal, f_exp, f_re)
         model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
                                        offset=offset)
-      }  
+      }
     }
-    
+
 
     summary_eti <- summary(model_eti_mixed)
 
@@ -332,7 +332,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       } else {
         formula <- paste0(f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
         model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }  
+      }
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- paste0(f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re)
@@ -358,7 +358,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Extract fixed treatment effect from mixed model
     fe_treatment <- summary_teh$coefficients["treatment",1]
-    
+
     # Calculate the CI for treatment effect at each exposure time
     ####### RESUME HERE #######
     est_teh <- rep(fe_treatment, length(exp_timepoints)) + re_treatment[rownames(re_treatment) != "0", "treatment"]
@@ -369,7 +369,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = exp_times,
-      est = est_teh, 
+      est = est_teh,
       se = se_teh,
       vcov = NA,
       ci_upper = ci_upper_teh,
@@ -445,7 +445,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Fit mixed model
     formula <- paste0(f_out, f_cal, paste0("b", 1:n_knots_exp, collapse = " + "), f_re)    # Fit mixed model
-    
+
     if(is.null(offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
         model_ncs_mixed <- lme4::lmer(formula, data=dat)
@@ -589,13 +589,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ###################################################.
     ##### Exposure Time Indicator (ETI) GEE model #####
     ###################################################.
-    
+
     for (i in c(1:length(exp_times))) {
       dat[[paste0("exp_",exp_times[i])]] <- as.integer(dat$exposure_time==exp_times[i])
     }
-    
+
     f_exp <- paste0("exp_", exp_times, collapse = " + ")
-    
+
     # Fit GEE model
     formula <- paste0(f_out, f_cal, f_exp)
     model_eti_GEE <- geepack::geeglm(
