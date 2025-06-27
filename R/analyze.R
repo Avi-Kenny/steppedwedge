@@ -122,6 +122,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     for (i in 1:n_knots_cal) {
       dat[[paste0("j_", i)]] <- basis_cal[,i]
     }
+    f_cal_terms <- paste0("j_", 1:ncol(basis_cal))
+    f_cal <- paste(f_cal_terms, collapse = " + ") 
+    f_cal <- paste0(f_cal, " - 1 + ") 
+    
     rm(knots_cal,basis_cal)
   }
 
