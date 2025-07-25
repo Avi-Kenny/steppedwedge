@@ -70,7 +70,7 @@ the number of knots to use for exposure time, including boundary knots.
 The spline basis includes an intercept, and the degree of the basis is
 equal to the number of knots.}
 
-\item{n_knots_cal}{An integer; only relevant when exp_time="NCS". Specifies
+\item{n_knots_cal}{An integer; only relevant when cal_time="NCS". Specifies
 the number of knots to use for calendar time, including boundary knots.
 The spline basis includes an intercept, and the degree of the basis is
 equal to the number of knots.}
