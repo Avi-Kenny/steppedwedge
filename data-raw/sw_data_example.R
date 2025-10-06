@@ -28,6 +28,11 @@ sw_data_example %<>%
   dplyr::mutate(outcome_bin = rbinom(n = dplyr::n(), size = 1, prob = prob)) %>%
   # generate continuous outcomes
   dplyr::mutate(outcome_cont = rnorm(n = dplyr::n(), mean = (cluster_re+cluster_time_re), sd = 1)) %>%
+  # generate binomial outcomes
+  mutate(denominator = floor(runif(nrow(.), min = 5, max = 15))) %>%
+  rowwise() %>%
+  mutate(numerator = rbinom(1, denominator, 0.5)) %>%
+  ungroup() %>%
   dplyr::select(-c(seq, dplyr::ends_with("_re"))) %>%
   # convert to non-tibble dataframe
   data.frame()
