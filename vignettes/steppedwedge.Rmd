@@ -192,18 +192,18 @@ dat_binom <- load_data(
 ```
 
 
-Mixed model, with Point Treament Effect (PTE) as the estimand, using an Exposure Time Indicator (ETI) model.
+Mixed model, with Time Average Treament Effect (TATE) as the estimand, using an Exposure Time Indicator (ETI) model.
 
 ```{r}
 
-analysis_binomial <- analyze(
+analysis_binom <- analyze(
   dat = dat_binom,
   method = "mixed",
   family = binomial,
   estimand_type = "TATE", 
   exp_time = "ETI")
 
-print(analysis_binomial)
+print(analysis_binom)
 
 ```
 
