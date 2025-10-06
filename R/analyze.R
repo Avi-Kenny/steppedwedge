@@ -67,16 +67,7 @@
 #'
 #' results_pte
 #' 
-#' # Analysis example 3: PTE estimand for exposure time 3 with binomial outcome data
-#' # Load data
-#' test_data_bin <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
-#' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)
-#' 
-#' results_pte_bin <- analyze(dat = test_data_bin, method = "mixed", estimand_type = "PTE",
-#' estimand_time = 3, exp_time = "ETI")
-#'
-#' results_pte_bin
-#'
+
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
@@ -173,18 +164,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(is.null(offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(f_out, f_cal, "treatment", f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::lmer(formula, data=dat)
       } else {
-        formula <- as.formula(paste0(f_out, f_cal, "treatment", f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::glmer(formula, family=family, data=dat)
       }
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(f_out, f_cal, "treatment", f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::lmer(formula, data=dat, offset=offset)
       } else {
-        formula <- as.formula(paste0(f_out, f_cal, "treatment", f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::glmer(formula, family=family, data=dat,
                                       offset=offset)
       }
@@ -239,18 +230,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(is.null(offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(f_out, f_cal, f_exp, f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::lmer(formula, data=dat)
       } else {
-        formula <- as.formula(paste0(f_out, f_cal, f_exp, f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::glmer(formula, family=family, data=dat)
       }
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(f_out, f_cal, f_exp, f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::lmer(formula, data=dat, offset=offset)
       } else {
-        formula <- as.formula(paste0(f_out, f_cal, f_exp, f_re))
+        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
                                        offset=offset)
       }
@@ -341,24 +332,24 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Fit mixed model
     if(is.null(offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(
+        formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
         model_teh_mixed <- lme4::lmer(formula, data=dat)
       } else {
-        formula <- as.formula(paste0(
+        formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
         model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
       }
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
-        formula <- as.formula(paste0(
+        formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
         model_teh_mixed <- lme4::lmer(formula, data=dat, offset=offset)
       } else {
-        formula <- as.formula(paste0(
+        formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
         model_teh_mixed <- lme4::glmer(formula, family=family, data=dat,
@@ -466,7 +457,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
 
     # Fit mixed model
-    formula <- as.formula(paste0(
+    formula <- stats::as.formula(paste0(
       f_out, f_cal, paste0("b", 1:n_knots_exp, collapse = " + "), f_re
     ))
 
