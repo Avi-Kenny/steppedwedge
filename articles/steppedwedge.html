@@ -74,13 +74,13 @@ data object that can be accepted by the <code>plot_design</code> and
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sw_data_example</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   cluster period trt      prob outcome_bin outcome_cont</span></span>
-<span><span class="co">#&gt; 1       1      1   0 0.5667807           0  -3.02179837</span></span>
-<span><span class="co">#&gt; 2       1      1   0 0.5667807           0  -0.07145287</span></span>
-<span><span class="co">#&gt; 3       1      1   0 0.5667807           1   0.96807617</span></span>
-<span><span class="co">#&gt; 4       1      1   0 0.5667807           0   0.29456948</span></span>
-<span><span class="co">#&gt; 5       1      1   0 0.5667807           1  -0.83921584</span></span>
-<span><span class="co">#&gt; 6       1      1   0 0.5667807           1  -0.42335941</span></span>
+<span><span class="co">#&gt;   cluster period trt      prob outcome_bin outcome_cont denominator numerator</span></span>
+<span><span class="co">#&gt; 1       1      1   0 0.5667807           0  -3.02179837          14         4</span></span>
+<span><span class="co">#&gt; 2       1      1   0 0.5667807           0  -0.07145287           5         2</span></span>
+<span><span class="co">#&gt; 3       1      1   0 0.5667807           1   0.96807617           8         6</span></span>
+<span><span class="co">#&gt; 4       1      1   0 0.5667807           0   0.29456948           5         4</span></span>
+<span><span class="co">#&gt; 5       1      1   0 0.5667807           1  -0.83921584          11        10</span></span>
+<span><span class="co">#&gt; 6       1      1   0 0.5667807           1  -0.42335941          10         6</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
 <span>  time <span class="op">=</span> <span class="st">"period"</span>,</span>
@@ -229,11 +229,45 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="binomial-outcome">Binomial outcome<a class="anchor" aria-label="anchor" href="#binomial-outcome"></a>
+</h2>
+<p>When loading data where the outcome is binomial, specify the names of
+the “# of successes” and “# of trials” variables as the
+<code>outcome</code> argument.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">dat_binom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
+<span>  time <span class="op">=</span><span class="st">"period"</span>,</span>
+<span>  cluster_id <span class="op">=</span> <span class="st">"cluster"</span>,</span>
+<span>  individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  treatment <span class="op">=</span> <span class="st">"trt"</span>,</span>
+<span>  outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"numerator"</span>, <span class="st">"denominator"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.</span></span></code></pre></div>
+<p>Mixed model, with Point Treament Effect (PTE) as the estimand, using
+an Exposure Time Indicator (ETI) model.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">analysis_binomial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
+<span>  dat <span class="op">=</span> <span class="va">dat_binom</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
+<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
+<span>  exp_time <span class="op">=</span> <span class="st">"ETI"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_binomial</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Treatment effect estimate: 0.04</span></span>
+<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.051, 0.13</span></span>
+<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="plotting-effect-curves">Plotting effect curves<a class="anchor" aria-label="anchor" href="#plotting-effect-curves"></a>
 </h2>
 <p>The <code>plot_effect_curve</code> function plots effect estimates by
 exposure time for one or more <code>analyze</code> objects.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">IT_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat_cont</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
@@ -254,7 +288,7 @@ exposure time for one or more <code>analyze</code> objects.</p>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_effect_curves.html">plot_effect_curves</a></span><span class="op">(</span><span class="va">IT_model</span>, <span class="va">NCS_4_model</span>, <span class="va">ETI_model</span>, <span class="va">TEH_model</span>, facet_nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="steppedwedge_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="steppedwedge_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
