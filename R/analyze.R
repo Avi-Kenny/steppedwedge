@@ -66,6 +66,16 @@
 #' estimand_time = 3, exp_time = "ETI")
 #'
 #' results_pte
+#' 
+#' # Analysis example 3: PTE estimand for exposure time 3 with binomial outcome data
+#' # Load data
+#' test_data_bin <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+#' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)
+#' 
+#' results_pte_bin <- analyze(dat = test_data_bin, method = "mixed", estimand_type = "PTE",
+#' estimand_time = 3, exp_time = "ETI")
+#'
+#' results_pte_bin
 #'
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
