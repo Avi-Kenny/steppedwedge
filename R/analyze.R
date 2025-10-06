@@ -34,7 +34,7 @@
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
-#' @param advanced A list of options returned by \code{\link{advanced}}.
+#' @param advanced A list of options returned by \code{\link{advanced_params}}.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
