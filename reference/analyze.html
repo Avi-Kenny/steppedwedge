@@ -163,6 +163,16 @@ dataframe with treatment effect at each exposure timepoint.</p>
 <span>estimand_time <span class="op">=</span> <span class="fl">3</span>, exp_time <span class="op">=</span> <span class="st">"ETI"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results_pte</span></span>
+<span></span>
+<span><span class="co"># Analysis example 3: TATE estimand for exposure time 3 with binomial outcome data</span></span>
+<span><span class="co"># Load data</span></span>
+<span><span class="va">test_data_bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_data.html">load_data</a></span><span class="op">(</span>time <span class="op">=</span><span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"cluster"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>treatment <span class="op">=</span> <span class="st">"trt"</span>, outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"numerator"</span>, <span class="st">"denominator"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">sw_data_example</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results_pte_bin</span> <span class="op">&lt;-</span> <span class="fu">analyze</span><span class="op">(</span>dat <span class="op">=</span> <span class="va">test_data_bin</span>, family <span class="op">=</span> <span class="va">binomial</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, </span>
+<span>estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"ETI"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results_pte_bin</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
