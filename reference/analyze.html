@@ -49,9 +49,7 @@
 <span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,</span>
 <span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span>,</span>
 <span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span>,</span>
-<span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n_knots_exp <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  n_knots_cal <span class="op">=</span> <span class="fl">4</span></span>
+<span>  advanced <span class="op">=</span> <span class="fu"><a href="advanced_params.html">advanced_params</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,22 +118,8 @@ if method="GEE" is used. Defines the GEE working correlation structure;
 see the documentation for `geepack::geeglm`.</p></dd>
 
 
-<dt id="arg-offset">offset<a class="anchor" aria-label="anchor" href="#arg-offset"></a></dt>
-<dd><p>A linear predictor offset term; see docs for `lme4::lmer`.</p></dd>
-
-
-<dt id="arg-n-knots-exp">n_knots_exp<a class="anchor" aria-label="anchor" href="#arg-n-knots-exp"></a></dt>
-<dd><p>An integer; only relevant when exp_time="NCS". Specifies
-the number of knots to use for exposure time, including boundary knots.
-The spline basis includes an intercept, and the degree of the basis is
-equal to the number of knots.</p></dd>
-
-
-<dt id="arg-n-knots-cal">n_knots_cal<a class="anchor" aria-label="anchor" href="#arg-n-knots-cal"></a></dt>
-<dd><p>An integer; only relevant when cal_time="NCS". Specifies
-the number of knots to use for calendar time, including boundary knots.
-The spline basis includes an intercept, and the degree of the basis is
-equal to the number of knots.</p></dd>
+<dt id="arg-advanced">advanced<a class="anchor" aria-label="anchor" href="#arg-advanced"></a></dt>
+<dd><p>A list of options returned by <code><a href="advanced_params.html">advanced_params</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -164,7 +148,13 @@ dataframe with treatment effect at each exposure timepoint.</p>
 <span></span>
 <span><span class="va">results_pte</span></span>
 <span></span>
-<span><span class="co"># Analysis example 3: TATE estimand for exposure time 3 with binomial outcome data</span></span>
+<span><span class="co"># Analysis example 3: TATE estimand for exposure times 1 through 4, Natural Cubic Splines model</span></span>
+<span><span class="va">results_tate_ncs</span> <span class="op">&lt;-</span> <span class="fu">analyze</span><span class="op">(</span>dat <span class="op">=</span> <span class="va">test_data</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
+<span>estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"NCS"</span>, advanced <span class="op">=</span> <span class="fu"><a href="advanced_params.html">advanced_params</a></span><span class="op">(</span>n_knots_exp <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results_tate_ncs</span></span>
+<span></span>
+<span><span class="co"># Analysis example 4: TATE estimand for exposure times 1 through 4 with binomial outcome data</span></span>
 <span><span class="co"># Load data</span></span>
 <span><span class="va">test_data_bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_data.html">load_data</a></span><span class="op">(</span>time <span class="op">=</span><span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"cluster"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>treatment <span class="op">=</span> <span class="st">"trt"</span>, outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"numerator"</span>, <span class="st">"denominator"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">sw_data_example</span><span class="op">)</span></span>
