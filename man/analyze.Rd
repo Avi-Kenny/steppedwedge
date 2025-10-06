@@ -14,9 +14,7 @@ analyze(
   family = stats::gaussian,
   re = c("clust", "time"),
   corstr = "exchangeable",
-  offset = NULL,
-  n_knots_exp = 4,
-  n_knots_cal = 4
+  advanced = advanced_params()
 )
 }
 \arguments{
@@ -63,17 +61,7 @@ cohort design is used), "tx" (random treatment effect)}
 if method="GEE" is used. Defines the GEE working correlation structure;
 see the documentation for `geepack::geeglm`.}
 
-\item{offset}{A linear predictor offset term; see docs for `lme4::lmer`.}
-
-\item{n_knots_exp}{An integer; only relevant when exp_time="NCS". Specifies
-the number of knots to use for exposure time, including boundary knots.
-The spline basis includes an intercept, and the degree of the basis is
-equal to the number of knots.}
-
-\item{n_knots_cal}{An integer; only relevant when cal_time="NCS". Specifies
-the number of knots to use for calendar time, including boundary knots.
-The spline basis includes an intercept, and the degree of the basis is
-equal to the number of knots.}
+\item{advanced}{A list of options returned by \code{\link{advanced}}.}
 }
 \value{
 A list with the model object, model type as a string, estimand type
@@ -101,7 +89,13 @@ estimand_time = 3, exp_time = "ETI")
 
 results_pte
 
-# Analysis example 3: TATE estimand for exposure time 3 with binomial outcome data
+# Analysis example 3: TATE estimand for exposure times 1 through 4, Natural Cubic Splines model
+results_tate_ncs <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+estimand_time = c(1, 4), exp_time = "NCS", advanced = advanced_params(n_knots_exp = 4))
+
+results_tate_ncs
+
+# Analysis example 4: TATE estimand for exposure time 3 with binomial outcome data
 # Load data
 test_data_bin <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)

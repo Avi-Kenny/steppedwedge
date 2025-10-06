@@ -34,15 +34,7 @@
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
-#' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
-#' @param n_knots_exp An integer; only relevant when exp_time="NCS". Specifies
-#'     the number of knots to use for exposure time, including boundary knots.
-#'     The spline basis includes an intercept, and the degree of the basis is
-#'     equal to the number of knots.
-#' @param n_knots_cal An integer; only relevant when cal_time="NCS". Specifies
-#'     the number of knots to use for calendar time, including boundary knots.
-#'     The spline basis includes an intercept, and the degree of the basis is
-#'     equal to the number of knots.
+#' @param advanced A list of options returned by \code{\link{advanced}}.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
@@ -67,7 +59,13 @@
 #'
 #' results_pte
 #' 
-#' # Analysis example 3: TATE estimand for exposure time 3 with binomial outcome data
+#' # Analysis example 3: TATE estimand for exposure times 1 through 4, Natural Cubic Splines model
+#' results_tate_ncs <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+#' estimand_time = c(1, 4), exp_time = "NCS", advanced = advanced_params(n_knots_exp = 4))
+#' 
+#' results_tate_ncs
+#' 
+#' # Analysis example 4: TATE estimand for exposure times 1 through 4 with binomial outcome data
 #' # Load data
 #' test_data_bin <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)
@@ -76,13 +74,14 @@
 #' estimand_type = "TATE", estimand_time = c(1, 4), exp_time = "ETI")
 #'
 #' results_pte_bin
-#'
+#' 
+
 
 analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
-                    re=c("clust", "time"), corstr="exchangeable", offset=NULL,
-                    n_knots_exp=4, n_knots_cal=4) {
+                    re=c("clust", "time"), corstr="exchangeable", 
+                    advanced = advanced_params()) {
 
   cluster_id <- NULL
   rm(cluster_id)
@@ -122,15 +121,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_cal <- ""
   } else if (cal_time=="NCS") {
 
-    knots_cal <- seq(min(dat$time), max(dat$time), length.out=n_knots_cal)
+    knots_cal <- seq(min(dat$time), max(dat$time), length.out=advanced$n_knots_cal)
     basis_cal <- splines::ns(
       x = dat$time,
-      knots = knots_cal[2:(n_knots_cal-1)],
+      knots = knots_cal[2:(advanced$n_knots_cal-1)],
       intercept = TRUE,
-      Boundary.knots = knots_cal[c(1,n_knots_cal)]
+      Boundary.knots = knots_cal[c(1,advanced$n_knots_cal)]
     )
     dat$j <- rep(NA, nrow(dat))
-    for (i in 1:n_knots_cal) {
+    for (i in 1:advanced$n_knots_cal) {
       dat[[paste0("j_", i)]] <- basis_cal[,i]
     }
     f_cal_terms <- paste0("j_", 1:ncol(basis_cal))
@@ -172,7 +171,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ################################################.
 
     # Fit mixed model
-    if(is.null(offset)) {
+    if(is.null(advanced$offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::lmer(formula, data=dat)
@@ -183,11 +182,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
-        model_it_mixed <- lme4::lmer(formula, data=dat, offset=offset)
+        model_it_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
       } else {
         formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
         model_it_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                      offset=offset)
+                                      offset=advanced$offset)
       }
     }
 
@@ -238,7 +237,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_exp <- paste0("exp_", exp_times, collapse = " + ")
 
     # Fit mixed model
-    if(is.null(offset)) {
+    if(is.null(advanced$offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::lmer(formula, data=dat)
@@ -249,11 +248,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
-        model_eti_mixed <- lme4::lmer(formula, data=dat, offset=offset)
+        model_eti_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
       } else {
         formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
         model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=offset)
+                                       offset=advanced$offset)
       }
     }
 
@@ -340,7 +339,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
 
     # Fit mixed model
-    if(is.null(offset)) {
+    if(is.null(advanced$offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
         formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
@@ -357,13 +356,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
-        model_teh_mixed <- lme4::lmer(formula, data=dat, offset=offset)
+        model_teh_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
       } else {
         formula <- stats::as.formula(paste0(
           f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
         ))
         model_teh_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=offset)
+                                       offset=advanced$offset)
       }
     }
 
@@ -453,25 +452,25 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Create the spline basis
     S <- max(dat$exposure_time)
-    knots_exp <- seq(0, S, length.out=n_knots_exp)
+    knots_exp <- seq(0, S, length.out=advanced$n_knots_exp)
     ns_basis <- splines::ns(
       x = dat$exposure_time,
-      knots = knots_exp[2:(n_knots_exp-1)],
+      knots = knots_exp[2:(advanced$n_knots_exp-1)],
       intercept = TRUE,
-      Boundary.knots = knots_exp[c(1,n_knots_exp)]
+      Boundary.knots = knots_exp[c(1,advanced$n_knots_exp)]
     )
 
     dat$b <- rep(NA, nrow(dat))
-    for (i in 1:n_knots_exp) {
+    for (i in 1:advanced$n_knots_exp) {
       dat[[paste0("b", i)]] <- ns_basis[,i] * dat$treatment
     }
 
     # Fit mixed model
     formula <- stats::as.formula(paste0(
-      f_out, f_cal, paste0("b", 1:n_knots_exp, collapse = " + "), f_re
+      f_out, f_cal, paste0("b", 1:advanced$n_knots_exp, collapse = " + "), f_re
     ))
 
-    if(is.null(offset)) {
+    if(is.null(advanced$offset)) {
       if(family$family == "gaussian" & family$link == "identity") {
         model_ncs_mixed <- lme4::lmer(formula, data=dat)
       } else {
@@ -479,10 +478,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       }
     } else {
       if(family$family == "gaussian" & family$link == "identity") {
-        model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=offset)
+        model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
       } else {
         model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=offset)
+                                       offset=advanced$offset)
       }
     }
 
@@ -505,9 +504,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
     B <- as.matrix(splines::ns(
       x = c(1:S),
-      knots = knots_exp[2:(n_knots_exp-1)],
+      knots = knots_exp[2:(advanced$n_knots_exp-1)],
       intercept = TRUE,
-      Boundary.knots = knots_exp[c(1,n_knots_exp)]
+      Boundary.knots = knots_exp[c(1,advanced$n_knots_exp)]
     ))
 
     class(B) <- "matrix"
