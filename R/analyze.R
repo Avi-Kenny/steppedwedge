@@ -73,7 +73,7 @@
 #' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)
 #' 
 #' results_pte_bin <- analyze(dat = test_data_bin, family = binomial, method = "mixed", 
-#' estimand_type = "TATE", estimand_time = 3, exp_time = "ETI")
+#' estimand_type = "TATE", estimand_time = c(1, 4), exp_time = "ETI")
 #'
 #' results_pte_bin
 #'
