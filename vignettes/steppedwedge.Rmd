@@ -225,7 +225,7 @@ ETI_model <- analyze(
 NCS_4_model <- analyze(
   dat = dat_cont, method = "mixed", estimand_type = "TATE",
   estimand_time = c(1, 4), exp_time = "NCS", 
-  advanced = advanced_params(n_knots_exp = 4)
+  advanced = advanced(n_knots_exp = 4)
 )
 TEH_model <- analyze(
   dat = dat_cont, method = "mixed", estimand_type = "TATE",

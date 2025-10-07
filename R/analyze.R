@@ -34,7 +34,7 @@
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
-#' @param advanced A list of options returned by \code{\link{advanced_params}}.
+#' @param advanced A list of options returned by \code{\link{advanced}}.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
@@ -61,7 +61,7 @@
 #' 
 #' # Analysis example 3: TATE estimand for exposure times 1 through 4, Natural Cubic Splines model
 #' results_tate_ncs <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
-#' estimand_time = c(1, 4), exp_time = "NCS", advanced = advanced_params(n_knots_exp = 4))
+#' estimand_time = c(1, 4), exp_time = "NCS", advanced = advanced(n_knots_exp = 4))
 #' 
 #' results_tate_ncs
 #' 
@@ -81,7 +81,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable", 
-                    advanced = advanced_params()) {
+                    advanced = advanced()) {
 
   cluster_id <- NULL
   rm(cluster_id)
