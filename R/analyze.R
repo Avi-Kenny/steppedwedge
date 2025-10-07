@@ -81,7 +81,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable", 
-                    advanced = advanced()) {
+                    advanced = steppedwedge::advanced()) {
 
   cluster_id <- NULL
   rm(cluster_id)

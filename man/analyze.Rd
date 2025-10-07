@@ -14,7 +14,7 @@ analyze(
   family = stats::gaussian,
   re = c("clust", "time"),
   corstr = "exchangeable",
-  advanced = advanced()
+  advanced = steppedwedge::advanced()
 )
 }
 \arguments{
