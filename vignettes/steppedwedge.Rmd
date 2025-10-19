@@ -134,20 +134,6 @@ print(analysis_4)
 ```
 
 
-Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Treatment Effect Heterogeneity over exposure time (TEH) model.
-
-```{r}
-analysis_5 <- analyze(
-  dat = dat,
-  method = "mixed",
-  estimand_type = "TATE", 
-  exp_time = "TEH",
-  family = binomial
-)
-
-print(analysis_5)
-```
-
 ## Continuous outcome
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
@@ -227,12 +213,8 @@ NCS_4_model <- analyze(
   estimand_time = c(1, 4), exp_time = "NCS", 
   advanced = advanced(n_knots_exp = 4)
 )
-TEH_model <- analyze(
-  dat = dat_cont, method = "mixed", estimand_type = "TATE",
-  estimand_time = c(1, 4), exp_time = "TEH"
-)
 
-plot_effect_curves(IT_model, NCS_4_model, ETI_model, TEH_model, facet_nrow = 1)
+plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1)
 
 
 ```
