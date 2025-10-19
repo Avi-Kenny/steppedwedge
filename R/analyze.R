@@ -38,8 +38,9 @@
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
-#' treatment effect 95% confidence interval as a numeric vector of length 2, and
-#' dataframe with treatment effect at each exposure timepoint.
+#' treatment effect 95% confidence interval as a numeric vector of length 2,
+#' a list with treatment effect estimates (and standard errors and 95% confidence intervals)
+#' at each exposure timepoint, and the original dataframe passed to `analyze()`.
 #' @export
 #'
 #' @examples
@@ -83,6 +84,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                     re=c("clust", "time"), corstr="exchangeable", 
                     advanced = steppedwedge::advanced()) {
 
+  dat_orig <- dat
   cluster_id <- NULL
   rm(cluster_id)
 
@@ -221,7 +223,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_ci = te_ci,
       converged = performance::check_convergence(model_it_mixed)[1],
       messages = model_it_mixed@optinfo$conv$lme4$messages,
-      effect_curve = effect_curve
+      effect_curve = effect_curve,
+      dat = dat_orig
     )
   } else if(method == "mixed" & exp_time == "ETI") {
 
@@ -306,7 +309,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
 
     } else if(estimand_type == "PTE") {
@@ -325,7 +329,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_eti_mixed)[1],
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
 
     }
@@ -414,7 +419,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
 
     } else if(estimand_type == "PTE") {
@@ -438,7 +444,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_teh_mixed)[1],
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
 
     }
@@ -551,7 +558,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = tate_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
     } else if(estimand_type == "PTE") {
 
@@ -569,7 +577,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
-        effect_curve = effect_curve
+        effect_curve = effect_curve,
+        dat = dat_orig
       )
     }
 
@@ -605,7 +614,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       estimand_type = "TATE (IT)",
       te_est = te_est,
       te_se = te_se,
-      te_ci = te_ci
+      te_ci = te_ci,
+      dat = dat_orig
     )
   } else if(method == "GEE" & exp_time == "ETI") {
 
@@ -660,7 +670,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         estimand_type = "TATE",
         te_est = tate_est,
         te_se = tate_se,
-        te_ci = tate_ci
+        te_ci = tate_ci,
+        dat = dat_orig
       )
 
     } else if(estimand_type == "PTE") {
@@ -676,7 +687,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         estimand_type = "PTE",
         te_est = pte_est,
         te_se = pte_se,
-        te_ci = pte_ci
+        te_ci = pte_ci,
+        dat = dat_orig
       )
       #
       # # Estimate the effect curve
