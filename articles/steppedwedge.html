@@ -181,29 +181,12 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; Treatment effect estimate: -0.184</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.497, 0.128</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
-<p>Mixed model, with Time Average Treament Effect (TATE) as the
-estimand, using a Treatment Effect Heterogeneity over exposure time
-(TEH) model.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">analysis_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
-<span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
-<span>  estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, </span>
-<span>  exp_time <span class="op">=</span> <span class="st">"TEH"</span>,</span>
-<span>  family <span class="op">=</span> <span class="va">binomial</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: -0.189</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: -0.448, 0.07</span></span>
-<span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
 </h2>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">dat_cont</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
 <span>  time <span class="op">=</span> <span class="st">"period"</span>,</span>
@@ -234,7 +217,7 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <p>When loading data where the outcome is binomial, specify the names of
 the “# of successes” and “# of trials” variables as the
 <code>outcome</code> argument.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">dat_binom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_data.html">load_data</a></span><span class="op">(</span></span>
 <span>  time <span class="op">=</span><span class="st">"period"</span>,</span>
@@ -247,7 +230,7 @@ the “# of successes” and “# of trials” variables as the
 <span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">analysis_binom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat_binom</span>,</span>
@@ -267,7 +250,7 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 </h2>
 <p>The <code>plot_effect_curve</code> function plots effect estimates by
 exposure time for one or more <code>analyze</code> objects.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">IT_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat_cont</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
@@ -282,14 +265,9 @@ exposure time for one or more <code>analyze</code> objects.</p>
 <span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"NCS"</span>, </span>
 <span>  advanced <span class="op">=</span> <span class="fu"><a href="../reference/advanced.html">advanced</a></span><span class="op">(</span>n_knots_exp <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">TEH_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
-<span>  dat <span class="op">=</span> <span class="va">dat_cont</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
-<span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"TEH"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/plot_effect_curves.html">plot_effect_curves</a></span><span class="op">(</span><span class="va">IT_model</span>, <span class="va">NCS_4_model</span>, <span class="va">ETI_model</span>, <span class="va">TEH_model</span>, facet_nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="steppedwedge_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<span><span class="fu"><a href="../reference/plot_effect_curves.html">plot_effect_curves</a></span><span class="op">(</span><span class="va">IT_model</span>, <span class="va">NCS_4_model</span>, <span class="va">ETI_model</span>, facet_nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="steppedwedge_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
