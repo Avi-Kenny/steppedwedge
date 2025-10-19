@@ -20,27 +20,27 @@
 plot_cluster_chart <- function(analysis_object)
 {
   # Prevent R CMD CHECK note
-  # aes <- cluster_id <- first_exposure <- n <- time <- treatment <- x <- NULL
-  # rm(aes,cluster_id,first_exposure,n,time,treatment,x)
+  outcome <- preds <- time <- treatment <- NULL
+  rm(outcome,preds,time,treatment)
   
   # Input validation
   if (!methods::is(analysis_object,"sw_analysis")) { stop("`analysis_object` must be of class `sw_analysis`.") }
   
   dat <- analysis_object$dat
   
-  dat$preds <- as.numeric(predict(analysis_object$model))
+  dat$preds <- as.numeric(stats::predict(analysis_object$model))
 
   dat$cluster <- factor(paste("Cluster", dat$cluster_id))
 
   cluster_order <- order(as.numeric(unique(gsub("Cluster ", "", dat$cluster))))
   dat$cluster <- factor(dat$cluster, levels = paste("Cluster", cluster_order))
   
-  cluster_chart <- ggplot(dat, aes(x=time, y=outcome, color=factor(treatment))) +
-    geom_point(alpha=0.5) +
-    geom_line(aes(y=preds), color="darkred", linewidth=1) +
-    labs(color="Treatment", x="Time", y="Outcome") +
-    scale_color_manual(values=c("#E69F00", "#009E73")) +
-    facet_wrap(~cluster, ncol=4) +
+  cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
+    ggplot2::geom_point(alpha=0.5) +
+    ggplot2::geom_line(ggplot2::aes(y=preds), color="darkred", linewidth=1) +
+    ggplot2::labs(color="Treatment", x="Time", y="Outcome") +
+    ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
+    ggplot2::facet_wrap(~cluster, ncol=4) +
     # move legend to bottom
     ggplot2::theme(legend.position = "bottom")
   
