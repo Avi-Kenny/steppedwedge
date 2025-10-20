@@ -12,6 +12,8 @@
 #'     the number of knots to use for calendar time, including boundary knots.
 #'     The spline basis includes an intercept, and the degree of the basis is
 #'     equal to the number of knots.
+#' @param var_est A character string; either "model", for model-based variance,
+#'     or "robust", to use the robust variance estimator.
 #'
 #' @return A list of options
 #' @export
@@ -23,6 +25,7 @@
 #' analyze(dat = dat, method = "mixed", estimand_type = "TATE",  exp_time = "NCS",
 #' family = binomial)
 #' 
-advanced <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4) {
-  return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal))
+advanced <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model") {
+  return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal,
+              var_est=var_est))
 }

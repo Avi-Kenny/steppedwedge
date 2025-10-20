@@ -4,7 +4,7 @@
 \alias{advanced}
 \title{Set advanced parameters for analysis of data from stepped wedge trials}
 \usage{
-advanced(offset = NULL, n_knots_exp = 4, n_knots_cal = 4)
+advanced(offset = NULL, n_knots_exp = 4, n_knots_cal = 4, var_est = "model")
 }
 \arguments{
 \item{offset}{A linear predictor offset term; see docs for `lme4::lmer`.}
@@ -18,6 +18,9 @@ equal to the number of knots.}
 the number of knots to use for calendar time, including boundary knots.
 The spline basis includes an intercept, and the degree of the basis is
 equal to the number of knots.}
+
+\item{var_est}{A character string; either "model", for model-based variance,
+or "robust", to use the robust variance estimator.}
 }
 \value{
 A list of options
