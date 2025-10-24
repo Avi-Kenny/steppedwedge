@@ -270,8 +270,14 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Extract coefficient estimates and covariance matrix corresponding to exposure
     #     time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
-    se_eti <- summary_eti$coefficients[,2][indices] # column 2 contains the standard errors
-    cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
+    if(advanced$var_est == "model") {
+      se_eti <- summary_eti$coefficients[,2][indices] # column 2 contains the standard errors
+      cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
+    } else if(advanced$var_est == "robust") {
+      cov_cr  <- vcovCR.glmerMod(model_eti_mixed, cluster = dat$cluster_id, type = "classic")
+      cov_mtx <- cov_cr[indices, indices, drop = FALSE]
+      se_eti  <- sqrt(Matrix::diag(cov_mtx))
+    }
 
     # Calculate the CI for treatment effect at each exposure time
     ci_lower_eti <- coeffs - 1.96 * se_eti
