@@ -7,7 +7,7 @@
 #' @return A robust covariance matrix estimate
 #' @noRd
 vcovCR.glmerMod = function(obj, cluster, type="classic"){
-
+  eps=1e-14
   ######################
   # Helper functions (from clubSandwich)
   ######################
@@ -29,12 +29,12 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   # other helper functions
   #################
   mtx_DA <- function(D,A) {
-    matrix(rep(diag(D),ncol(A))*as.numeric(A), ncol=ncol(A))
+    matrix(rep(Matrix::diag(D),ncol(A))*as.numeric(A), ncol=ncol(A))
   }
   mtx_AD <- function(A,D) {
-    matrix(rep(diag(D), each=nrow(A))*as.numeric(A), ncol=ncol(A))
+    matrix(rep(Matrix::diag(D), each=nrow(A))*as.numeric(A), ncol=ncol(A))
   }
-
+  
   ##################
   # Function starts here
   ##################
@@ -42,21 +42,21 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   if ("merMod" %in% class(obj)) {
     stop("The 'obj' should be an object fitted using lmer or glmer.")
   }
-  if (!is.null(obj@call$weights))
+  if (!is.null(obj@call$weights)) 
     stop("Models with prior weights are not currently supported.")
   # Check if cluster is manually input and of class factor
   if (!missing(cluster) && !is.factor(cluster)) {
     stop("If 'cluster' is manually input, it must be of class 'factor'.")
   }
-  if (missing(cluster))
+  if (missing(cluster)) 
     cluster <- get_outer_group(obj)
-  if (!is_nested_lmerMod(obj, cluster))
+  if (!is_nested_lmerMod(obj, cluster)) 
     stop("Non-nested random effects detected. Method is not available for such models.")
   ######################
   # decode options
   #######################
   ropt = substr(type,1,2)
-  if (ropt=="FG") {
+  if (ropt=="FG") {    
     type1="FG"
     if (nchar(type)==2) {
       r = 0.75
@@ -64,7 +64,7 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
       r = as.numeric(substr(type,regexpr("\\(",type)[[1]]+1,regexpr("\\)",type)[[1]]-1))
     }
   } else {
-    if (ropt=="KC") {
+    if (ropt=="KC") {    
       type1="KC"
       if (nchar(type)==2) {
         exact = FALSE
@@ -95,7 +95,7 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
             }
           }
         }
-      } else {
+      } else { 
         type1 = type
       }}}
   # Check if type is one of the specific allowed values
@@ -128,50 +128,50 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
   #
   sigma2 = stats::sigma(obj)^2
   lambda = lme4::getME(obj,"Lambda")
-  R = as.matrix(lambda%*%t(lambda)*sigma2)
+  R = Matrix::as.matrix(lambda%*%Matrix::t(lambda)*sigma2)
   WB_B <- R
   if (Matrix::isDiagonal(WB_B)) diagB=TRUE else diagB=FALSE
   ##################
   # Robust variance calculation
   ##################
   XtVX = stats::vcov(obj)
-  WB_C1 = solve(XtVX)
+  WB_C1 = Matrix::solve(XtVX)
   sum=matrix(0,np,np)
   # start loop over clusters
   for (g in clusternames){
     grp = (cluster == g & nden>0)
     ng = sum(grp)
     if (link == "identity") {
-      delta = diag(ng)
-      deltainv = delta
+      delta = Matrix::diag(ng)  
+      deltainv = delta 
     } else if (link == "logit") {
       term = ginv_eta[grp]*(1-ginv_eta[grp])
-      delta = diag(term,ng,ng)
-      deltainv = diag(1/term,ng,ng)
+      delta = Matrix::diag(term,ng,ng)
+      deltainv = Matrix::diag(1/term,ng,ng)
     } else if (link == "log") {
       term = ginv_eta[grp]
-      delta = diag(term,ng,ng)
-      deltainv = diag(1/term,ng,ng)
+      delta = Matrix::diag(term,ng,ng)
+      deltainv = Matrix::diag(1/term,ng,ng)
     } else {
       stop("Link ",link," not supported")
     }
     #
     P = deltainv%*%(Y[grp]-ginv_eta[grp]) + eta[grp]
     e = matrix(P - X[grp,]%*%beta,ncol=1)
-    ete = e[,,drop=FALSE]%*%t(e[,,drop=FALSE])
+    ete = e[,,drop=FALSE]%*%Matrix::t(e[,,drop=FALSE])
     #
-    Sigma = diag(sigma2*stats::family(obj)$variance(ginv_eta[grp])/nden[grp])
-
+    Sigma = Matrix::diag(sigma2*stats::family(obj)$variance(ginv_eta[grp])/nden[grp],ng,ng)
+    
     # this is diagonal, which is the first term of WB
-
+    
     if (link=="identity") {
-      WB_A <- diag(1/diag(Sigma))
+      WB_A <- Matrix::diag(1/Matrix::diag(Sigma),ng,ng)
     } else {
-      WB_A <- diag(1/diag(mtx_AD(mtx_DA(deltainv,Sigma),deltainv)))
+      WB_A <- Matrix::diag(1/Matrix::diag(mtx_AD(mtx_DA(deltainv,Sigma),deltainv)),ng,ng)
     }
-
-    WB_U <- Z[grp,,drop=FALSE]
-    WB_Ut <- t(Z[grp,,drop=FALSE])
+    
+    WB_U <- Z[grp,,drop=FALSE] 
+    WB_Ut <- Matrix::t(Z[grp,,drop=FALSE])
     # Compute the inverse
     if (diagB) {
       WB_AUB <- mtx_AD(mtx_DA(WB_A,WB_U),WB_B)
@@ -179,52 +179,52 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
       WB_AUB <- mtx_DA(WB_A,WB_U)%*%WB_B
     }
     WB_UtA <- mtx_AD(WB_Ut,WB_A)
-    Vinv <- WB_A - WB_AUB%*%solve(diag(nq) + WB_Ut%*%WB_AUB)%*%WB_UtA
-    #
+    Vinv <- WB_A - WB_AUB%*%Matrix::solve(Matrix::diag(nq) + WB_Ut%*%WB_AUB)%*%WB_UtA
+    #    
     if (type1=="MD") {
-      WB_U = -t(Vinv)%*%X[grp,]
-      WB_V = t(X[grp,])
+      WB_U = -Matrix::t(Vinv)%*%X[grp,,drop=FALSE]
+      WB_V = Matrix::t(X[grp,,drop=FALSE])
       # Since WB_A is identity, the following expressions are simplified from general Woodbury
       O = WB_C1 + WB_V%*%WB_U
-      #      WB_A = diag(ng)
+      #      WB_A = Matrix::diag(ng)
       #      FF = WB_A - WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V
-      FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V)
-      diag(FF) = diag(FF) + 1
-      FVX = FF%*%Vinv%*%X[grp,]
-      sum = sum + t(FVX)%*%ete%*%FVX
+      FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V) 
+      Matrix::diag(FF) = Matrix::diag(FF) + 1
+      FVX = FF%*%Vinv%*%X[grp,,drop=FALSE]
+      sum = sum + Matrix::t(FVX)%*%ete%*%FVX
     } else {
       if (type1=="KC") {
         if (exact) {
-          H = X[grp,]%*%XtVX%*%t(X[grp,])%*%Vinv
-          FF = MASS::ginv(expm::sqrtm(diag(ng) - t(H)))
+          H = X[grp,,drop=FALSE]%*%XtVX%*%Matrix::t(X[grp,,drop=FALSE])%*%Vinv  
+          FF = MASS::ginv(expm::sqrtm(Matrix::diag(ng) - Matrix::t(H)))
           if (is.complex(FF)) stop("(I-H_g)^(-1/2) is complex")
-          FVX = FF%*%Vinv%*%X[grp,]
-          sum = sum + t(FVX)%*%ete%*%FVX
+          FVX = FF%*%Vinv%*%X[grp,,drop=FALSE]
+          sum = sum + Matrix::t(FVX)%*%ete%*%FVX
         } else {
-          WB_U = -t(Vinv)%*%X[grp,]
-          WB_V = t(X[grp,])
+          WB_U = -Matrix::t(Vinv)%*%X[grp,,drop=FALSE]
+          WB_V = Matrix::t(X[grp,,drop=FALSE])
           # Since WB_A is identity, the following expressions are simplified from general Woodbury
           O = WB_C1 + WB_V%*%WB_U
-          #        WB_A = diag(ng)
+          #        WB_A = Matrix::diag(ng)
           #        FF = WB_A - WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V
-          FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V)
-          diag(FF) = diag(FF) + 1
-          VX = Vinv%*%X[grp,]
+          FF = -(WB_U%*%MASS::ginv(matrix(as.numeric(O),dim(O)))%*%WB_V) 
+          Matrix::diag(FF) = Matrix::diag(FF) + 1
+          VX = Vinv%*%X[grp,,drop=FALSE]
           FVX = FF%*%VX
-          term = t(FVX)%*%ete%*%VX
-          #        sum = sum + (t(FVX)%*%ete%*%VX + t(VX)%*%ete%*%FVX)/2
-          sum = sum + (term + t(term))/2
+          term = Matrix::t(FVX)%*%ete%*%VX
+          #        sum = sum + (Matrix::t(FVX)%*%ete%*%VX + Matrix::t(VX)%*%ete%*%FVX)/2
+          sum = sum + (term + Matrix::t(term))/2
         }
       } else {
         if (type1=="FG") {
-          Q = t(X[grp,])%*%Vinv%*%X[grp,]%*%XtVX
-          XAA = mtx_AD(X[grp,],diag(1/sqrt(1-pmin(r,diag(Q)))))
-          #      XAA = X[grp,]%*%diag(1/sqrt(1-pmin(r,diag(Q))))
-          sum = sum + t(XAA)%*%Vinv%*%ete%*%Vinv%*%XAA
+          Q = Matrix::t(X[grp,,drop=FALSE])%*%Vinv%*%X[grp,,drop=FALSE]%*%XtVX
+          XAA = mtx_AD(X[grp,],Matrix::diag(1/sqrt(1-pmin(r,Matrix::diag(Q))),np,np))
+          #      XAA = X[grp,]%*%Matrix::diag(1/sqrt(1-pmin(r,Matrix::diag(Q))))
+          sum = sum + Matrix::t(XAA)%*%Vinv%*%ete%*%Vinv%*%XAA
         } else {
           # classic and MBN
-          VX = Vinv%*%X[grp,]
-          sum = sum + t(VX)%*%ete%*%VX
+          VX = Vinv%*%X[grp,,drop=FALSE]
+          sum = sum + Matrix::t(VX)%*%ete%*%VX 
         }}}
   }
   # end loop over clusters
@@ -239,11 +239,11 @@ vcovCR.glmerMod = function(obj, cluster, type="classic"){
     if (DF) {c = (f-1)/(f-np) * (m/(m-1))}
     if (m > (d+1)*np) {deltam = np/(m-np)} else {deltam = 1/d}
     omega = XtVX %*% sum
-    evals = eigen(omega,symmetric=TRUE,only.values=TRUE)
-    if (m > np) {pstar = np} else {pstar = sum(evals$values>0)}
-    phi =  max(r,sum(evals$values)/pstar)
+    evals = Re(eigen(omega,only.values=TRUE)$values)
+    if (m > np) {pstar = np} else {pstar = sum(evals>eps)}
+    phi =  max(r,sum(evals)/pstar)
   }
-  #
+  #  
   robustVar = c*XtVX%*%sum%*%XtVX + deltam*phi*XtVX
   robustVar
 }
