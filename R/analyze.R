@@ -199,7 +199,14 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     #     effect; recall that the TATE estimator for any interval and the PTE
     #     estimators are all equivalent when using the immediate treatment model
     te_est <- summary_it$coefficients["treatment",1]
-    te_se <- summary_it$coefficients["treatment",2]
+    if(advanced$var_est == "model") {
+      te_se <- summary_it$coefficients["treatment",2]
+    } else if(advanced$var_est == "robust") {
+      cov_cr  <- vcovCR.glmerMod(model_it_mixed, cluster = dat$cluster_id, 
+                                 type = advanced$var_est_type)
+      cov_mtx <- cov_cr["treatment", "treatment"]
+      te_se  <- sqrt(cov_mtx)
+    }
     te_ci <- te_est + c(-1.96,1.96) * te_se
 
     # Estimate the effect curve
@@ -274,7 +281,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       se_eti <- summary_eti$coefficients[,2][indices] # column 2 contains the standard errors
       cov_mtx <- stats::vcov(model_eti_mixed)[indices,indices]
     } else if(advanced$var_est == "robust") {
-      cov_cr  <- vcovCR.glmerMod(model_eti_mixed, cluster = dat$cluster_id, type = "classic")
+      cov_cr  <- vcovCR.glmerMod(model_eti_mixed, cluster = dat$cluster_id, 
+                                 type = advanced$var_est_type)
       cov_mtx <- cov_cr[indices, indices, drop = FALSE]
       se_eti  <- sqrt(Matrix::diag(cov_mtx))
     }
@@ -507,8 +515,16 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Extract coefficient estimates and covariance matrix corresponding to spline
     # terms
     coeffs_spl <- summary_ncs$coefficients[,1][indices]
-    cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
-
+    if(advanced$var_est == "model") {
+      cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
+      # te_se <- summary_it$coefficients["treatment",2]
+    } else if(advanced$var_est == "robust") {
+      cov_cr <- vcovCR.glmerMod(model_ncs_mixed, cluster = dat$cluster_id,
+                                type = advanced$var_est_type)
+      indices <- grep("^b[0-9]+$", rownames(cov_cr))
+      cov_mtx_spl <- cov_cr[indices,indices]
+    }
+    
     # Get number of unique (non-zero) exposure times
     exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
     num_exp_timepoints <- length(exp_timepoints)
