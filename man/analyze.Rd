@@ -61,7 +61,7 @@ cohort design is used), "tx" (random treatment effect)}
 if method="GEE" is used. Defines the GEE working correlation structure;
 see the documentation for `geepack::geeglm`.}
 
-\item{advanced}{A list of options returned by \code{\link{advanced}}.}
+\item{advanced}{A list of options returned by \code{\link{params}}.}
 }
 \value{
 A list with the model object, model type as a string, estimand type
