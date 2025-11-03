@@ -263,7 +263,7 @@ exposure time for one or more <code>analyze</code> objects.</p>
 <span><span class="va">NCS_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat_cont</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, estimand_type <span class="op">=</span> <span class="st">"TATE"</span>,</span>
 <span>  estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"NCS"</span>, </span>
-<span>  advanced <span class="op">=</span> <span class="fu"><a href="../reference/advanced.html">advanced</a></span><span class="op">(</span>n_knots_exp <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span>  advanced <span class="op">=</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span>n_knots_exp <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_effect_curves.html">plot_effect_curves</a></span><span class="op">(</span><span class="va">IT_model</span>, <span class="va">NCS_4_model</span>, <span class="va">ETI_model</span>, facet_nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
