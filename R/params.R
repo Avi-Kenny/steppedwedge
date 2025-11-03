@@ -27,8 +27,8 @@
 #' analyze(dat = dat, method = "mixed", estimand_type = "TATE",  exp_time = "NCS",
 #' family = binomial)
 #' 
-advanced <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
-                     var_est_type="classic") {
+params <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
+                   var_est_type="classic") {
   return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal,
               var_est=var_est, var_est_type=var_est_type))
 }

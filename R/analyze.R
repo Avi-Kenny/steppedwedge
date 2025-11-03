@@ -62,7 +62,7 @@
 #' 
 #' # Analysis example 3: TATE estimand for exposure times 1 through 4, Natural Cubic Splines model
 #' results_tate_ncs <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
-#' estimand_time = c(1, 4), exp_time = "NCS", advanced = advanced(n_knots_exp = 4))
+#' estimand_time = c(1, 4), exp_time = "NCS", advanced = params(n_knots_exp = 4))
 #' 
 #' results_tate_ncs
 #' 
@@ -82,7 +82,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                     estimand_time=c(1,max(dat$exposure_time)), exp_time="IT",
                     cal_time="categorical", family=stats::gaussian,
                     re=c("clust", "time"), corstr="exchangeable", 
-                    advanced = steppedwedge::advanced()) {
+                    advanced = params()) {
 
   dat_orig <- dat
   cluster_id <- NULL
