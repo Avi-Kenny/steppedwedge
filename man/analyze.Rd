@@ -12,6 +12,7 @@ analyze(
   exp_time = "IT",
   cal_time = "categorical",
   family = stats::gaussian,
+  exponentiate = FALSE,
   re = c("clust", "time"),
   corstr = "exchangeable",
   advanced = params()
@@ -50,6 +51,10 @@ slope parameter. "none" assumes that there is no underlying calendar time
 trend.}
 
 \item{family}{A family object; see documentation for `glm`.}
+
+\item{exponentiate}{Logical; if TRUE, return exponentiated treatment effect 
+estimates and confidence intervals (including in the `effect_curve`
+object). Defaults to FALSE.}
 
 \item{re}{A character vector of random effects to include; only relevant if
 method="mixed" is used. Possible random effects include "clust" (random
