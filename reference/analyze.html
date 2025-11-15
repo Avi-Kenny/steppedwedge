@@ -47,6 +47,7 @@
 <span>  exp_time <span class="op">=</span> <span class="st">"IT"</span>,</span>
 <span>  cal_time <span class="op">=</span> <span class="st">"categorical"</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,</span>
+<span>  exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  re <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clust"</span>, <span class="st">"time"</span><span class="op">)</span>,</span>
 <span>  corstr <span class="op">=</span> <span class="st">"exchangeable"</span>,</span>
 <span>  advanced <span class="op">=</span> <span class="fu"><a href="params.html">params</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -102,6 +103,12 @@ trend.</p></dd>
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
 <dd><p>A family object; see documentation for `glm`.</p></dd>
+
+
+<dt id="arg-exponentiate">exponentiate<a class="anchor" aria-label="anchor" href="#arg-exponentiate"></a></dt>
+<dd><p>Logical; if TRUE, return exponentiated treatment effect
+estimates and confidence intervals (including in the `effect_curve`
+object). Defaults to FALSE.</p></dd>
 
 
 <dt id="arg-re">re<a class="anchor" aria-label="anchor" href="#arg-re"></a></dt>

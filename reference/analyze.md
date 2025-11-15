@@ -13,6 +13,7 @@ analyze(
   exp_time = "IT",
   cal_time = "categorical",
   family = stats::gaussian,
+  exponentiate = FALSE,
   re = c("clust", "time"),
   corstr = "exchangeable",
   advanced = params()
@@ -65,6 +66,12 @@ analyze(
 - family:
 
   A family object; see documentation for \`glm\`.
+
+- exponentiate:
+
+  Logical; if TRUE, return exponentiated treatment effect estimates and
+  confidence intervals (including in the \`effect_curve\` object).
+  Defaults to FALSE.
 
 - re:
 
