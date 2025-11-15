@@ -213,12 +213,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     exp_times <- sort(unique(dat$exposure_time))
     exp_times <- exp_times[exp_times!=0]
     effect_curve <- list(
-      exp_time = exp_times,
-      est = rep(te_est, length(exp_times)),
-      se = rep(te_se, length(exp_times)),
+      exp_time = c(0, exp_times),
+      est = c(0, rep(te_est, length(exp_times))),
+      se = c(0, rep(te_se, length(exp_times))),
       vcov = NA,
-      ci_upper = rep(te_ci[1], length(exp_times)),
-      ci_lower = rep(te_ci[2], length(exp_times))
+      ci_upper = c(0, rep(te_ci[1], length(exp_times))),
+      ci_lower = c(0, rep(te_ci[2], length(exp_times)))
     )
 
     results <- list(
@@ -293,12 +293,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = exp_times,
-      est = as.numeric(coeffs),
-      se = se_eti,
+      exp_time = c(0, exp_times),
+      est = c(0, as.numeric(coeffs)),
+      se = c(0, se_eti),
       vcov = cov_mtx,
-      ci_lower = as.numeric(ci_lower_eti),
-      ci_upper = as.numeric(ci_upper_eti)
+      ci_lower = c(0, as.numeric(ci_lower_eti)),
+      ci_upper = c(0, as.numeric(ci_upper_eti))
     )
 
     if(estimand_type == "TATE") {
@@ -409,12 +409,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = exp_times,
-      est = est_teh,
-      se = se_teh,
+      exp_time = c(0, exp_times),
+      est = c(0, est_teh),
+      se = c(0, se_teh),
       vcov = NA,
-      ci_upper = ci_upper_teh,
-      ci_lower = ci_lower_teh
+      ci_upper = c(0, ci_upper_teh),
+      ci_lower = c(0, ci_lower_teh)
     )
 
     if(estimand_type == "TATE") {
@@ -551,12 +551,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = exp_times,
-      est = coeffs_trans,
-      se = se_ncs,
+      exp_time = c(0, exp_times),
+      est = c(0, coeffs_trans),
+      se = c(0, se_ncs),
       vcov = cov_mtx,
-      ci_lower = ci_lower_ncs,
-      ci_upper = ci_upper_ncs
+      ci_lower = c(0, ci_lower_ncs),
+      ci_upper = c(0, ci_upper_ncs)
     )
 
     if(estimand_type == "TATE") {
