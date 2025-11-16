@@ -216,6 +216,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     if(exponentiate) {
       te_est <- exp(te_est)
       te_ci <- exp(te_ci)
+      zero_value <- 1
+    } else {
+      zero_value <- 0
     }
 
     # Estimate the effect curve
@@ -223,11 +226,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     exp_times <- exp_times[exp_times!=0]
     effect_curve <- list(
       exp_time = c(0, exp_times),
-      est = c(0, rep(te_est, length(exp_times))),
+      est = c(zero_value, rep(te_est, length(exp_times))),
       se = c(0, rep(te_se, length(exp_times))),
       vcov = NA,
-      ci_upper = c(0, rep(te_ci[1], length(exp_times))),
-      ci_lower = c(0, rep(te_ci[2], length(exp_times)))
+      ci_upper = c(zero_value, rep(te_ci[1], length(exp_times))),
+      ci_lower = c(zero_value, rep(te_ci[2], length(exp_times)))
     )
 
     results <- list(
@@ -304,20 +307,22 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       coeffs_return <- exp(coeffs)
       ci_lower_eti_return <- exp(ci_lower_eti)
       ci_upper_eti_return <- exp(ci_upper_eti)
+      zero_value <- 1
     } else {
       coeffs_return <- coeffs
       ci_lower_eti_return <- ci_lower_eti
       ci_upper_eti_return <- ci_upper_eti
+      zero_value <- 0
     }
 
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = c(0, exp_times),
-      est = c(0, as.numeric(coeffs_return)),
+      est = c(zero_value, as.numeric(coeffs_return)),
       se = c(0, se_eti),
       vcov = cov_mtx,
-      ci_lower = c(0, as.numeric(ci_lower_eti_return)),
-      ci_upper = c(0, as.numeric(ci_upper_eti_return))
+      ci_lower = c(zero_value, as.numeric(ci_lower_eti_return)),
+      ci_upper = c(zero_value, as.numeric(ci_upper_eti_return))
     )
 
     if(estimand_type == "TATE") {
@@ -446,20 +451,22 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       est_teh_return <- exp(est_teh)
       ci_lower_teh_return <- exp(ci_lower_teh)
       ci_upper_teh_return <- exp(ci_upper_teh)
+      zero_value <- 1
     } else {
       est_teh_return <- est_teh
       ci_lower_teh_return <- ci_lower_teh
       ci_upper_teh_return <- ci_upper_teh
+      zero_value <- 0
     }
 
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = c(0, exp_times),
-      est = c(0, est_teh_return),
+      est = c(zero_value, est_teh_return),
       se = c(0, se_teh),
       vcov = NA,
-      ci_upper = c(0, ci_upper_teh_return),
-      ci_lower = c(0, ci_lower_teh_return)
+      ci_upper = c(zero_value, ci_upper_teh_return),
+      ci_lower = c(zero_value, ci_lower_teh_return)
     )
 
     if(estimand_type == "TATE") {
@@ -614,20 +621,22 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       coeffs_trans_return <- exp(coeffs_trans)
       ci_lower_ncs_return <- exp(ci_lower_ncs)
       ci_upper_ncs_return <- exp(ci_upper_ncs)
+      zero_value <- 1
     } else {
       coeffs_trans_return <- coeffs_trans
       ci_lower_ncs_return <- ci_lower_ncs
       ci_upper_ncs_return <- ci_upper_ncs
+      zero_value <- 0
     }
 
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = c(0, exp_times),
-      est = c(0, coeffs_trans),
+      est = c(zero_value, coeffs_trans),
       se = c(0, se_ncs),
       vcov = cov_mtx,
-      ci_lower = c(0, ci_lower_ncs),
-      ci_upper = c(0, ci_upper_ncs)
+      ci_lower = c(zero_value, ci_lower_ncs),
+      ci_upper = c(zero_value, ci_upper_ncs)
     )
 
     if(estimand_type == "TATE") {
@@ -799,9 +808,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_ci = pte_ci,
         dat = dat_orig
       )
-      #
-      # # Estimate the effect curve
-      # curve_eti <- as.numeric(c(0, coeffs))
+
 
     }
 
