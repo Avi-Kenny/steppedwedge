@@ -43,7 +43,8 @@
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
 #' treatment effect 95% confidence interval as a numeric vector of length 2,
 #' a list with treatment effect estimates (and standard errors and 95% confidence intervals)
-#' at each exposure timepoint, and the original dataframe passed to `analyze()`.
+#' at each exposure timepoint, the original dataframe passed to `analyze()`, and an
+#' indicator whether the effect esimates and CI are exponentiated.
 #' @export
 #'
 #' @examples
@@ -813,6 +814,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
 
   }
+  
+  results$exponentiated <- exponentiate
 
   class(results) <- c("list", "sw_analysis")
 
