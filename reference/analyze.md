@@ -98,8 +98,9 @@ analyze(
 A list with the model object, model type as a string, estimand type as a
 string, numeric treatment effect estimate, numeric treatment effect
 standard error, treatment effect 95 a list with treatment effect
-estimates (and standard errors and 95 at each exposure timepoint, and
-the original dataframe passed to \`analyze()\`.
+estimates (and standard errors and 95 at each exposure timepoint, the
+original dataframe passed to \`analyze()\`, and an indicator whether the
+effect esimates and CI are exponentiated.
 
 ## Examples
 
