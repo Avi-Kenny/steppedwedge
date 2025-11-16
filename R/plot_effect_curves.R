@@ -46,16 +46,20 @@ plot_effect_curves <- function(..., labels = NA, facet_nrow = 1) {
   curve_colors <- c("deepskyblue3", "darkorchid3", "darkgreen", "darkorange",
                     "firebrick3", "darkgrey")
   
+  
+  df_ref <- unique(df_plot[c("curve", "y_ref")])
+  
   # Set up ggplot2 object
   plot <- ggplot2::ggplot(
     df_plot,
-    ggplot2::aes(x=x, y=y, color=curve, fill=curve)
-  ) 
-  # +
-  #   ggplot2::coord_cartesian(xlim=z_x, ylim=z_y, expand=F)
-  
-  # Primary plot
-  plot <- plot +
+    ggplot2::aes(x = x, y = y, color = curve, fill = curve)
+  ) +
+    ggplot2::geom_hline(
+      data = df_ref,
+      ggplot2::aes(yintercept = y_ref),
+      linetype = "dashed",
+      color = "grey60"
+    ) +
     ggplot2::geom_line() +
     ggplot2::geom_ribbon(ggplot2::aes(ymin=ci_lower, ymax=ci_upper), 
                          alpha = 0.05, linetype = "dotted") +
@@ -108,7 +112,9 @@ as_table <- function(..., labels = NA) {
     y = double(),
     ci_lower = double(),
     ci_upper = double(),
-    curve = character()
+    curve = character(),
+    exponentiated = logical(),
+    y_ref = double()
   )
   
   counter <- 1
@@ -123,7 +129,9 @@ as_table <- function(..., labels = NA) {
       y = obj$effect_curve$est,
       ci_lower = obj$effect_curve$ci_lower,
       ci_upper = obj$effect_curve$ci_upper,
-      curve = labels[counter]
+      curve = labels[counter],
+      exponentiated = obj$exponentiated,
+      y_ref = ifelse(obj$exponentiated, 1, 0)
     )
     
     df_ests <- rbind(df_ests,df_add)
