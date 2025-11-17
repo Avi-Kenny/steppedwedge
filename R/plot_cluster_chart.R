@@ -35,9 +35,27 @@ plot_cluster_chart <- function(analysis_object)
   cluster_order <- order(as.numeric(unique(gsub("Cluster ", "", dat$cluster))))
   dat$cluster <- factor(dat$cluster, levels = paste("Cluster", cluster_order))
   
+  
+  # Prep for line segment for clusters with a single timepoint at a particular treatment level
+  dat_seg <- dat %>%
+    group_by(cluster) %>%
+    mutate(dx = 0.2) %>%  
+    group_by(cluster, treatment) %>%
+    mutate(n_in_group = n_distinct(time)) %>%
+    ungroup() %>%
+    filter(n_in_group == 1)   # keep only singleton groups for the segment layer
+  
   cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
-    ggplot2::geom_point(alpha=0.5) +
+    ggplot2::geom_jitter(alpha=0.5, width = 0.1) +
     ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
+    # short horizontal segment for singleton groups
+    geom_segment(
+      data = dat_seg,
+      ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
+                   group = factor(treatment), color = factor(treatment)),
+      linewidth = 1,
+      lineend = "round"
+    ) +
     ggplot2::labs(color="Treatment", x="Time", y="Outcome") +
     ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
     ggplot2::facet_wrap(~cluster, ncol=4) +
