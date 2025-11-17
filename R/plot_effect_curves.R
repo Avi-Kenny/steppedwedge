@@ -33,8 +33,8 @@ plot_effect_curves <- function(..., labels = NA, facet_nrow = 1) {
   }
   
   # To prevent R CMD CHECK notes
-  x <- y <- ci_lower <- ci_upper <- curve <- ymin <- ymax <- NULL
-  rm(x, y, ci_lower, ci_upper, curve, ymin, ymax)
+  x <- y <- ci_lower <- ci_upper <- curve <- ymin <- ymax <- y_ref <- NULL
+  rm(x, y, ci_lower, ci_upper, curve, ymin, ymax, y_ref)
   
   if (missing(labels)) { labels <- sapply(substitute(list(...))[-1], deparse)
   
