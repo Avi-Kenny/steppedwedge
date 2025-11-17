@@ -20,15 +20,17 @@
 plot_cluster_chart <- function(analysis_object)
 {
   # Prevent R CMD CHECK note
-  outcome <- preds <- time <- treatment <- cluster <- dx <- n_in_group <- y_ref <- NULL
-  rm(outcome,preds,time,treatment, cluster, dx, n_in_group, y_ref)
+  outcome <- preds <- time <- treatment <- cluster <- dx <- n_in_group <- y_ref <-
+    prop <- successes <- trials <- NULL
+  rm(outcome,preds,time,treatment, cluster, dx, n_in_group, y_ref, prop, successes, 
+     trials)
   
   # Input validation
   if (!methods::is(analysis_object,"sw_analysis")) { stop("`analysis_object` must be of class `sw_analysis`.") }
   
   dat <- analysis_object$dat
   
-  dat$preds <- as.numeric(stats::predict(analysis_object$model))
+  dat$preds <- as.numeric(stats::predict(analysis_object$model, type = "response"))
 
   dat$cluster <- factor(paste("Cluster", dat$cluster_id))
 
@@ -45,22 +47,74 @@ plot_cluster_chart <- function(analysis_object)
     dplyr::ungroup() %>%
     dplyr::filter(n_in_group == 1)   # keep only singleton groups for the segment layer
   
-  cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
-    ggplot2::geom_jitter(alpha=0.5, width = 0.1) +
-    ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
-    # short horizontal segment for singleton groups
-    ggplot2::geom_segment(
-      data = dat_seg,
-      ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
-                   group = factor(treatment), color = factor(treatment)),
-      linewidth = 1,
-      lineend = "round"
-    ) +
-    ggplot2::labs(color="Treatment", x="Time", y="Outcome") +
-    ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
-    ggplot2::facet_wrap(~cluster, ncol=4) +
-    # move legend to bottom
-    ggplot2::theme(legend.position = "bottom")
+  if("outcome" %in% names(dat)) {
+    if(all(is.na(dat$outcome) | dat$outcome %in% c(0, 1, TRUE, FALSE))) {
+      dat <- dat %>%
+        dplyr::group_by(cluster, time) %>%
+        dplyr::mutate(prop = mean(outcome)) %>%
+        dplyr::distinct(cluster, time, prop, preds, treatment)
+      cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=prop, color=factor(treatment))) +
+        ggplot2::geom_jitter(alpha=0.5, width = 0.1, height = 0) +
+        ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
+        # short horizontal segment for singleton groups
+        ggplot2::geom_segment(
+          data = dat_seg,
+          ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
+                       group = factor(treatment), color = factor(treatment)),
+          linewidth = 1,
+          lineend = "round"
+        ) +
+        ggplot2::labs(color="Treatment", x="Time", y="Proportion with outcome",
+                      caption="Lines represent predicted probabilities; points represent actual proportions per cluster-period") +
+        ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
+        ggplot2::facet_wrap(~cluster, ncol=4) +
+        # move legend to bottom
+        ggplot2::theme(legend.position = "bottom")
+    } else {
+      cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
+        ggplot2::geom_jitter(alpha=0.5, width = 0.1, height = 0) +
+        ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
+        # short horizontal segment for singleton groups
+        ggplot2::geom_segment(
+          data = dat_seg,
+          ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
+                       group = factor(treatment), color = factor(treatment)),
+          linewidth = 1,
+          lineend = "round"
+        ) +
+        ggplot2::labs(color="Treatment", x="Time", y="Outcome",
+                      caption="Lines represent predicted outcomes; points represent actual outcomes") +
+        ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
+        ggplot2::facet_wrap(~cluster, ncol=4) +
+        # move legend to bottom
+        ggplot2::theme(legend.position = "bottom")
+    }
+  } else if("successes" %in% names(dat)) {
+    dat <- dat %>%
+      data.frame() %>%
+      dplyr::group_by(cluster, time) %>%
+      dplyr::mutate(prop = sum(successes) / sum(trials)) %>%
+      dplyr::distinct(cluster, time, prop, preds, treatment)
+    cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=prop, color=factor(treatment))) +
+      ggplot2::geom_jitter(alpha=0.5, width = 0.1, height = 0) +
+      ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
+      # short horizontal segment for singleton groups
+      ggplot2::geom_segment(
+        data = dat_seg,
+        ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
+                     group = factor(treatment), color = factor(treatment)),
+        linewidth = 1,
+        lineend = "round"
+      ) +
+      ggplot2::labs(color="Treatment", x="Time", y="Proportion with outcome",
+                    caption="Lines represent predicted probabilities; points represent actual proportions per cluster-period") +
+      ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
+      ggplot2::facet_wrap(~cluster, ncol=4) +
+      # move legend to bottom
+      ggplot2::theme(legend.position = "bottom")
+  }
+  
+  
   
   return(list(cluster_chart = cluster_chart))
 
