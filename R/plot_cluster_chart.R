@@ -20,8 +20,8 @@
 plot_cluster_chart <- function(analysis_object)
 {
   # Prevent R CMD CHECK note
-  outcome <- preds <- time <- treatment <- NULL
-  rm(outcome,preds,time,treatment)
+  outcome <- preds <- time <- treatment <- cluster <- dx <- n_in_group <- y_ref <- NULL
+  rm(outcome,preds,time,treatment, cluster, dx, n_in_group, y_ref)
   
   # Input validation
   if (!methods::is(analysis_object,"sw_analysis")) { stop("`analysis_object` must be of class `sw_analysis`.") }
@@ -38,18 +38,18 @@ plot_cluster_chart <- function(analysis_object)
   
   # Prep for line segment for clusters with a single timepoint at a particular treatment level
   dat_seg <- dat %>%
-    group_by(cluster) %>%
-    mutate(dx = 0.2) %>%  
-    group_by(cluster, treatment) %>%
-    mutate(n_in_group = n_distinct(time)) %>%
-    ungroup() %>%
-    filter(n_in_group == 1)   # keep only singleton groups for the segment layer
+    dplyr::group_by(cluster) %>%
+    dplyr::mutate(dx = 0.2) %>%  
+    dplyr::group_by(cluster, treatment) %>%
+    dplyr::mutate(n_in_group = dplyr::n_distinct(time)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n_in_group == 1)   # keep only singleton groups for the segment layer
   
   cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
     ggplot2::geom_jitter(alpha=0.5, width = 0.1) +
     ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
     # short horizontal segment for singleton groups
-    geom_segment(
+    ggplot2::geom_segment(
       data = dat_seg,
       ggplot2::aes(x = time - dx, xend = time + dx, y = preds, yend = preds,
                    group = factor(treatment), color = factor(treatment)),
