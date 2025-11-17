@@ -37,7 +37,7 @@ plot_cluster_chart <- function(analysis_object)
   
   cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=outcome, color=factor(treatment))) +
     ggplot2::geom_point(alpha=0.5) +
-    ggplot2::geom_line(ggplot2::aes(y=preds), color="darkred", linewidth=1) +
+    ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
     ggplot2::labs(color="Treatment", x="Time", y="Outcome") +
     ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
     ggplot2::facet_wrap(~cluster, ncol=4) +
