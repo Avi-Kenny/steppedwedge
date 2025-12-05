@@ -31,9 +31,7 @@ ETI_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "ETI")
 NCS_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "NCS")
-TEH_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
-estimand_time = c(1, 4), exp_time = "TEH")
-ests_table <- as_table(IT_model, IT_model, NCS_model, TEH_model)
+ests_table <- as_table(IT_model, IT_model, NCS_model)
 head(ests_table)
 }
 }
