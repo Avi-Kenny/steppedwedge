@@ -100,7 +100,7 @@ string, numeric treatment effect estimate, numeric treatment effect
 standard error, treatment effect 95 a list with treatment effect
 estimates (and standard errors and 95 at each exposure timepoint, the
 original dataframe passed to \`analyze()\`, and an indicator whether the
-effect esimates and CI are exponentiated.
+effect estimates and CI are exponentiated.
 
 ## Examples
 
