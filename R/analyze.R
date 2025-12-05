@@ -44,7 +44,7 @@
 #' treatment effect 95% confidence interval as a numeric vector of length 2,
 #' a list with treatment effect estimates (and standard errors and 95% confidence intervals)
 #' at each exposure timepoint, the original dataframe passed to `analyze()`, and an
-#' indicator whether the effect esimates and CI are exponentiated.
+#' indicator whether the effect estimates and CI are exponentiated.
 #' @export
 #'
 #' @examples
@@ -583,16 +583,19 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Extract coefficient estimates and covariance matrix corresponding to spline
     # terms
-    coeffs_spl <- summary_ncs$coefficients[,1][indices]
+    coeffs_orig <- summary_ncs$coefficients[,1]
+    coeffs_spl <- coeffs_orig[indices]
     if(advanced$var_est == "model") {
-      cov_mtx_spl <- stats::vcov(model_ncs_mixed)[indices,indices]
+      cov_orig_full <- stats::vcov(model_ncs_mixed)
+      cov_mtx_spl <- cov_orig_full[indices,indices]
       # te_se <- summary_it$coefficients["treatment",2]
     } else if(advanced$var_est == "robust") {
-      cov_cr <- vcovCR.glmerMod(model_ncs_mixed, cluster = dat$cluster_id,
-                                type = advanced$var_est_type)
-      indices <- grep("^b[0-9]+$", rownames(cov_cr))
-      cov_mtx_spl <- cov_cr[indices,indices]
+      cov_orig_full <- vcovCR.glmerMod(model_ncs_mixed, cluster = dat$cluster_id,
+                                      type = advanced$var_est_type)
+      indices <- grep("^b[0-9]+$", rownames(cov_orig_full))
+      cov_mtx_spl <- cov_orig_full[indices,indices]
     }
+    
     
     # Get number of unique (non-zero) exposure times
     exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
@@ -612,8 +615,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     coeffs_trans <- as.numeric(B %*% coeffs_spl)
     cov_mtx <- B %*% cov_mtx_spl %*% t(B)
     se_ncs <- sqrt(diag(matrix(cov_mtx, nrow = nrow(cov_mtx))))
-
-
+    
+    
     # Calculate the CI for treatment effect at each exposure time
     ci_lower_ncs <- coeffs_trans - 1.96 * se_ncs
     ci_upper_ncs <- coeffs_trans + 1.96 * se_ncs
@@ -639,7 +642,46 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_lower = c(zero_value, ci_lower_ncs),
       ci_upper = c(zero_value, ci_upper_ncs)
     )
-
+    
+    # Create A* block diagonal transformation matrix to return
+    
+    # Dimensions for the identity block (non-spline parameters)
+    total_fixed_params <- nrow(summary_ncs$coefficients)
+    n_spline_params <- length(indices)
+    n_other_params <- total_fixed_params - n_spline_params
+    
+    # Create the identity block (I) for non-spline terms
+    I_block <- diag(n_other_params)
+    
+    # Create zero blocks to fill the off-diagonals
+    # Top-right: 0s connecting non-spline params to exposure time rows
+    Zero_top_right <- matrix(0, nrow = n_other_params, ncol = n_spline_params)
+    
+    # Bottom-left: 0s connecting spline params to non-spline rows
+    Zero_bottom_left <- matrix(0, nrow = nrow(B), ncol = n_other_params)
+    
+    # Bind them together: [ I   0 ]
+    #                     [ 0   B ]
+    Top_Row <- cbind(I_block, Zero_top_right)
+    Bottom_Row <- cbind(Zero_bottom_left, B)
+    
+    T_mat <- rbind(Top_Row, Bottom_Row)
+    
+    rownames(T_mat) <- c(rownames(summary_ncs$coefficients)[-indices], 
+                         paste0("ExpTime_", 1:nrow(B)))
+    colnames(T_mat) <- names(coeffs_orig)
+    
+    coeffs_trans_full <- as.numeric(T_mat %*% coeffs_orig)
+    cov_trans_full <- T_mat %*% cov_orig_full %*% t(T_mat)
+    
+    name_prefix <- rownames(summary_ncs$coefficients)[-indices]
+    name_suffix <- paste0("Exp_Time_", 1:nrow(B))
+    new_names <- c(name_prefix, name_suffix)
+    
+    names(coeffs_trans_full) <- new_names
+    rownames(cov_trans_full) <- new_names
+    colnames(cov_trans_full) <- new_names
+    
     if(estimand_type == "TATE") {
       # Estimate the TATE
       num_estimand_timepoints <- estimand_time[2] - estimand_time[1] + 1
@@ -670,7 +712,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
-        dat = dat_orig
+        dat = dat_orig,
+        transformation_matrix = T_mat,
+        cov_mtx_orig_full = cov_orig_full,
+        coeffs_full = coeffs_trans_full,
+        cov_mtx_full = cov_trans_full
       )
     } else if(estimand_type == "PTE") {
 
@@ -697,7 +743,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
-        dat = dat_orig
+        dat = dat_orig,
+        transformation_matrix = T_mat,
+        cov_mtx_orig_full = cov_orig_full,
+        coeffs_full = coeffs_trans_full,
+        cov_mtx_full = cov_trans_full
       )
     }
 
