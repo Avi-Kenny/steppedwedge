@@ -34,10 +34,10 @@ sw_data_example %<>%
                                      mean = (b_cont * trt + cluster_re+cluster_time_re),
                                      sd = 1)) %>%
   # generate binomial outcomes
-  mutate(denominator = floor(runif(nrow(.), min = 5, max = 15))) %>%
-  rowwise() %>%
-  mutate(numerator = rbinom(1, denominator, prob)) %>%
-  ungroup() %>%
+  dplyr::mutate(denominator = floor(runif(nrow(.), min = 5, max = 15))) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(numerator = rbinom(1, denominator, prob)) %>%
+  dplyr::ungroup() %>%
   dplyr::select(-c(seq, dplyr::ends_with("_re"))) %>%
   # convert to non-tibble dataframe
   data.frame()
