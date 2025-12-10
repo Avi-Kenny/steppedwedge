@@ -9,7 +9,8 @@ params(
   n_knots_exp = 4,
   n_knots_cal = 4,
   var_est = "model",
-  var_est_type = "classic"
+  var_est_type = "classic",
+  return_ncs = F
 )
 }
 \arguments{
@@ -30,6 +31,10 @@ or "robust", to use the robust variance estimator.}
 
 \item{var_est_type}{A character string; one of c("classic","DF","KC","MD","FG");
 only relevant when var_est="robust".}
+
+\item{return_ncs}{Logical; only relevant when exp_time="NCS". Specifies whether
+the full covariance matrix for the calendar time parameters and the 
+transformed treatment effect parameters are returned.}
 }
 \value{
 A list of options

@@ -16,6 +16,9 @@
 #'     or "robust", to use the robust variance estimator.
 #' @param var_est_type A character string; one of c("classic","DF","KC","MD","FG");
 #'     only relevant when var_est="robust".
+#' @param return_ncs Logical; only relevant when exp_time="NCS". Specifies whether
+#'     the full covariance matrix for the calendar time parameters and the 
+#'     transformed treatment effect parameters are returned.
 #'
 #' @return A list of options
 #' @export
@@ -28,7 +31,7 @@
 #' family = binomial)
 #' 
 params <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
-                   var_est_type="classic") {
+                   var_est_type="classic", return_ncs=F) {
   return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal,
-              var_est=var_est, var_est_type=var_est_type))
+              var_est=var_est, var_est_type=var_est_type, return_ncs=return_ncs))
 }

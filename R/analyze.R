@@ -645,42 +645,44 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Create A* block diagonal transformation matrix to return
     
-    # Dimensions for the identity block (non-spline parameters)
-    total_fixed_params <- nrow(summary_ncs$coefficients)
-    n_spline_params <- length(indices)
-    n_other_params <- total_fixed_params - n_spline_params
-    
-    # Create the identity block (I) for non-spline terms
-    I_block <- diag(n_other_params)
-    
-    # Create zero blocks to fill the off-diagonals
-    # Top-right: 0s connecting non-spline params to exposure time rows
-    Zero_top_right <- matrix(0, nrow = n_other_params, ncol = n_spline_params)
-    
-    # Bottom-left: 0s connecting spline params to non-spline rows
-    Zero_bottom_left <- matrix(0, nrow = nrow(B), ncol = n_other_params)
-    
-    # Bind them together: [ I   0 ]
-    #                     [ 0   B ]
-    Top_Row <- cbind(I_block, Zero_top_right)
-    Bottom_Row <- cbind(Zero_bottom_left, B)
-    
-    T_mat <- rbind(Top_Row, Bottom_Row)
-    
-    rownames(T_mat) <- c(rownames(summary_ncs$coefficients)[-indices], 
-                         paste0("ExpTime_", 1:nrow(B)))
-    colnames(T_mat) <- names(coeffs_orig)
-    
-    coeffs_trans_full <- as.numeric(T_mat %*% coeffs_orig)
-    cov_trans_full <- T_mat %*% cov_orig_full %*% t(T_mat)
-    
-    name_prefix <- rownames(summary_ncs$coefficients)[-indices]
-    name_suffix <- paste0("Exp_Time_", 1:nrow(B))
-    new_names <- c(name_prefix, name_suffix)
-    
-    names(coeffs_trans_full) <- new_names
-    rownames(cov_trans_full) <- new_names
-    colnames(cov_trans_full) <- new_names
+    if(advanced$return_ncs == T) {
+      # Dimensions for the identity block (non-spline parameters)
+      total_fixed_params <- nrow(summary_ncs$coefficients)
+      n_spline_params <- length(indices)
+      n_other_params <- total_fixed_params - n_spline_params
+      
+      # Create the identity block (I) for non-spline terms
+      I_block <- diag(n_other_params)
+      
+      # Create zero blocks to fill the off-diagonals
+      # Top-right: 0s connecting non-spline params to exposure time rows
+      Zero_top_right <- matrix(0, nrow = n_other_params, ncol = n_spline_params)
+      
+      # Bottom-left: 0s connecting spline params to non-spline rows
+      Zero_bottom_left <- matrix(0, nrow = nrow(B), ncol = n_other_params)
+      
+      # Bind them together: [ I   0 ]
+      #                     [ 0   B ]
+      Top_Row <- cbind(I_block, Zero_top_right)
+      Bottom_Row <- cbind(Zero_bottom_left, B)
+      
+      T_mat <- rbind(Top_Row, Bottom_Row)
+      
+      rownames(T_mat) <- c(rownames(summary_ncs$coefficients)[-indices], 
+                           paste0("ExpTime_", 1:nrow(B)))
+      colnames(T_mat) <- names(coeffs_orig)
+      
+      coeffs_trans_full <- as.numeric(T_mat %*% coeffs_orig)
+      cov_trans_full <- T_mat %*% cov_orig_full %*% t(T_mat)
+      
+      name_prefix <- rownames(summary_ncs$coefficients)[-indices]
+      name_suffix <- paste0("Exp_Time_", 1:nrow(B))
+      new_names <- c(name_prefix, name_suffix)
+      
+      names(coeffs_trans_full) <- new_names
+      rownames(cov_trans_full) <- new_names
+      colnames(cov_trans_full) <- new_names
+    }
     
     if(estimand_type == "TATE") {
       # Estimate the TATE
@@ -712,11 +714,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
-        dat = dat_orig,
-        transformation_matrix = T_mat,
-        cov_mtx_orig_full = cov_orig_full,
-        coeffs_full = coeffs_trans_full,
-        cov_mtx_full = cov_trans_full
+        dat = dat_orig
       )
     } else if(estimand_type == "PTE") {
 
@@ -743,12 +741,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         converged = performance::check_convergence(model_ncs_mixed)[1],
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
-        dat = dat_orig,
-        transformation_matrix = T_mat,
-        cov_mtx_orig_full = cov_orig_full,
-        coeffs_full = coeffs_trans_full,
-        cov_mtx_full = cov_trans_full
+        dat = dat_orig
       )
+    }
+    
+    if(advanced$return_ncs == T) {
+      results$transformation_matrix = T_mat
+      results$cov_mtx_orig_full = cov_orig_full
+      results$coeffs_full = coeffs_trans_full
+      results$cov_mtx_full = cov_trans_full
     }
 
   } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
