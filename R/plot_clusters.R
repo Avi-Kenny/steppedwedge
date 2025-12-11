@@ -1,8 +1,9 @@
-#' Plot cluster chart
+#' Plot observed and predicted outcomes by cluster over time
 #'
 #' @param analysis_object A list of class `sw_analysis`.
+#' @param ncol Integer; number of columns in the faceted plot. Defaults to 3.
 #'
-#' @returns A list with a plot of the actual and predicted outcomes by cluster.
+#' @returns A list with a `ggplot2` object of the actual and predicted outcomes by cluster.
 #' @export
 #'
 #' @examples
@@ -15,9 +16,9 @@
 #' estimand_time = c(1, 4), exp_time = "ETI")
 #' 
 #' # Plot by cluster
-#' plot_cluster_chart(results_tate)
+#' plot_clusters(results_tate)
 #' 
-plot_cluster_chart <- function(analysis_object)
+plot_clusters <- function(analysis_object, ncol=3)
 {
   # Prevent R CMD CHECK note
   outcome <- preds <- time <- treatment <- cluster <- dx <- n_in_group <- y_ref <-
@@ -64,10 +65,9 @@ plot_cluster_chart <- function(analysis_object)
           linewidth = 1,
           lineend = "round"
         ) +
-        ggplot2::labs(color="Treatment", x="Time", y="Proportion with outcome",
-                      caption="Lines represent predicted probabilities; points represent actual proportions per cluster-period") +
+        ggplot2::labs(color="Treatment", x="Time", y="Proportion with outcome") +
         ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
-        ggplot2::facet_wrap(~cluster, ncol=4) +
+        ggplot2::facet_wrap(~cluster, ncol=ncol) +
         # move legend to bottom
         ggplot2::theme(legend.position = "bottom")
     } else {
@@ -82,10 +82,9 @@ plot_cluster_chart <- function(analysis_object)
           linewidth = 1,
           lineend = "round"
         ) +
-        ggplot2::labs(color="Treatment", x="Time", y="Outcome",
-                      caption="Lines represent predicted outcomes; points represent actual outcomes") +
+        ggplot2::labs(color="Treatment", x="Time", y="Outcome") +
         ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
-        ggplot2::facet_wrap(~cluster, ncol=4) +
+        ggplot2::facet_wrap(~cluster, ncol=ncol) +
         # move legend to bottom
         ggplot2::theme(legend.position = "bottom")
     }
@@ -109,7 +108,7 @@ plot_cluster_chart <- function(analysis_object)
       ggplot2::labs(color="Treatment", x="Time", y="Proportion with outcome",
                     caption="Lines represent predicted probabilities; points represent actual proportions per cluster-period") +
       ggplot2::scale_color_manual(values=c("#E69F00", "#009E73")) +
-      ggplot2::facet_wrap(~cluster, ncol=4) +
+      ggplot2::facet_wrap(~cluster, ncol=ncol) +
       # move legend to bottom
       ggplot2::theme(legend.position = "bottom")
   }
