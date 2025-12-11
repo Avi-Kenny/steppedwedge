@@ -6,7 +6,7 @@
 \title{Example stepped wedge data}
 \format{
 ## `sw_data_example`
-A data frame with 2,063 rows and 6 columns:
+A data frame with 2,063 rows and 5 columns:
 \describe{
   \item{cluster}{Cluster id}
   \item{period}{Time period}

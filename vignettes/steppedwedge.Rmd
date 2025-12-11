@@ -172,7 +172,7 @@ dat_binom <- load_data(
   individual_id = NULL,
   treatment = "trt",
   outcome = c("numerator", "denominator"),
-  data = sw_data_example
+  data = sw_data_example_binom
 )
 
 ```
