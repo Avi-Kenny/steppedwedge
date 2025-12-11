@@ -11,8 +11,8 @@
 - [`params()`](https://avi-kenny.github.io/steppedwedge/reference/params.md)
   : Set advanced parameters for analysis of data from stepped wedge
   trials
-- [`plot_cluster_chart()`](https://avi-kenny.github.io/steppedwedge/reference/plot_cluster_chart.md)
-  : Plot cluster chart
+- [`plot_clusters()`](https://avi-kenny.github.io/steppedwedge/reference/plot_clusters.md)
+  : Plot observed and predicted outcomes by cluster over time
 - [`plot_design()`](https://avi-kenny.github.io/steppedwedge/reference/plot_design.md)
   : Plot stepped wedge design
 - [`plot_effect_curves()`](https://avi-kenny.github.io/steppedwedge/reference/plot_effect_curves.md)
