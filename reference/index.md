@@ -19,3 +19,5 @@
   : Plot effect estimates by exposure time for one or more models.
 - [`sw_data_example`](https://avi-kenny.github.io/steppedwedge/reference/sw_data_example.md)
   : Example stepped wedge data
+- [`sw_data_example_binom`](https://avi-kenny.github.io/steppedwedge/reference/sw_data_example_binom.md)
+  : Example stepped wedge data with aggregrated outcomes

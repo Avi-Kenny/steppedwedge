@@ -130,7 +130,7 @@ results_tate_ncs
 # Analysis example 4: TATE estimand for exposure times 1 through 4 with binomial outcome data
 # Load data
 test_data_bin <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
-treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example)
+treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example_binom)
 
 results_pte_bin <- analyze(dat = test_data_bin, family = binomial, method = "mixed", 
 estimand_type = "TATE", estimand_time = c(1, 4), exp_time = "ETI")

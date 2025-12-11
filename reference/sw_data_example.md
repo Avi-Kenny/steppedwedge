@@ -10,7 +10,7 @@ sw_data_example
 
 ## Format
 
-\## \`sw_data_example\` A data frame with 2,063 rows and 6 columns:
+\## \`sw_data_example\` A data frame with 2,063 rows and 5 columns:
 
 - cluster:
 

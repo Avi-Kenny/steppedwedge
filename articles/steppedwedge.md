@@ -11,13 +11,13 @@ use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 ``` r
 data(sw_data_example)
 head(sw_data_example)
-#>   cluster period trt      prob outcome_bin outcome_cont denominator numerator
-#> 1       1      1   0 0.5667807           0  -3.02179837          14        11
-#> 2       1      1   0 0.5667807           0  -0.07145287           5         3
-#> 3       1      1   0 0.5667807           1   0.96807617           8         3
-#> 4       1      1   0 0.5667807           0   0.29456948           5         1
-#> 5       1      1   0 0.5667807           1  -0.83921584          11         2
-#> 6       1      1   0 0.5667807           1  -0.42335941          10         4
+#>   cluster period trt outcome_bin outcome_cont
+#> 1       1      1   0           0  -3.02179837
+#> 2       1      1   0           0  -0.07145287
+#> 3       1      1   0           1   0.96807617
+#> 4       1      1   0           0   0.29456948
+#> 5       1      1   0           1  -0.83921584
+#> 6       1      1   0           1  -0.42335941
 
 dat <- load_data(
   time = "period",
@@ -182,7 +182,7 @@ dat_binom <- load_data(
   individual_id = NULL,
   treatment = "trt",
   outcome = c("numerator", "denominator"),
-  data = sw_data_example
+  data = sw_data_example_binom
 )
 #> Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.
 ```
@@ -198,10 +198,11 @@ analysis_binom <- analyze(
   family = binomial,
   estimand_type = "TATE", 
   exp_time = "ETI")
+#> boundary (singular) fit: see help('isSingular')
 
 print(analysis_binom)
-#> Treatment effect estimate: 0.597
-#> Treatment effect 95% confidence interval: 0.447, 0.747
+#> Treatment effect estimate: 0.696
+#> Treatment effect 95% confidence interval: 0.397, 0.996
 #> Converged: TRUE
 ```
 
