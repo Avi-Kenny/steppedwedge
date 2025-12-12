@@ -4,6 +4,8 @@
 library(steppedwedge)
 ```
 
+## Loading data
+
 The `load_data` function takes in raw data and creates a data object
 that can be accepted by the `plot_design` and `analyze` functions. We
 use the made-up dataframe `sw_data_example` to demonstrate the workflow.
@@ -30,6 +32,8 @@ dat <- load_data(
 #> Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.
 ```
 
+## Plotting the design
+
 The `plot_design` function produces a diagram of the stepped wedge
 design and a summary of the variables.
 
@@ -42,11 +46,13 @@ print(plot_dat)
 
 ![](steppedwedge_files/figure-html/unnamed-chunk-4-1.png)
 
+## Analyzing the data
+
 The `analyze` function analyzes the stepped wedge data. First, we
 analyze the data using a mixed effects model, with the Time Average
 Treament Effect (TATE) as the estimand, assuming an Immediate Treatment
 (IT) effect, passing the `family = "binomial"` and `link = "logit"`
-arguments to `glmer`.
+arguments to `glmer`. \## Binary outcome
 
 ``` r
 analysis_1 <- analyze(
@@ -137,7 +143,7 @@ print(analysis_4)
 #> Converged: TRUE
 ```
 
-## Continuous outcome
+### Continuous outcome
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand,
 using a Natural Cubic Splines (NCS) model.
@@ -168,7 +174,7 @@ print(analysis_6)
 #> Converged: TRUE
 ```
 
-## Binomial outcome
+### Binomial outcome
 
 When loading data where the outcome is binomial, specify the names of
 the “# of successes” and “# of trials” variables as the `outcome`
@@ -231,3 +237,35 @@ plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1)
 ```
 
 ![](steppedwedge_files/figure-html/unnamed-chunk-13-1.png)
+
+## Plotting cluster charts
+
+The `plot_clusters` function plots actual and predicted outcomes for
+each cluster by calendar time for an `analyze` object.
+
+### Continuous outcome
+
+For continuous outcomes, the actual outcomes are jittered, with the
+predicted outcomes represented by the plotted line:
+
+``` r
+
+plot_clusters(analysis_6, ncol = 3)
+#> $cluster_chart
+```
+
+![](steppedwedge_files/figure-html/unnamed-chunk-14-1.png)
+
+### Binary outcome
+
+For binary outcomes, the observed probability for each cluster period is
+plotted as a point, with the predicted probabilities represented by the
+plotted line:
+
+``` r
+
+plot_clusters(analysis_4, ncol = 3)
+#> $cluster_chart
+```
+
+![](steppedwedge_files/figure-html/unnamed-chunk-15-1.png)

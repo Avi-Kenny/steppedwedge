@@ -67,6 +67,9 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://avi-kenny.github.io/steppedwedge/">steppedwedge</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
+</h2>
 <p>The <code>load_data</code> function takes in raw data and creates a
 data object that can be accepted by the <code>plot_design</code> and
 <code>analyze</code> functions. We use the made-up dataframe
@@ -91,6 +94,10 @@ data object that can be accepted by the <code>plot_design</code> and
 <span>  data <span class="op">=</span> <span class="va">sw_data_example</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Stepped wedge dataset loaded. Discrete time design with 15 clusters, 5 sequences, and 6 time points.</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="plotting-the-design">Plotting the design<a class="anchor" aria-label="anchor" href="#plotting-the-design"></a>
+</h2>
 <p>The <code>plot_design</code> function produces a diagram of the
 stepped wedge design and a summary of the variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -99,11 +106,16 @@ stepped wedge design and a summary of the variables.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_dat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $design_plot</span></span></code></pre></div>
 <p><img src="steppedwedge_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" width="864" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level2">
+<h2 id="analyzing-the-data">Analyzing the data<a class="anchor" aria-label="anchor" href="#analyzing-the-data"></a>
+</h2>
 <p>The <code>analyze</code> function analyzes the stepped wedge data.
 First, we analyze the data using a mixed effects model, with the Time
 Average Treament Effect (TATE) as the estimand, assuming an Immediate
 Treatment (IT) effect, passing the <code>family = "binomial"</code> and
-<code>link = "logit"</code> arguments to <code>glmer</code>.</p>
+<code>link = "logit"</code> arguments to <code>glmer</code>. ## Binary
+outcome</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze.html">analyze</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -179,9 +191,9 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; Treatment effect estimate: 0.421</span></span>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.104, 0.738</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
-</h2>
+<div class="section level3">
+<h3 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
+</h3>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -209,9 +221,9 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.329, 0.723</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="binomial-outcome">Binomial outcome<a class="anchor" aria-label="anchor" href="#binomial-outcome"></a>
-</h2>
+<div class="section level3">
+<h3 id="binomial-outcome">Binomial outcome<a class="anchor" aria-label="anchor" href="#binomial-outcome"></a>
+</h3>
 <p>When loading data where the outcome is binomial, specify the names of
 the “# of successes” and “# of trials” variables as the
 <code>outcome</code> argument.</p>
@@ -243,6 +255,7 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.397, 0.996</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
+</div>
 <div class="section level2">
 <h2 id="plotting-effect-curves">Plotting effect curves<a class="anchor" aria-label="anchor" href="#plotting-effect-curves"></a>
 </h2>
@@ -266,6 +279,36 @@ exposure time for one or more <code>analyze</code> objects.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_effect_curves.html">plot_effect_curves</a></span><span class="op">(</span><span class="va">IT_model</span>, <span class="va">NCS_4_model</span>, <span class="va">ETI_model</span>, facet_nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="steppedwedge_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="plotting-cluster-charts">Plotting cluster charts<a class="anchor" aria-label="anchor" href="#plotting-cluster-charts"></a>
+</h2>
+<p>The <code>plot_clusters</code> function plots actual and predicted
+outcomes for each cluster by calendar time for an <code>analyze</code>
+object.</p>
+<div class="section level3">
+<h3 id="continuous-outcome-1">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome-1"></a>
+</h3>
+<p>For continuous outcomes, the actual outcomes are jittered, with the
+predicted outcomes represented by the plotted line:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/plot_clusters.html">plot_clusters</a></span><span class="op">(</span><span class="va">analysis_6</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $cluster_chart</span></span></code></pre></div>
+<p><img src="steppedwedge_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="binary-outcome">Binary outcome<a class="anchor" aria-label="anchor" href="#binary-outcome"></a>
+</h3>
+<p>For binary outcomes, the observed probability for each cluster period
+is plotted as a point, with the predicted probabilities represented by
+the plotted line:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/plot_clusters.html">plot_clusters</a></span><span class="op">(</span><span class="va">analysis_4</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $cluster_chart</span></span></code></pre></div>
+<p><img src="steppedwedge_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" width="700"></p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
