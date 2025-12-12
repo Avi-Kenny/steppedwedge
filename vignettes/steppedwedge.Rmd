@@ -232,7 +232,7 @@ The `plot_clusters` function plots actual and predicted outcomes for each cluste
 
 For continuous outcomes, the actual outcomes are jittered, with the predicted outcomes represented by the plotted line:
 
-```{r}
+```{r, fig.height = 8}
 
 plot_clusters(analysis_6, ncol = 3)
 
@@ -242,7 +242,7 @@ plot_clusters(analysis_6, ncol = 3)
 
 For binary outcomes, the observed probability for each cluster period is plotted as a point, with the predicted probabilities represented by the plotted line:
 
-```{r}
+```{r, fig.height = 8}
 
 plot_clusters(analysis_4, ncol = 3)
 
