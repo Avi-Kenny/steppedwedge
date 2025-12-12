@@ -55,7 +55,7 @@ plot_clusters <- function(analysis_object, ncol=3)
         dplyr::mutate(prop = mean(outcome)) %>%
         dplyr::distinct(cluster, time, prop, preds, treatment)
       cluster_chart <- ggplot2::ggplot(dat, ggplot2::aes(x=time, y=prop, color=factor(treatment))) +
-        ggplot2::geom_jitter(alpha=0.5, width = 0.1, height = 0) +
+        ggplot2::geom_jitter(alpha=0.5, width = 0, height = 0) +
         ggplot2::geom_line(ggplot2::aes(y=preds), linewidth=1) +
         # short horizontal segment for singleton groups
         ggplot2::geom_segment(
