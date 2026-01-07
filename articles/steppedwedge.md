@@ -209,7 +209,7 @@ analysis_binom <- analyze(
 print(analysis_binom)
 #> Treatment effect estimate: 0.696
 #> Treatment effect 95% confidence interval: 0.397, 0.996
-#> Converged: TRUE
+#> Converged: FALSE
 ```
 
 ## Plotting effect curves
