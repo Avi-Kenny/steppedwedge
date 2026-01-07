@@ -170,6 +170,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   # Save vector of (non-zero) exposure times
   exp_times <- sort(unique(dat$exposure_time))
   exp_times <- exp_times[exp_times!=0]
+  max_exp_time <- max(exp_times)
 
   if(method == "mixed" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
 
@@ -223,8 +224,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
 
     # Estimate the effect curve
-    exp_times <- sort(unique(dat$exposure_time))
-    exp_times <- exp_times[exp_times!=0]
     effect_curve <- list(
       exp_time = c(0, exp_times),
       est = c(zero_value, rep(te_est, length(exp_times))),
@@ -233,6 +232,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_upper = c(zero_value, rep(te_ci[1], length(exp_times))),
       ci_lower = c(zero_value, rep(te_ci[2], length(exp_times)))
     )
+    
+    if(lme4::isSingular(model_it_mixed)) {
+      is_converged <- FALSE
+    } else {
+      is_converged <- performance::check_convergence(model_it_mixed)[1]
+    }
 
     results <- list(
       model = model_it_mixed,
@@ -241,7 +246,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_est = te_est,
       te_se = te_se,
       te_ci = te_ci,
-      converged = performance::check_convergence(model_it_mixed)[1],
+      converged = is_converged,
       messages = model_it_mixed@optinfo$conv$lme4$messages,
       effect_curve = effect_curve,
       dat = dat_orig
@@ -325,6 +330,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_lower = c(zero_value, as.numeric(ci_lower_eti_return)),
       ci_upper = c(zero_value, as.numeric(ci_upper_eti_return))
     )
+    
+    if(lme4::isSingular(model_eti_mixed)) {
+      is_converged <- FALSE
+    } else {
+      is_converged <- performance::check_convergence(model_eti_mixed)[1]
+    }
 
     if(estimand_type == "TATE") {
 
@@ -354,7 +365,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_est = tate_est_return,
         te_se = tate_se,
         te_ci = tate_ci_return,
-        converged = performance::check_convergence(model_eti_mixed)[1],
+        converged = is_converged,
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
@@ -374,15 +385,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         pte_est_return <- pte_est
         pte_ci_return <- pte_ci
       }
-
-      results <- list(
+      
+        results <- list(
         model = model_eti_mixed,
         model_type = "eti_mixed",
         estimand_type = "PTE",
         te_est = pte_est_return,
         te_se = pte_se,
         te_ci = pte_ci_return,
-        converged = performance::check_convergence(model_eti_mixed)[1],
+        converged = is_converged,
         messages = model_eti_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
@@ -430,8 +441,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     summary_teh <- summary(model_teh_mixed)
 
     # Extract random slopes for treatment and their variances from mixed model
-    exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
-    max_exp_timepoint <- max(exp_timepoints)
     re_model <- lme4::ranef(model_teh_mixed, condVar = TRUE)
     re_treatment <- re_model$exposure_time
 
@@ -443,7 +452,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Calculate the CI for treatment effect at each exposure time
     ####### RESUME HERE #######
-    est_teh <- rep(fe_treatment, length(exp_timepoints)) + re_treatment[rownames(re_treatment) != "0", "treatment"]
+    est_teh <- rep(fe_treatment, length(exp_times)) + re_treatment[rownames(re_treatment) != "0", "treatment"]
     se_teh <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se[-1]^2)
     ci_lower_teh <- est_teh - 1.96 * se_teh
     ci_upper_teh <- est_teh + 1.96 * se_teh
@@ -470,6 +479,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_lower = c(zero_value, ci_lower_teh_return)
     )
 
+    if(lme4::isSingular(model_teh_mixed)) {
+      is_converged <- FALSE
+    } else {
+      is_converged <- performance::check_convergence(model_teh_mixed)[1]
+    }
+    
     if(estimand_type == "TATE") {
 
       # Estimate the TATE
@@ -484,7 +499,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         tate_est_return <- tate_est
         tate_ci_return <- tate_ci
       }
-
+      
       results <- list(
         model = model_teh_mixed,
         model_type = "teh_mixed",
@@ -492,7 +507,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_est = tate_est_return,
         te_se = tate_se,
         te_ci = tate_ci_return,
-        converged = performance::check_convergence(model_teh_mixed)[1],
+        converged = is_converged,
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
@@ -525,7 +540,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_est = pte_est_return,
         te_se = pte_se,
         te_ci = pte_ci_return,
-        converged = performance::check_convergence(model_teh_mixed)[1],
+        converged = is_converged,
         messages = model_teh_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
@@ -596,12 +611,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       cov_mtx_spl <- cov_orig_full[indices,indices]
     }
     
-    
-    # Get number of unique (non-zero) exposure times
-    exp_timepoints <- unique(dat$exposure_time[dat$exposure_time != 0])
-    num_exp_timepoints <- length(exp_timepoints)
-    max_exp_timepoint <- max(exp_timepoints)
-
     # Transform the spline terms into effect curve estimates (+ covariance matrix)
     B <- as.matrix(splines::ns(
       x = c(1:S),
@@ -635,7 +644,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
 
     # Estimate the effect curve
     effect_curve <- list(
-      exp_time = c(0, exp_times),
+      exp_time = c(0, 1:S),
       est = c(zero_value, coeffs_trans),
       se = c(0, se_ncs),
       vcov = cov_mtx,
@@ -645,7 +654,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Create A* block diagonal transformation matrix to return
     
-    if(advanced$return_ncs == T) {
+    if(advanced$return_ncs == TRUE) {
       # Dimensions for the identity block (non-spline parameters)
       total_fixed_params <- nrow(summary_ncs$coefficients)
       n_spline_params <- length(indices)
@@ -684,12 +693,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       colnames(cov_trans_full) <- new_names
     }
     
+    if(lme4::isSingular(model_ncs_mixed)) {
+      is_converged <- FALSE
+    } else {
+      is_converged <- performance::check_convergence(model_ncs_mixed)[1]
+    }
+    
     if(estimand_type == "TATE") {
       # Estimate the TATE
       num_estimand_timepoints <- estimand_time[2] - estimand_time[1] + 1
       M <- matrix(c(rep(0, estimand_time[1] - 1),
                     rep(1 / num_estimand_timepoints, num_estimand_timepoints),
-                    rep(0, max_exp_timepoint - estimand_time[2])
+                    rep(0, max_exp_time - estimand_time[2])
                     ),
                   nrow = 1)
       tate_est <- (M %*% coeffs_trans)[1]
@@ -711,7 +726,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_est = tate_est_return,
         te_se = tate_se,
         te_ci = tate_ci_return,
-        converged = performance::check_convergence(model_ncs_mixed)[1],
+        converged = is_converged,
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
@@ -730,7 +745,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         pte_est_return <- pte_est
         pte_ci_return <- pte_ci
       }
-
+      
       results <- list(
         model = model_ncs_mixed,
         model_type = "ncs_mixed",
@@ -738,14 +753,14 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_est = pte_est_return,
         te_se = pte_se,
         te_ci = pte_ci_return,
-        converged = performance::check_convergence(model_ncs_mixed)[1],
+        converged = is_converged,
         messages = model_ncs_mixed@optinfo$conv$lme4$messages,
         effect_curve = effect_curve,
         dat = dat_orig
       )
     }
     
-    if(advanced$return_ncs == T) {
+    if(advanced$return_ncs == TRUE) {
       results$transformation_matrix = T_mat
       results$cov_mtx_orig_full = cov_orig_full
       results$coeffs_full = coeffs_trans_full
