@@ -761,10 +761,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     }
     
     if(advanced$return_ncs == TRUE) {
-      results$transformation_matrix = T_mat
-      results$cov_mtx_orig_full = cov_orig_full
-      results$coeffs_full = coeffs_trans_full
-      results$cov_mtx_full = cov_trans_full
+      results$T_mat    = T_mat
+      results$V_orig   = cov_orig_full
+      results$beta_new = coeffs_trans_full
+      results$V_new    = cov_trans_full
     }
 
   } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
