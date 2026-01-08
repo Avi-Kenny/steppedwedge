@@ -685,7 +685,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       cov_trans_full <- T_mat %*% cov_orig_full %*% t(T_mat)
       
       name_prefix <- rownames(summary_ncs$coefficients)[-indices]
-      name_suffix <- paste0("Exp_Time_", 1:nrow(B))
+      name_suffix <- paste0("ExpTime_", 1:nrow(B))
       new_names <- c(name_prefix, name_suffix)
       
       names(coeffs_trans_full) <- new_names
