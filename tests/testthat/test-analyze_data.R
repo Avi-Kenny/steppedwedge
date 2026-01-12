@@ -126,3 +126,83 @@ test_that("Function handles different family and link functions", {
   expect_true(result_binomial$model@resp$family$family == "binomial")
   expect_true(methods::is(result_gaussian$model,"lmerMod"))
 })
+
+# P-value Calculation Tests
+
+test_that("P-value is calculated correctly for Mixed IT model", {
+  # Gaussian (Identity link)
+  result <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                    exp_time="IT", family="gaussian")
+  
+  # Check existence and type
+  expect_true(!is.null(result$te_p))
+  expect_true(is.numeric(result$te_p))
+  expect_true(result$te_p >= 0 && result$te_p <= 1)
+  
+  # Check calculation (Wald test on linear scale)
+  # formula: 2 * (1 - pnorm(|est / se|))
+  manual_p <- 2 * (1 - pnorm(abs(result$te_est / result$te_se)))
+  expect_equal(result$te_p, manual_p)
+})
+
+test_that("P-value is consistent when exponentiating (Mixed IT)", {
+  # Use binomial/logit so exponentiation makes sense (Odds Ratio)
+  # 1. Linear run (Log-Odds)
+  result_lin <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                        exp_time="IT", family="binomial", exponentiate = FALSE)
+  
+  # 2. Exponentiated run (Odds Ratio)
+  result_exp <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                        exp_time="IT", family="binomial", exponentiate = TRUE)
+  
+  # P-values should be identical (hypothesis test is invariant to transformation)
+  expect_equal(result_lin$te_p, result_exp$te_p)
+  
+  # Check calculation using log of exponentiated estimate
+  # Note: The function returns te_se on the linear scale even if exponentiate=TRUE
+  linear_est_from_exp <- log(result_exp$te_est)
+  manual_p <- 2 * (1 - pnorm(abs(linear_est_from_exp / result_exp$te_se)))
+  expect_equal(result_exp$te_p, manual_p)
+})
+
+test_that("P-value is calculated correctly for Mixed ETI model (TATE)", {
+  result <- analyze(sw_data, method="mixed", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="ETI", family="gaussian")
+  
+  expect_true(!is.null(result$te_p))
+  
+  # For TATE, te_est is the weighted average, te_se is the SE of that average
+  manual_p <- 2 * (1 - pnorm(abs(result$te_est / result$te_se)))
+  expect_equal(result$te_p, manual_p)
+})
+
+test_that("P-value is calculated correctly for Mixed ETI model (PTE)", {
+  result <- analyze(sw_data, method="mixed", estimand_type="PTE",
+                    estimand_time = 2, exp_time="ETI", family="gaussian")
+  
+  expect_true(!is.null(result$te_p))
+  
+  manual_p <- 2 * (1 - pnorm(abs(result$te_est / result$te_se)))
+  expect_equal(result$te_p, manual_p)
+})
+
+test_that("P-value is calculated correctly for GEE IT model", {
+  result <- analyze(sw_data, method="GEE", estimand_type="TATE",
+                    exp_time="IT", family="gaussian")
+  
+  expect_true(!is.null(result$te_p))
+  
+  manual_p <- 2 * (1 - pnorm(abs(result$te_est / result$te_se)))
+  expect_equal(result$te_p, manual_p)
+})
+
+test_that("P-value is calculated correctly for GEE ETI model", {
+  result <- analyze(sw_data, method="GEE", estimand_type="TATE",
+                    estimand_time = c(1, 2), exp_time="ETI", family="gaussian")
+  
+  expect_true(!is.null(result$te_p))
+  
+  manual_p <- 2 * (1 - pnorm(abs(result$te_est / result$te_se)))
+  expect_equal(result$te_p, manual_p)
+})
+
