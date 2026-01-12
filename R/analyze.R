@@ -465,7 +465,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     fe_treatment <- summary_teh$coefficients["treatment",1]
     
     # Calculate the CI for treatment effect at each exposure time
-    ####### RESUME HERE #######
     est_teh <- rep(fe_treatment, length(exp_times)) + re_treatment[rownames(re_treatment) != "0", "treatment"]
     se_teh <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se[-1]^2)
     ci_lower_teh <- est_teh - 1.96 * se_teh
@@ -833,6 +832,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_se = te_se,
       te_ci = te_ci,
       te_p = te_p,
+      converged = NA,
       dat = dat_orig
     )
   } else if(method == "GEE" & exp_time == "ETI") {
@@ -893,6 +893,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = tate_se,
         te_ci = tate_ci,
         te_p = tate_p,
+        converged = NA,
         dat = dat_orig
       )
       
@@ -914,6 +915,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se = pte_se,
         te_ci = pte_ci,
         te_p = pte_p,
+        converged = NA,
         dat = dat_orig
       )
       
@@ -922,6 +924,12 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
   }
   
+  # Append configuration metadata to the results object for print function
+  results$method <- method
+  results$exp_time <- exp_time
+  results$cal_time <- cal_time
+  results$re <- re
+  results$corstr <- corstr
   results$exponentiated <- exponentiate
   
   class(results) <- c("list", "sw_analysis")
