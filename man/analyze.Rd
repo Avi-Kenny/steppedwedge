@@ -72,9 +72,11 @@ see the documentation for `geepack::geeglm`.}
 A list with the model object, model type as a string, estimand type
 as a string, numeric treatment effect estimate, numeric treatment effect standard error,
 treatment effect 95% confidence interval as a numeric vector of length 2,
-a list with treatment effect estimates (and standard errors and 95% confidence intervals)
-at each exposure timepoint, the original dataframe passed to `analyze()`, and an
-indicator whether the effect estimates and CI are exponentiated.
+p-value corresponding to the null hypothesis that the main treatment effect 
+estimand equals zero, a list with treatment effect estimates (and standard errors 
+and 95% confidence intervals) at each exposure timepoint, the original dataframe
+passed to `analyze()`, and an indicator whether the effect estimates and CI 
+are exponentiated.
 }
 \description{
 Analyze a stepped wedge dataset
