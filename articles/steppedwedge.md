@@ -65,8 +65,11 @@ analysis_1 <- analyze(
 )
 
 print(analysis_1)
-#> Treatment effect estimate: 0.39
-#> Treatment effect 95% confidence interval: 0.123, 0.656
+#> Mixed model with random effects for cluster and time
+#> Exp time: "IT", cal time: "categorical"
+#> TATE (IT) estimate: 0.39
+#> TATE (IT) 95% confidence interval: 0.123, 0.656
+#> TATE (IT) p-value: 0.0041307
 #> Converged: TRUE
 ```
 
@@ -84,8 +87,11 @@ analysis_1b <- analyze(
 )
 
 print(analysis_1b)
-#> Treatment effect estimate: 0.391
-#> Treatment effect 95% confidence interval: 0.128, 0.653
+#> Mixed model with random effects for cluster
+#> Exp time: "IT", cal time: "categorical"
+#> TATE (IT) estimate: 0.391
+#> TATE (IT) 95% confidence interval: 0.128, 0.653
+#> TATE (IT) p-value: 0.0035093
 #> Converged: TRUE
 ```
 
@@ -102,9 +108,12 @@ analysis_2 <- analyze(
 )
 
 print(analysis_2)
-#> Treatment effect estimate: 0.389
-#> Treatment effect 95% confidence interval: 0.138, 0.64
-#> Converged:
+#> GEE model with working exchangeable correlation structure
+#> Exp time: "IT", cal time: "categorical"
+#> TATE (IT) estimate: 0.389
+#> TATE (IT) 95% confidence interval: 0.138, 0.64
+#> TATE (IT) p-value: 0.0024142
+#> Converged: NA
 ```
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand,
@@ -120,8 +129,11 @@ analysis_3 <- analyze(
 )
 
 print(analysis_3)
-#> Treatment effect estimate: 0.418
-#> Treatment effect 95% confidence interval: 0.102, 0.733
+#> Mixed model with random effects for cluster and time
+#> Exp time: "ETI", cal time: "categorical"
+#> TATE estimate: 0.418
+#> TATE 95% confidence interval: 0.102, 0.733
+#> TATE p-value: 0.0094832
 #> Converged: TRUE
 ```
 
@@ -138,8 +150,11 @@ analysis_4 <- analyze(
 )
 
 print(analysis_4)
-#> Treatment effect estimate: 0.421
-#> Treatment effect 95% confidence interval: 0.104, 0.738
+#> Mixed model with random effects for cluster and time
+#> Exp time: "NCS", cal time: "categorical"
+#> TATE estimate: 0.421
+#> TATE 95% confidence interval: 0.104, 0.738
+#> TATE p-value: 0.0092387
 #> Converged: TRUE
 ```
 
@@ -169,8 +184,11 @@ analysis_6 <- analyze(
 )
 
 print(analysis_6)
-#> Treatment effect estimate: 0.526
-#> Treatment effect 95% confidence interval: 0.329, 0.723
+#> Mixed model with random effects for cluster and time
+#> Exp time: "NCS", cal time: "categorical"
+#> TATE estimate: 0.526
+#> TATE 95% confidence interval: 0.329, 0.723
+#> TATE p-value: < 0.001
 #> Converged: TRUE
 ```
 
@@ -207,8 +225,11 @@ analysis_binom <- analyze(
 #> boundary (singular) fit: see help('isSingular')
 
 print(analysis_binom)
-#> Treatment effect estimate: 0.696
-#> Treatment effect 95% confidence interval: 0.397, 0.996
+#> Mixed model with random effects for cluster and time
+#> Exp time: "ETI", cal time: "categorical"
+#> TATE estimate: 0.696
+#> TATE 95% confidence interval: 0.397, 0.996
+#> TATE p-value: < 0.001
 #> Converged: FALSE
 ```
 

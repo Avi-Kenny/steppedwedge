@@ -127,8 +127,11 @@ outcome</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.39</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.123, 0.656</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster and time</span></span>
+<span><span class="co">#&gt; Exp time: "IT", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE (IT) estimate: 0.39</span></span>
+<span><span class="co">#&gt; TATE (IT) 95% confidence interval: 0.123, 0.656</span></span>
+<span><span class="co">#&gt; TATE (IT) p-value: 0.0041307</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but including a random effect for cluster only,
 not for cluster-time interaction.</p>
@@ -143,8 +146,11 @@ not for cluster-time interaction.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_1b</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.391</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.128, 0.653</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster</span></span>
+<span><span class="co">#&gt; Exp time: "IT", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE (IT) estimate: 0.391</span></span>
+<span><span class="co">#&gt; TATE (IT) 95% confidence interval: 0.128, 0.653</span></span>
+<span><span class="co">#&gt; TATE (IT) p-value: 0.0035093</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Repeat the analysis, but using GEE rather than a mixed model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -158,9 +164,12 @@ not for cluster-time interaction.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.389</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.138, 0.64</span></span>
-<span><span class="co">#&gt; Converged:</span></span></code></pre></div>
+<span><span class="co">#&gt; GEE model with working exchangeable correlation structure</span></span>
+<span><span class="co">#&gt; Exp time: "IT", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE (IT) estimate: 0.389</span></span>
+<span><span class="co">#&gt; TATE (IT) 95% confidence interval: 0.138, 0.64</span></span>
+<span><span class="co">#&gt; TATE (IT) p-value: 0.0024142</span></span>
+<span><span class="co">#&gt; Converged: NA</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treament Effect (TATE) as the
 estimand, using an Exposure Time Indicator (ETI) model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -173,8 +182,11 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.418</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.102, 0.733</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster and time</span></span>
+<span><span class="co">#&gt; Exp time: "ETI", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE estimate: 0.418</span></span>
+<span><span class="co">#&gt; TATE 95% confidence interval: 0.102, 0.733</span></span>
+<span><span class="co">#&gt; TATE p-value: 0.0094832</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <p>Mixed model, with Time Average Treatment Effect (TATE) as the
 estimand, using a Natural Cubic Splines (NCS) model.</p>
@@ -188,8 +200,11 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.421</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.104, 0.738</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster and time</span></span>
+<span><span class="co">#&gt; Exp time: "NCS", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE estimate: 0.421</span></span>
+<span><span class="co">#&gt; TATE 95% confidence interval: 0.104, 0.738</span></span>
+<span><span class="co">#&gt; TATE p-value: 0.0092387</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="continuous-outcome">Continuous outcome<a class="anchor" aria-label="anchor" href="#continuous-outcome"></a>
@@ -217,8 +232,11 @@ estimand, using a Natural Cubic Splines (NCS) model.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.526</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.329, 0.723</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster and time</span></span>
+<span><span class="co">#&gt; Exp time: "NCS", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE estimate: 0.526</span></span>
+<span><span class="co">#&gt; TATE 95% confidence interval: 0.329, 0.723</span></span>
+<span><span class="co">#&gt; TATE p-value: &lt; 0.001</span></span>
 <span><span class="co">#&gt; Converged: TRUE</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -251,8 +269,11 @@ estimand, using an Exposure Time Indicator (ETI) model.</p>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis_binom</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Treatment effect estimate: 0.696</span></span>
-<span><span class="co">#&gt; Treatment effect 95% confidence interval: 0.397, 0.996</span></span>
+<span><span class="co">#&gt; Mixed model with random effects for cluster and time</span></span>
+<span><span class="co">#&gt; Exp time: "ETI", cal time: "categorical"</span></span>
+<span><span class="co">#&gt; TATE estimate: 0.696</span></span>
+<span><span class="co">#&gt; TATE 95% confidence interval: 0.397, 0.996</span></span>
+<span><span class="co">#&gt; TATE p-value: &lt; 0.001</span></span>
 <span><span class="co">#&gt; Converged: FALSE</span></span></code></pre></div>
 </div>
 </div>
