@@ -150,9 +150,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   
   # Parse formula terms for random effects
   f_re <- ""
-  if ("clust" %in% re) {
-    f_re <- paste0(f_re, " + (1|cluster_id)")
+  if ("clust" %in% re && "tx" %in% re) {
+    if (isTRUE(advanced$re_correlated)) {
+      f_re <- paste0(f_re, " + (1 + treatment | cluster_id)")
+    } else {
+      f_re <- paste0(f_re, " + (1 + treatment || cluster_id)")
+    }
+  } else if ("clust" %in% re) {
+    f_re <- paste0(f_re, " + (1 | cluster_id)")
+  } else if ("tx" %in% re) {
+    f_re <- paste0(f_re, " + (0 + treatment | cluster_id)")
   }
+
   if ("time" %in% re) {
     dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
     f_re <- paste0(f_re, " + (1|ij)")
