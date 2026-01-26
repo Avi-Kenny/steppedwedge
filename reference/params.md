@@ -13,7 +13,8 @@ params(
   n_knots_cal = 4,
   var_est = "model",
   var_est_type = "classic",
-  return_ncs = F
+  return_ncs = F,
+  re_correlated = F
 )
 ```
 
@@ -52,6 +53,11 @@ params(
   Logical; only relevant when exp_time="NCS". Specifies whether the full
   covariance matrix for the calendar time parameters and the transformed
   treatment effect parameters are returned.
+
+- re_correlated:
+
+  Logical; specifies whether random treatment effect and random
+  intercept for cluster are correlated.
 
 ## Value
 
