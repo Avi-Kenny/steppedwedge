@@ -169,10 +169,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if ("ind" %in% re) {
     f_re <- paste0(f_re, " + (1|individual_id)")
   }
-  if ("tx" %in% re) {
-    stop("Random treatment effects not yet implemented")
-  }
-  
+
   # Parse formula terms for outcome
   f_out <- ifelse(attr(dat, "binomial") == TRUE,
                   "cbind(successes, trials - successes) ~ ",
