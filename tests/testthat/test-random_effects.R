@@ -18,7 +18,7 @@ simulate_sw_mixed <- function(n_clusters = 20,
   
   # Draw random effects for each cluster
   # Column 1 = Random Intercept (b_0j), Column 2 = Random Slope (b_1j)
-  re <- mvrnorm(n = n_clusters, mu = c(0, 0), Sigma = Sigma)
+  re <- MASS::mvrnorm(n = n_clusters, mu = c(0, 0), Sigma = Sigma)
   
   clusters <- data.frame(
     cluster_id = 1:n_clusters,
@@ -80,7 +80,7 @@ test_that("analyze() constructs correct formula for Correlated vs Uncorrelated R
   # Extract the model object from the list
   model_uncorr <- res_uncorr$model 
   
-  f_uncorr_str <- as.character(formula(model_uncorr))[3]
+  f_uncorr_str <- as.character(stats::formula(model_uncorr))[3]
   
   # Check for expanded terms or explicit double bar
   has_split_terms <- grepl("\\(1 \\| cluster_id\\)", f_uncorr_str) & 
@@ -97,7 +97,7 @@ test_that("analyze() constructs correct formula for Correlated vs Uncorrelated R
   
   model_corr <- res_corr$model # Extract model
   
-  f_corr_str <- as.character(formula(model_corr))[3]
+  f_corr_str <- as.character(stats::formula(model_corr))[3]
   
   # Expect the combined single term
   expect_true(grepl("\\(1 \\+ treatment \\| cluster_id\\)", f_corr_str),
@@ -109,7 +109,7 @@ test_that("analyze() handles partial random effects specifications", {
   
   # Case A: Random Cluster Intercept Only
   res_clust <- analyze(dat, re = c("clust"))
-  f_clust <- as.character(formula(res_clust$model))[3] # Extract model
+  f_clust <- as.character(stats::formula(res_clust$model))[3] # Extract model
   
   expect_true(grepl("\\(1 \\| cluster_id\\)", f_clust))
   expect_false(grepl("treatment \\|", f_clust))
