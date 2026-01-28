@@ -151,7 +151,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   # Parse formula terms for random effects
   f_re <- ""
   if ("clust" %in% re && "tx" %in% re) {
-    if (isTRUE(advanced$re_correlated)) {
+    if (advanced$re_correlated) {
       f_re <- paste0(f_re, " + (1 + treatment | cluster_id)")
     } else {
       f_re <- paste0(f_re, " + (1 + treatment || cluster_id)")
