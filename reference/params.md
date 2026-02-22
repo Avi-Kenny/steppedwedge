@@ -14,7 +14,8 @@ params(
   var_est = "model",
   var_est_type = "classic",
   return_ncs = F,
-  re_correlated = F
+  re_correlated = F,
+  w = 1
 )
 ```
 
@@ -58,6 +59,11 @@ params(
 
   Logical; specifies whether random treatment effect and random
   intercept for cluster are correlated.
+
+- w:
+
+  Integer; the number of washout periods to use when \`exp_time =
+  "DCT"\` (Delayed Constant Treatment). Defaults to 1.
 
 ## Value
 

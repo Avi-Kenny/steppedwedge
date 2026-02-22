@@ -46,13 +46,16 @@ analyze(
 
 - exp_time:
 
-  One of c("IT", "ETI", "NCS", "TEH"); model for exposure time. "IT"
-  encodes an immediate treatment model with a single treatment effect
-  parameter. "ETI" is an exposure time indicator model, including one
-  indicator variable for each exposure time point. "NCS" uses a natural
-  cubic spline model for the exposure time trend. "TEH" includes a
-  random slope term in the model, allowing the treatment effect to vary
-  by timepoint.
+  One of c("IT", "ETI", "DCT", "NCS", "TEH"); model for exposure time.
+  "IT" encodes an immediate treatment model with a single treatment
+  effect parameter. "ETI" is an exposure time indicator model, including
+  one indicator variable for each exposure time point. "NCS" uses a
+  natural cubic spline model for the exposure time trend. "TEH" includes
+  a random slope term in the model, allowing the treatment effect to
+  vary by timepoint. "DCT" encodes a delayed constant treatment model,
+  which estimates individual effects for a specified number of washout
+  periods (set via the \`w\` parameter in \`advanced\`) followed by a
+  single constant treatment effect.
 
 - cal_time:
 

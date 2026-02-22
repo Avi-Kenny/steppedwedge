@@ -49,7 +49,8 @@
 <span>  var_est <span class="op">=</span> <span class="st">"model"</span>,</span>
 <span>  var_est_type <span class="op">=</span> <span class="st">"classic"</span>,</span>
 <span>  return_ncs <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  re_correlated <span class="op">=</span> <span class="cn">F</span></span>
+<span>  re_correlated <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  w <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,6 +95,11 @@ transformed treatment effect parameters are returned.</p></dd>
 <dt id="arg-re-correlated">re_correlated<a class="anchor" aria-label="anchor" href="#arg-re-correlated"></a></dt>
 <dd><p>Logical; specifies whether random treatment effect and random
 intercept for cluster are correlated.</p></dd>
+
+
+<dt id="arg-w">w<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
+<dd><p>Integer; the number of washout periods to use when `exp_time = "DCT"`
+(Delayed Constant Treatment). Defaults to 1.</p></dd>
 
 </dl></div>
     <div class="section level2">
