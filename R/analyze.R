@@ -12,13 +12,16 @@
 #'     average over. When estimand_type="PTE", `estimand_time` must be a numeric
 #'     vector of length 1, representing the time period of interest. See
 #'     examples.
-#' @param exp_time One of c("IT", "ETI", "NCS", "TEH"); model for exposure time.
+#' @param exp_time One of c("IT", "ETI", "DCT", "NCS", "TEH"); model for exposure time.
 #'     "IT" encodes an immediate treatment model with a single treatment effect
 #'     parameter. "ETI" is an exposure time indicator model, including one
 #'     indicator variable for each exposure time point. "NCS" uses a natural
 #'     cubic spline model for the exposure time trend. "TEH" includes a random
 #'     slope term in the model, allowing the treatment effect to vary by
-#'     timepoint.
+#'     timepoint. "DCT" encodes a delayed constant treatment model, which
+#'     estimates individual effects for a specified number of washout periods
+#'     (set via the `w` parameter in `advanced`) followed by a single constant
+#'     treatment effect.
 #' @param cal_time One of c("categorical", "NCS", "linear", "none"); model for
 #'     calendar time. "categorical" uses indicator variables for discrete time
 #'     points, as in the Hussey and Hughes model. "NCS" uses a natural cubic
@@ -98,7 +101,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (!(cal_time %in% c("categorical", "NCS", "linear", "none"))) {
     stop("`cal_time` misspecified.")
   }
-  if (!(exp_time %in% c("IT", "ETI", "NCS", "TEH"))) {
+  if (!(exp_time %in% c("IT", "ETI", "NCS", "TEH", "DCT"))) {
     stop("`exp_time` misspecified.")
   }
   if (!all(re %in% c("clust", "time", "ind", "tx"))) {
@@ -420,6 +423,141 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       )
       
     }
+    
+  } else if(method == "mixed" & exp_time == "DCT") {
+    
+    ########################################################.
+    ##### Delayed Constant Treatment (DCT) mixed model #####
+    ########################################################.
+    
+    # Ensure w is provided via the advanced params list
+    w <- advanced$w 
+    if(is.null(w) || w < 1 || w >= max(dat$exposure_time)) {
+      stop("For exp_time='DCT', you must specify a valid washout period 'w' (1 <= w < max exposure time).")
+    }
+
+    # Create washout indicators for s = 1 to w
+    for (s in 1:w) {
+      dat[[paste0("washout_", s)]] <- as.integer(dat$exposure_time == s)
+    }
+    f_washout <- paste0("washout_", 1:w, collapse = " + ")
+    
+    # Create the delayed constant treatment indicator for s > w
+    dat$delayed_treatment <- as.integer(dat$exposure_time > w)
+    
+    # Combine exposure formula terms
+    f_exp_dct <- paste0(f_washout, " + delayed_treatment")
+    
+    
+    # Fit mixed model
+    formula_str <- paste0(f_out, f_cal, f_exp_dct, f_re)
+    formula <- stats::as.formula(formula_str)
+    
+    if(is.null(advanced$offset)) {
+      if(family$family == "gaussian" & family$link == "identity") {
+        model_dct_mixed <- lme4::lmer(formula, data=dat)
+      } else {
+        model_dct_mixed <- lme4::glmer(formula, family=family, data=dat)
+      }
+    } else {
+      if(family$family == "gaussian" & family$link == "identity") {
+        model_dct_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
+      } else {
+        model_dct_mixed <- lme4::glmer(formula, family=family, data=dat, offset=advanced$offset)
+      }
+    }
+    
+    summary_dct <- summary(model_dct_mixed)
+    
+    # Extract estimate and CI for the delayed treatment effect
+    te_est <- summary_dct$coefficients["delayed_treatment", 1]
+    
+    if(advanced$var_est == "model") {
+      te_se <- summary_dct$coefficients["delayed_treatment", 2]
+    } else if(advanced$var_est == "robust") {
+      cov_cr  <- vcovCR.glmerMod(model_dct_mixed, cluster = dat$cluster_id, 
+                                 type = advanced$var_est_type)
+      te_se  <- sqrt(cov_cr["delayed_treatment", "delayed_treatment"])
+    }
+    te_ci <- te_est + c(-1.96, 1.96) * te_se
+    
+    # Calculate P-value
+    te_p <- 2 * (1 - stats::pnorm(abs(te_est / te_se)))
+
+    # Extract washout coefficients and their standard errors
+    washout_names <- paste0("washout_", 1:w)
+    est_washout <- summary_dct$coefficients[washout_names, 1]
+    
+    if(advanced$var_est == "model") {
+      se_washout <- summary_dct$coefficients[washout_names, 2]
+    } else if(advanced$var_est == "robust") {
+      # cov_cr should be calculated earlier if var_est == "robust"
+      se_washout <- sqrt(diag(as.matrix(cov_cr[washout_names, washout_names, drop = FALSE])))
+    }
+    
+    # Map estimates to the full vector of non-zero exposure times
+    # Find how many timepoints get the delayed constant effect
+    num_delayed <- sum(exp_times > w) 
+    
+    # Concatenate the washout effects and the repeated delayed effect
+    est_curve <- c(est_washout, rep(te_est, num_delayed))
+    se_curve  <- c(se_washout, rep(te_se, num_delayed))
+    
+    # Calculate pointwise confidence intervals for the curve
+    ci_lower_curve <- est_curve - 1.96 * se_curve
+    ci_upper_curve <- est_curve + 1.96 * se_curve
+    
+    # Handle exponentiation based on user arguments
+    if(exponentiate) {
+      est_curve_return <- exp(est_curve)
+      ci_lower_return  <- exp(ci_lower_curve)
+      ci_upper_return  <- exp(ci_upper_curve)
+      zero_value <- 1
+    } else {
+      est_curve_return <- est_curve
+      ci_lower_return  <- ci_lower_curve
+      ci_upper_return  <- ci_upper_curve
+      zero_value <- 0
+    }
+    
+    # Estimate the effect curve
+    effect_curve <- list(
+      exp_time = c(0, exp_times),
+      est      = c(zero_value, as.numeric(est_curve_return)),
+      se       = c(0, as.numeric(se_curve)),
+      vcov     = NA, # Can be set to NA, or you can subset the vcov matrix if downstream functions strictly require it
+      ci_lower = c(zero_value, as.numeric(ci_lower_return)),
+      ci_upper = c(zero_value, as.numeric(ci_upper_return))
+    )
+    
+    if(lme4::isSingular(model_dct_mixed)) {
+      is_converged <- FALSE
+    } else {
+      is_converged <- performance::check_convergence(model_dct_mixed)[1]
+    }
+    
+    if(exponentiate) {
+      te_est <- exp(te_est)
+      te_ci <- exp(te_ci)
+      zero_value <- 1
+    } else {
+      zero_value <- 0
+    }
+    
+    results <- list(
+      model = model_dct_mixed,
+      model_type = "dct_mixed",
+      estimand_type = "TATE (DCT)",
+      te_est = te_est,
+      te_se = te_se,
+      te_ci = te_ci,
+      te_p = te_p,
+      converged = is_converged,
+      messages = model_dct_mixed@optinfo$conv$lme4$messages,
+      effect_curve = effect_curve,
+      dat = dat_orig
+    )
+    
     
   } else if(method == "mixed" & exp_time == "TEH") {
     

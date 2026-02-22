@@ -35,13 +35,16 @@ average over. When estimand_type="PTE", `estimand_time` must be a numeric
 vector of length 1, representing the time period of interest. See
 examples.}
 
-\item{exp_time}{One of c("IT", "ETI", "NCS", "TEH"); model for exposure time.
+\item{exp_time}{One of c("IT", "ETI", "DCT", "NCS", "TEH"); model for exposure time.
 "IT" encodes an immediate treatment model with a single treatment effect
 parameter. "ETI" is an exposure time indicator model, including one
 indicator variable for each exposure time point. "NCS" uses a natural
 cubic spline model for the exposure time trend. "TEH" includes a random
 slope term in the model, allowing the treatment effect to vary by
-timepoint.}
+timepoint. "DCT" encodes a delayed constant treatment model, which
+estimates individual effects for a specified number of washout periods
+(set via the `w` parameter in `advanced`) followed by a single constant
+treatment effect.}
 
 \item{cal_time}{One of c("categorical", "NCS", "linear", "none"); model for
 calendar time. "categorical" uses indicator variables for discrete time

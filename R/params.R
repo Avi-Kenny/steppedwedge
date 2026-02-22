@@ -21,6 +21,8 @@
 #'     transformed treatment effect parameters are returned.
 #' @param re_correlated Logical; specifies whether random treatment effect and random
 #'     intercept for cluster are correlated.
+#' @param w Integer; the number of washout periods to use when `exp_time = "DCT"` 
+#'     (Delayed Constant Treatment). Defaults to 1.
 #'
 #' @return A list of options
 #' @export
@@ -33,8 +35,13 @@
 #' family = binomial)
 #' 
 params <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
-                   var_est_type="classic", return_ncs=F, re_correlated=F) {
+                   var_est_type="classic", return_ncs=F, re_correlated=F,
+                   w=1) {
+  # Input validation for w
+  if (!is.null(w) && (w < 1 || w != round(w))) {
+    stop("The washout period 'w' must be a positive integer.")
+  }
   return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal,
               var_est=var_est, var_est_type=var_est_type, return_ncs=return_ncs, 
-              re_correlated=re_correlated))
+              re_correlated=re_correlated, w=w))
 }
