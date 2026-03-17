@@ -62,8 +62,10 @@ object). Defaults to FALSE.}
 \item{re}{A character vector of random effects to include; only relevant if
 method="mixed" is used. Possible random effects include "clust" (random
 intercept for cluster), "time" (random intercept for cluster-time
-interaction), "ind" (random intercept for individuals; appropriate when a
-cohort design is used), "tx" (random treatment effect)}
+interaction), "ar1" (autoregressive order 1 correlation structure for 
+time periods within clusters, allowing the between-period intra-cluster 
+correlation to decay over time), "ind" (random intercept for individuals;
+appropriate when a cohort design is used), "tx" (random treatment effect)}
 
 \item{corstr}{One of c("independence", "exchangeable", "ar1"); only relevant
 if method="GEE" is used. Defines the GEE working correlation structure;

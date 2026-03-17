@@ -35,8 +35,10 @@
 #' @param re A character vector of random effects to include; only relevant if
 #'     method="mixed" is used. Possible random effects include "clust" (random
 #'     intercept for cluster), "time" (random intercept for cluster-time
-#'     interaction), "ind" (random intercept for individuals; appropriate when a
-#'     cohort design is used), "tx" (random treatment effect)
+#'     interaction), "ar1" (autoregressive order 1 correlation structure for 
+#'     time periods within clusters, allowing the between-period intra-cluster 
+#'     correlation to decay over time), "ind" (random intercept for individuals;
+#'     appropriate when a cohort design is used), "tx" (random treatment effect)
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
@@ -104,8 +106,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (!(exp_time %in% c("IT", "ETI", "NCS", "TEH", "DCT"))) {
     stop("`exp_time` misspecified.")
   }
-  if (!all(re %in% c("clust", "time", "ind", "tx"))) {
-    stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
+  if (!all(re %in% c("clust", "time", "ind", "tx", "ar1"))) {
+    stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx", "ar1")')
   }
   if (estimand_type == "TATE" &
       !(length(estimand_time) == 2 & is.numeric(estimand_time))) {
@@ -169,6 +171,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
     f_re <- paste0(f_re, " + (1|ij)")
   }
+  
+  if ("ar1" %in% re) {
+    # Ensure the user has the version of lme4 that supports structured covariance
+    if (utils::packageVersion("lme4") < "2.0.0") {
+      stop("The 'ar1' random effect structure requires the lme4 package version 2.0-0 or greater.")
+    }
+    f_re <- paste0(f_re, " + ar1(0 + factor(time) | cluster_id)")
+  }
+  
   if ("ind" %in% re) {
     f_re <- paste0(f_re, " + (1|individual_id)")
   }
