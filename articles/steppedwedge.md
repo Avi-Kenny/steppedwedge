@@ -69,7 +69,7 @@ print(analysis_1)
 #> Exp time: "IT", cal time: "categorical"
 #> TATE (IT) estimate: 0.39
 #> TATE (IT) 95% confidence interval: 0.123, 0.656
-#> TATE (IT) p-value: 0.0041307
+#> TATE (IT) p-value: 0.0041279
 #> Converged: TRUE
 ```
 
@@ -91,7 +91,7 @@ print(analysis_1b)
 #> Exp time: "IT", cal time: "categorical"
 #> TATE (IT) estimate: 0.391
 #> TATE (IT) 95% confidence interval: 0.128, 0.653
-#> TATE (IT) p-value: 0.0035093
+#> TATE (IT) p-value: 0.0035098
 #> Converged: TRUE
 ```
 
@@ -133,7 +133,7 @@ print(analysis_3)
 #> Exp time: "ETI", cal time: "categorical"
 #> TATE estimate: 0.418
 #> TATE 95% confidence interval: 0.102, 0.733
-#> TATE p-value: 0.0094832
+#> TATE p-value: 0.0094819
 #> Converged: TRUE
 ```
 
@@ -154,7 +154,7 @@ print(analysis_4)
 #> Exp time: "NCS", cal time: "categorical"
 #> TATE estimate: 0.421
 #> TATE 95% confidence interval: 0.104, 0.738
-#> TATE p-value: 0.0092387
+#> TATE p-value: 0.0092447
 #> Converged: TRUE
 ```
 
