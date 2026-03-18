@@ -117,6 +117,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       !(length(estimand_time) == 1 & is.numeric(estimand_time))) {
     stop('When estimand_type=="PTE", `estimand_time` must be a numeric vector of length 1')
   }
+  if (all(c("time", "ar1") %in% re)) {
+    stop("Conflicting random effects: You cannot specify both 'time' (constant between-period correlation) and 'ar1' (decaying correlation) simultaneously. Please choose one.")
+  }
   
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
   
