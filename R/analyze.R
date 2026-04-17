@@ -35,9 +35,7 @@
 #' @param re A character vector of random effects to include; only relevant if
 #'     method="mixed" is used. Possible random effects include "clust" (random
 #'     intercept for cluster), "time" (random intercept for cluster-time
-#'     interaction), "ar1" (autoregressive order 1 correlation structure for 
-#'     time periods within clusters, allowing the between-period intra-cluster 
-#'     correlation to decay over time), "ind" (random intercept for individuals;
+#'     interaction), "ind" (random intercept for individuals;
 #'     appropriate when a cohort design is used), "tx" (random treatment effect)
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
@@ -106,8 +104,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (!(exp_time %in% c("IT", "ETI", "NCS", "TEH", "DCT"))) {
     stop("`exp_time` misspecified.")
   }
-  if (!all(re %in% c("clust", "time", "ind", "tx", "ar1"))) {
-    stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx", "ar1")')
+  if (!all(re %in% c("clust", "time", "ind", "tx"))) {
+    stop('Random effects must be a subset of the vector c("clust", "time", "ind", "tx")')
   }
   if (estimand_type == "TATE" &
       !(length(estimand_time) == 2 & is.numeric(estimand_time))) {
@@ -116,9 +114,6 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   if (estimand_type == "PTE" &
       !(length(estimand_time) == 1 & is.numeric(estimand_time))) {
     stop('When estimand_type=="PTE", `estimand_time` must be a numeric vector of length 1')
-  }
-  if (all(c("time", "ar1") %in% re)) {
-    stop("Conflicting random effects: You cannot specify both 'time' (constant between-period correlation) and 'ar1' (decaying correlation) simultaneously. Please choose one.")
   }
   
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
@@ -169,24 +164,16 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   } else if ("tx" %in% re) {
     f_re <- paste0(f_re, " + (0 + treatment | cluster_id)")
   }
-
+  
   if ("time" %in% re) {
     dat$ij <- as.integer(factor(paste0(dat$cluster_id,"-",dat$time)))
     f_re <- paste0(f_re, " + (1|ij)")
   }
   
-  if ("ar1" %in% re) {
-    # Ensure the user has the version of lme4 that supports structured covariance
-    if (utils::packageVersion("lme4") < "2.0.0") {
-      stop("The 'ar1' random effect structure requires the lme4 package version 2.0-0 or greater.")
-    }
-    f_re <- paste0(f_re, " + ar1(0 + factor(time) | cluster_id)")
-  }
-  
   if ("ind" %in% re) {
     f_re <- paste0(f_re, " + (1|individual_id)")
   }
-
+  
   # Parse formula terms for outcome
   f_out <- ifelse(attr(dat, "binomial") == TRUE,
                   "cbind(successes, trials - successes) ~ ",
@@ -449,7 +436,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     if(is.null(w) || w < 1 || w >= max(dat$exposure_time)) {
       stop("For exp_time='DCT', you must specify a valid washout period 'w' (1 <= w < max exposure time).")
     }
-
+    
     # Create washout indicators for s = 1 to w
     for (s in 1:w) {
       dat[[paste0("washout_", s)]] <- as.integer(dat$exposure_time == s)
@@ -497,7 +484,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Calculate P-value
     te_p <- 2 * (1 - stats::pnorm(abs(te_est / te_se)))
-
+    
     # Extract washout coefficients and their standard errors
     washout_names <- paste0("washout_", 1:w)
     est_washout <- summary_dct$coefficients[washout_names, 1]
