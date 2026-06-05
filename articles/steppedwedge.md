@@ -162,7 +162,7 @@ print(analysis_4)
 #> Exp time: "NCS", cal time: "categorical"
 #> TATE estimate: 0.421
 #> TATE 95% confidence interval: 0.104, 0.738
-#> TATE p-value: 0.0092387
+#> TATE p-value: 0.0092477
 #> Converged: TRUE
 ```
 
