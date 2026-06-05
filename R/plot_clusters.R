@@ -45,6 +45,13 @@ plot_clusters <- function(object, ncol=3)
     dat <- object
   }
   
+  # Record whether the plot will use proportions — applies to both binary (0/1) and
+  # binomial (successes/trials) outcomes — before columns are dropped by distinct()
+  is_binomial_outcome <- isTRUE(attr(dat, "binomial"))
+  is_proportion_outcome <- is_binomial_outcome ||
+    ("outcome" %in% names(dat) &&
+       all(is.na(dat$outcome) | dat$outcome %in% c(0, 1, TRUE, FALSE)))
+  
   dat$cluster <- factor(paste("Cluster", dat$cluster_id))
   
   cluster_order <- order(as.numeric(unique(gsub("Cluster ", "", dat$cluster))))
@@ -124,7 +131,7 @@ plot_clusters <- function(object, ncol=3)
         lineend = "round"
       )
     
-    if ("successes" %in% names(dat)) {
+    if (is_proportion_outcome) {
       cluster_chart <- cluster_chart + 
         ggplot2::labs(caption="Lines represent predicted probabilities; points represent actual proportions per cluster-period")
     }
