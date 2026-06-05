@@ -5,14 +5,15 @@ Plot observed and predicted outcomes by cluster over time
 ## Usage
 
 ``` r
-plot_clusters(analysis_object, ncol = 3)
+plot_clusters(object, ncol = 3)
 ```
 
 ## Arguments
 
-- analysis_object:
+- object:
 
-  A list of class \`sw_analysis\`.
+  An analysis object of class \`sw_analysis\` or a dataset of class
+  \`sw_data\`/\`sw_dat\`.
 
 - ncol:
 
@@ -20,8 +21,8 @@ plot_clusters(analysis_object, ncol = 3)
 
 ## Value
 
-A list with a \`ggplot2\` object of the actual and predicted outcomes by
-cluster.
+A list with a \`ggplot2\` object of the actual (and predicted, if
+applicable) outcomes by cluster.
 
 ## Examples
 
@@ -30,10 +31,13 @@ cluster.
 test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 treatment = "trt", outcome = "outcome_cont", data = sw_data_example)
 
+# Plot just the dataset
+plot_clusters(test_data)
+
 # Analyze using TATE estimand for exposure times 1 through 4
 results_tate <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "ETI")
 
-# Plot by cluster
+# Plot analysis results (with predicted lines) by cluster
 plot_clusters(results_tate)
 ```

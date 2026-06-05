@@ -1,6 +1,7 @@
 # Basic package workflow
 
 ``` r
+
 library(steppedwedge)
 ```
 
@@ -11,6 +12,7 @@ that can be accepted by the `plot_design` and `analyze` functions. We
 use the made-up dataframe `sw_data_example` to demonstrate the workflow.
 
 ``` r
+
 data(sw_data_example)
 head(sw_data_example)
 #>   cluster period trt outcome_bin outcome_cont
@@ -38,6 +40,7 @@ The `plot_design` function produces a diagram of the stepped wedge
 design and a summary of the variables.
 
 ``` r
+
 plot_dat <- plot_design(dat)
 
 print(plot_dat)
@@ -55,6 +58,7 @@ Treament Effect (TATE) as the estimand, assuming an Immediate Treatment
 arguments to `glmer`. \## Binary outcome
 
 ``` r
+
 analysis_1 <- analyze(
   dat = dat,
   method = "mixed",
@@ -77,6 +81,7 @@ Repeat the analysis, but including a random effect for cluster only, not
 for cluster-time interaction.
 
 ``` r
+
 analysis_1b <- analyze(
   dat = dat,
   method = "mixed",
@@ -98,6 +103,7 @@ print(analysis_1b)
 Repeat the analysis, but using GEE rather than a mixed model.
 
 ``` r
+
 analysis_2 <- analyze(
   dat = dat,
   method = "GEE",
@@ -120,6 +126,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand,
 using an Exposure Time Indicator (ETI) model.
 
 ``` r
+
 analysis_3 <- analyze(
   dat = dat,
   method = "mixed",
@@ -141,6 +148,7 @@ Mixed model, with Time Average Treatment Effect (TATE) as the estimand,
 using a Natural Cubic Splines (NCS) model.
 
 ``` r
+
 analysis_4 <- analyze(
   dat = dat,
   method = "mixed",
@@ -164,6 +172,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand,
 using a Natural Cubic Splines (NCS) model.
 
 ``` r
+
 
 dat_cont <- load_data(
   time = "period",
@@ -200,6 +209,7 @@ argument.
 
 ``` r
 
+
 dat_binom <- load_data(
   time ="period",
   cluster_id = "cluster",
@@ -215,6 +225,7 @@ Mixed model, with Time Average Treament Effect (TATE) as the estimand,
 using an Exposure Time Indicator (ETI) model.
 
 ``` r
+
 
 analysis_binom <- analyze(
   dat = dat_binom,
@@ -239,6 +250,7 @@ The `plot_effect_curve` function plots effect estimates by exposure time
 for one or more `analyze` objects.
 
 ``` r
+
 
 IT_model <- analyze(
   dat = dat_cont, method = "mixed", estimand_type = "TATE",
@@ -271,6 +283,7 @@ predicted outcomes represented by the plotted line:
 
 ``` r
 
+
 plot_clusters(analysis_6, ncol = 3)
 #> $cluster_chart
 ```
@@ -284,6 +297,7 @@ plotted as a point, with the predicted probabilities represented by the
 plotted line:
 
 ``` r
+
 
 plot_clusters(analysis_4, ncol = 3)
 #> $cluster_chart
