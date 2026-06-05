@@ -77,7 +77,11 @@ An object of class `sw_data`
 ## Examples
 
 ``` r
-example_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+example_data <- load_data(time = "period", cluster_id = "cluster", individual_id = NULL,
 treatment = "trt", outcome = "outcome_cont", offset = NULL, data = sw_data_example)
 base::summary(example_data)
+
+example_data_binomial <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
+treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example_binom)
+base::summary(example_data_binomial)
 ```
