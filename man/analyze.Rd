@@ -117,4 +117,11 @@ estimand_type = "TATE", estimand_time = c(1, 4), exp_time = "ETI")
 
 results_pte_bin
 
+# Analysis example 5: TATE estimand using the Delayed Constant Treatment (DCT) model,
+# with a washout period of w = 2 exposure times
+results_tate_dct <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
+estimand_time = c(1, 4), exp_time = "DCT", advanced = params(w = 2))
+
+results_tate_dct
+
 }

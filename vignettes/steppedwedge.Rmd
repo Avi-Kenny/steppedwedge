@@ -139,6 +139,24 @@ print(analysis_4)
 ```
 
 
+Mixed model using a Delayed Constant Treatment (DCT) model. This model assumes the treatment effect during the first `w` exposure time periods is a nuisance "washout" effect, after which the treatment stabilizes to a constant effect $\delta$. Set `w` via `params()`.
+
+```{r}
+analysis_5 <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand_type = "TATE",
+  exp_time = "DCT",
+  family = binomial,
+  advanced = params(w = 2)
+)
+
+print(analysis_5)
+```
+
+The returned `te_est` is the estimate of $\delta$ — the constant treatment effect after the washout period. The washout-period coefficients ($\delta_1, \delta_2$) are estimated internally but treated as nuisance parameters.
+
+
 ## Continuous outcome
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand, using a Natural Cubic Splines (NCS) model.
@@ -218,8 +236,13 @@ NCS_4_model <- analyze(
   estimand_time = c(1, 4), exp_time = "NCS", 
   advanced = params(n_knots_exp = 4)
 )
+DCT_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE",
+  estimand_time = c(1, 4), exp_time = "DCT",
+  advanced = params(w = 2)
+)
 
-plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1)
+plot_effect_curves(IT_model, ETI_model, NCS_4_model, DCT_model, facet_nrow = 2)
 
 
 ```
