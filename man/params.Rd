@@ -56,6 +56,6 @@ dat <- load_data(time = "period", cluster_id = "cluster", individual_id = NULL,
 treatment = "trt", outcome = "outcome_bin", data = sw_data_example)
 
 analyze(dat = dat, method = "mixed", estimand_type = "TATE",  exp_time = "NCS",
-family = binomial)
+family = binomial, advanced = params(var_est = "robust"))
 
 }
