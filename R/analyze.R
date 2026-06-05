@@ -652,10 +652,18 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     if(estimand_type == "TATE") {
       
-      # Estimate the TATE
-      tate_est <- summary_teh$coefficients["treatment",1]
-      tate_se <- summary_teh$coefficients["treatment",2]
-      tate_ci <- tate_est + c(-1.96,1.96) * tate_se
+      # Average the per-exposure-time BLUP estimates over the estimand_time window.
+      # se_teh[s]^2 = fe_var + re_var[s], so re_var[s] = se_teh[s]^2 - fe_var.
+      # Var(TATE) = fe_var + (1/n^2) * sum(re_var[s] for s in window),
+      #   assuming independence of random slopes across exposure times.
+      window_mask <- exp_times >= estimand_time[1] & exp_times <= estimand_time[2]
+      n_window <- sum(window_mask)
+      fe_var <- summary_teh$coefficients["treatment", 2]^2
+      re_var_window <- pmax(se_teh[window_mask]^2 - fe_var, 0)
+      
+      tate_est <- mean(est_teh[window_mask])
+      tate_se <- sqrt(fe_var + sum(re_var_window) / n_window^2)
+      tate_ci <- tate_est + c(-1.96, 1.96) * tate_se
       
       # Calculate P-value (Wald test) before exponentiation
       tate_p <- 2 * (1 - stats::pnorm(abs(tate_est / tate_se)))
@@ -684,12 +692,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       
     } else if(estimand_type == "PTE") {
       
-      # Estimate the PTE by combining the estimates from the fixed effect component and the random effect for the final timepoint
+      # Estimate the PTE by combining the estimates from the fixed effect component and the random effect for the requested timepoint
       re_treatment_pte <- re_treatment[rownames(re_treatment) == as.character(estimand_time), "treatment"]
       pte_est <- lme4::fixef(model_teh_mixed)["treatment"] + re_treatment_pte
       
-      # Estimate the SE of the PTE by combining the variances from the fixed effect component and the random effect for the final timepoint
-      re_se_pte <- re_se[estimand_time]
+      # Safely find the exact position index for the standard error by matching the rownames
+      time_index <- match(as.character(estimand_time), rownames(re_treatment))
+      re_se_pte <- re_se[time_index]
       
       pte_se <- sqrt(summary_teh$coefficients["treatment",2]^2 + re_se_pte^2)
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
