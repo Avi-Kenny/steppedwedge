@@ -73,7 +73,7 @@ print(analysis_1)
 #> Exp time: "IT", cal time: "categorical"
 #> TATE (IT) estimate: 0.39
 #> TATE (IT) 95% confidence interval: 0.123, 0.656
-#> TATE (IT) p-value: 0.0041307
+#> TATE (IT) p-value: 0.0041279
 #> Converged: TRUE
 ```
 
@@ -96,7 +96,7 @@ print(analysis_1b)
 #> Exp time: "IT", cal time: "categorical"
 #> TATE (IT) estimate: 0.391
 #> TATE (IT) 95% confidence interval: 0.128, 0.653
-#> TATE (IT) p-value: 0.0035093
+#> TATE (IT) p-value: 0.0035098
 #> Converged: TRUE
 ```
 
@@ -140,7 +140,7 @@ print(analysis_3)
 #> Exp time: "ETI", cal time: "categorical"
 #> TATE estimate: 0.418
 #> TATE 95% confidence interval: 0.102, 0.733
-#> TATE p-value: 0.0094832
+#> TATE p-value: 0.0094819
 #> Converged: TRUE
 ```
 
@@ -162,9 +162,40 @@ print(analysis_4)
 #> Exp time: "NCS", cal time: "categorical"
 #> TATE estimate: 0.421
 #> TATE 95% confidence interval: 0.104, 0.738
-#> TATE p-value: 0.0092387
+#> TATE p-value: 0.0092447
 #> Converged: TRUE
 ```
+
+Mixed model using a Delayed Constant Treatment (DCT) model. This model
+assumes the treatment effect during the first `w` exposure time periods
+is a nuisance “washout” effect, after which the treatment stabilizes to
+a constant effect $`\delta`$. Set `w` via
+[`params()`](https://avi-kenny.github.io/steppedwedge/reference/params.md).
+
+``` r
+
+analysis_5 <- analyze(
+  dat = dat,
+  method = "mixed",
+  estimand_type = "TATE",
+  exp_time = "DCT",
+  family = binomial,
+  advanced = params(w = 2)
+)
+
+print(analysis_5)
+#> Mixed model with random effects for cluster and time
+#> Exp time: "DCT", cal time: "categorical"
+#> TATE (DCT) estimate: 0.321
+#> TATE (DCT) 95% confidence interval: -0.05, 0.692
+#> TATE (DCT) p-value: 0.089885
+#> Converged: TRUE
+```
+
+The returned `te_est` is the estimate of $`\delta`$ — the constant
+treatment effect after the washout period. The washout-period
+coefficients ($`\delta_1, \delta_2`$) are estimated internally but
+treated as nuisance parameters.
 
 ### Continuous outcome
 
@@ -265,11 +296,16 @@ NCS_4_model <- analyze(
   estimand_time = c(1, 4), exp_time = "NCS", 
   advanced = params(n_knots_exp = 4)
 )
+DCT_model <- analyze(
+  dat = dat_cont, method = "mixed", estimand_type = "TATE",
+  estimand_time = c(1, 4), exp_time = "DCT",
+  advanced = params(w = 2)
+)
 
-plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1)
+plot_effect_curves(IT_model, ETI_model, NCS_4_model, DCT_model, facet_nrow = 2)
 ```
 
-![](steppedwedge_files/figure-html/unnamed-chunk-13-1.png)
+![](steppedwedge_files/figure-html/unnamed-chunk-14-1.png)
 
 ## Plotting cluster charts
 
@@ -288,7 +324,7 @@ plot_clusters(analysis_6, ncol = 3)
 #> $cluster_chart
 ```
 
-![](steppedwedge_files/figure-html/unnamed-chunk-14-1.png)
+![](steppedwedge_files/figure-html/unnamed-chunk-15-1.png)
 
 ### Binary outcome
 
@@ -303,4 +339,4 @@ plot_clusters(analysis_4, ncol = 3)
 #> $cluster_chart
 ```
 
-![](steppedwedge_files/figure-html/unnamed-chunk-15-1.png)
+![](steppedwedge_files/figure-html/unnamed-chunk-16-1.png)
