@@ -4,7 +4,13 @@
 \alias{plot_effect_curves}
 \title{Plot effect estimates by exposure time for one or more models.}
 \usage{
-plot_effect_curves(..., labels = NA, facet_nrow = 1)
+plot_effect_curves(
+  ...,
+  labels = NA,
+  facet_nrow = 1,
+  continuous = FALSE,
+  resolution = 0.1
+)
 }
 \arguments{
 \item{...}{One or more objects of class \code{"sw_analysis"} returned by
@@ -15,6 +21,13 @@ representing plot labels. Only used if length(list(...))>1.}
 
 \item{facet_nrow}{Number of rows for displaying plots using 
 ggplot2::facet_wrap().}
+
+\item{continuous}{Logical; if TRUE, models fit with Natural Cubic Splines 
+(exp_time = "NCS") will be evaluated and plotted as smooth, continuous curves.
+Models using discrete exposure times (e.g., ETI, DCT) will remain discrete.}
+
+\item{resolution}{Numeric; the step size for generating the continuous curve. 
+Defaults to 0.1. Only relevant if continuous = TRUE.}
 }
 \value{
 A plot of the effect curve for each \code{"sw_analysis"} object 
@@ -35,6 +48,11 @@ ETI_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "ETI")
 NCS_4_model <- analyze(dat = test_data, method = "mixed", estimand_type = "TATE",
 estimand_time = c(1, 4), exp_time = "NCS", advanced = params(n_knots_exp = 4))
+
+# Plot discrete models
 plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1)
+
+# Plot continuous NCS model alongside discrete models
+plot_effect_curves(IT_model, NCS_4_model, ETI_model, facet_nrow = 1, continuous = TRUE)
 }
 }

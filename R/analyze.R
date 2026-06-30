@@ -827,11 +827,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Estimate the effect curve
     effect_curve <- list(
       exp_time = c(0, 1:S),
-      est = c(zero_value, coeffs_trans),
+      est = c(zero_value, coeffs_trans_return),
       se = c(0, se_ncs),
       vcov = cov_mtx,
-      ci_lower = c(zero_value, ci_lower_ncs),
-      ci_upper = c(zero_value, ci_upper_ncs)
+      ci_lower = c(zero_value, ci_lower_ncs_return),
+      ci_upper = c(zero_value, ci_upper_ncs_return)
     )
     
     # Create A* block diagonal transformation matrix to return
@@ -949,11 +949,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       )
     }
     
+    # Always store V_orig and knots_exp for continuous plotting
+    results$V_orig    <- cov_orig_full
+    results$knots_exp <- knots_exp
     if(advanced$return_ncs == TRUE) {
-      results$T_mat    = T_mat
-      results$V_orig   = cov_orig_full
-      results$beta_new = coeffs_trans_full
-      results$V_new    = cov_trans_full
+      results$T_mat    <- T_mat
+      results$beta_new <- coeffs_trans_full
+      results$V_new    <- cov_trans_full
     }
     
   } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
