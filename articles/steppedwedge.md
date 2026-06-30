@@ -119,7 +119,7 @@ print(analysis_2)
 #> TATE (IT) estimate: 0.389
 #> TATE (IT) 95% confidence interval: 0.138, 0.64
 #> TATE (IT) p-value: 0.0024142
-#> Converged: NA
+#> Converged: TRUE
 ```
 
 Mixed model, with Time Average Treament Effect (TATE) as the estimand,
