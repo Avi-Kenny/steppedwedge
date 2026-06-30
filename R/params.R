@@ -3,7 +3,8 @@
 #' @description This should be used in conjunction with \code{\link{analyze}} to
 #'     set parameters controlling analysis; see examples.
 #'
-#' @param offset A linear predictor offset term; see docs for `lme4::lmer`.
+#' @param offset A linear predictor offset term; see docs for `lme4::lmer` 
+#'     (mixed models) or `geepack::geeglm` (GEE models).
 #' @param n_knots_exp An integer; only relevant when exp_time="NCS". Specifies
 #'     the number of knots to use for exposure time, including boundary knots.
 #'     The spline basis includes an intercept, and the degree of the basis is

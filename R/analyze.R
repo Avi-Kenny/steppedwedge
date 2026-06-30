@@ -251,8 +251,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       est = c(zero_value, rep(te_est, length(exp_times))),
       se = c(0, rep(te_se, length(exp_times))),
       vcov = NA,
-      ci_upper = c(zero_value, rep(te_ci[1], length(exp_times))),
-      ci_lower = c(zero_value, rep(te_ci[2], length(exp_times)))
+      ci_lower = c(zero_value, rep(te_ci[1], length(exp_times))),
+      ci_upper = c(zero_value, rep(te_ci[2], length(exp_times)))
     )
     
     if(lme4::isSingular(model_it_mixed)) {
@@ -968,13 +968,26 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Fit GEE model
     formula <- paste0(f_out, f_cal, "treatment")
-    model_it_GEE <- geepack::geeglm(
-      stats::as.formula(formula),
-      data = dat,
-      family = family,
-      id = cluster_id,
-      corstr = corstr
-    )
+    
+    if(is.null(advanced$offset)) {
+      model_it_GEE <- geepack::geeglm(
+        stats::as.formula(formula),
+        data = dat,
+        family = family,
+        id = cluster_id,
+        corstr = corstr
+      )
+    } else {
+      model_it_GEE <- geepack::geeglm(
+        stats::as.formula(formula),
+        data = dat,
+        family = family,
+        id = cluster_id,
+        corstr = corstr,
+        offset = advanced$offset
+      )
+    }
+    
     summary_it <- summary(model_it_GEE)
     
     # Extract an estimate and confidence interval for the estimated treatment
@@ -987,16 +1000,35 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Calculate P-value (Wald test) before exponentiation
     te_p <- 2 * (1 - stats::pnorm(abs(te_est / te_se)))
     
+    if(exponentiate) {
+      te_est <- exp(te_est)
+      te_ci  <- exp(te_ci)
+      zero_value <- 1
+    } else {
+      zero_value <- 0
+    }
+    
+    # Estimate the effect curve
+    effect_curve <- list(
+      exp_time = c(0, exp_times),
+      est      = c(zero_value, rep(te_est, length(exp_times))),
+      se       = c(0, rep(te_se, length(exp_times))),
+      vcov     = NA,
+      ci_lower = c(zero_value, rep(te_ci[1], length(exp_times))),
+      ci_upper = c(zero_value, rep(te_ci[2], length(exp_times)))
+    )
+    
     results <- list(
-      model = model_it_GEE,
-      model_type = "it_GEE",
+      model        = model_it_GEE,
+      model_type   = "it_GEE",
       estimand_type = "TATE (IT)",
-      te_est = te_est,
-      te_se = te_se,
-      te_ci = te_ci,
-      te_p = te_p,
-      converged = NA,
-      dat = dat_orig
+      te_est       = te_est,
+      te_se        = te_se,
+      te_ci        = te_ci,
+      te_p         = te_p,
+      converged    = NA,
+      effect_curve = effect_curve,
+      dat          = dat_orig
     )
   } else if(method == "GEE" & exp_time == "ETI") {
     
@@ -1013,13 +1045,26 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Fit GEE model
     formula <- paste0(f_out, f_cal, f_exp)
-    model_eti_GEE <- geepack::geeglm(
-      stats::as.formula(formula),
-      data = dat,
-      family = family,
-      id = cluster_id,
-      corstr = corstr
-    )
+    
+    if(is.null(advanced$offset)) {
+      model_eti_GEE <- geepack::geeglm(
+        stats::as.formula(formula),
+        data = dat,
+        family = family,
+        id = cluster_id,
+        corstr = corstr
+      )
+    } else {
+      model_eti_GEE <- geepack::geeglm(
+        stats::as.formula(formula),
+        data = dat,
+        family = family,
+        id = cluster_id,
+        corstr = corstr,
+        offset = advanced$offset
+      )
+    }
+
     summary_eti <- summary(model_eti_GEE)
     
     
@@ -1031,6 +1076,33 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     #     time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     cov_mtx <- stats::vcov(model_eti_GEE)[indices,indices]
+    se_eti  <- sqrt(diag(as.matrix(cov_mtx)))
+    
+    # Calculate the CI for treatment effect at each exposure time
+    ci_lower_eti <- coeffs - 1.96 * se_eti
+    ci_upper_eti <- coeffs + 1.96 * se_eti
+    
+    if(exponentiate) {
+      coeffs_return       <- exp(coeffs)
+      ci_lower_eti_return <- exp(ci_lower_eti)
+      ci_upper_eti_return <- exp(ci_upper_eti)
+      zero_value <- 1
+    } else {
+      coeffs_return       <- coeffs
+      ci_lower_eti_return <- ci_lower_eti
+      ci_upper_eti_return <- ci_upper_eti
+      zero_value <- 0
+    }
+    
+    # Estimate the effect curve
+    effect_curve <- list(
+      exp_time = c(0, exp_times),
+      est      = c(zero_value, as.numeric(coeffs_return)),
+      se       = c(0, se_eti),
+      vcov     = cov_mtx,
+      ci_lower = c(zero_value, as.numeric(ci_lower_eti_return)),
+      ci_upper = c(zero_value, as.numeric(ci_upper_eti_return))
+    )
     
     if(estimand_type == "TATE") {
       
@@ -1045,19 +1117,28 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       tate_se <- (sqrt(M %*% cov_mtx %*% t(M)))[1,1]
       tate_ci <- tate_est + c(-1.96,1.96) * tate_se
       
-      # Calculate P-value (Wald test)
+      # Calculate P-value (Wald test) before exponentiation
       tate_p <- 2 * (1 - stats::pnorm(abs(tate_est / tate_se)))
       
+      if(exponentiate) {
+        tate_est_return <- exp(tate_est)
+        tate_ci_return  <- exp(tate_ci)
+      } else {
+        tate_est_return <- tate_est
+        tate_ci_return  <- tate_ci
+      }
+      
       results <- list(
-        model = model_eti_GEE,
-        model_type = "eti_GEE",
+        model         = model_eti_GEE,
+        model_type    = "eti_GEE",
         estimand_type = "TATE",
-        te_est = tate_est,
-        te_se = tate_se,
-        te_ci = tate_ci,
-        te_p = tate_p,
-        converged = NA,
-        dat = dat_orig
+        te_est        = tate_est_return,
+        te_se         = tate_se,
+        te_ci         = tate_ci_return,
+        te_p          = tate_p,
+        converged     = NA,
+        effect_curve  = effect_curve,
+        dat           = dat_orig
       )
       
     } else if(estimand_type == "PTE") {
@@ -1067,21 +1148,29 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       pte_se <- sqrt(cov_mtx[estimand_time,estimand_time])
       pte_ci <- pte_est + c(-1.96,1.96) * pte_se
       
-      # Calculate P-value (Wald test)
+      # Calculate P-value (Wald test) before exponentiation
       pte_p <- 2 * (1 - stats::pnorm(abs(pte_est / pte_se)))
       
-      results <- list(
-        model = model_eti_GEE,
-        model_type = "eti_GEE",
-        estimand_type = "PTE",
-        te_est = pte_est,
-        te_se = pte_se,
-        te_ci = pte_ci,
-        te_p = pte_p,
-        converged = NA,
-        dat = dat_orig
-      )
+      if(exponentiate) {
+        pte_est_return <- exp(pte_est)
+        pte_ci_return  <- exp(pte_ci)
+      } else {
+        pte_est_return <- pte_est
+        pte_ci_return  <- pte_ci
+      }
       
+      results <- list(
+        model         = model_eti_GEE,
+        model_type    = "eti_GEE",
+        estimand_type = "PTE",
+        te_est        = pte_est_return,
+        te_se         = pte_se,
+        te_ci         = pte_ci_return,
+        te_p          = pte_p,
+        converged     = NA,
+        effect_curve  = effect_curve,
+        dat           = dat_orig
+      )
       
     }
     

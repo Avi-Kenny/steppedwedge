@@ -16,7 +16,8 @@ params(
 )
 }
 \arguments{
-\item{offset}{A linear predictor offset term; see docs for `lme4::lmer`.}
+\item{offset}{A linear predictor offset term; see docs for `lme4::lmer` 
+(mixed models) or `geepack::geeglm` (GEE models).}
 
 \item{n_knots_exp}{An integer; only relevant when exp_time="NCS". Specifies
 the number of knots to use for exposure time, including boundary knots.
