@@ -960,11 +960,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
   } else if(method == "GEE" & estimand_type %in% c("TATE", "PTE") & exp_time == "IT") {
     
-    
     ##############################################.
     ##### Immediate Treatment (IT) GEE model #####
     ##############################################.
-    
     
     # Fit GEE model
     formula <- paste0(f_out, f_cal, "treatment")
@@ -1018,6 +1016,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_upper = c(zero_value, rep(te_ci[2], length(exp_times)))
     )
     
+    # geepack stores an error code; 0 indicates successful convergence.
+    is_converged <- model_it_GEE$geese$error == 0
+    conv_messages <- if(is_converged) NULL else "geeglm failed to converge or reached max iterations."
+    
     results <- list(
       model        = model_it_GEE,
       model_type   = "it_GEE",
@@ -1026,12 +1028,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       te_se        = te_se,
       te_ci        = te_ci,
       te_p         = te_p,
-      converged    = NA,
+      converged    = is_converged,
+      messages     = conv_messages,
       effect_curve = effect_curve,
       dat          = dat_orig
     )
-  } else if(method == "GEE" & exp_time == "ETI") {
     
+  } else if(method == "GEE" & exp_time == "ETI") {
     
     ###################################################.
     ##### Exposure Time Indicator (ETI) GEE model #####
@@ -1064,16 +1067,14 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         offset = advanced$offset
       )
     }
-
-    summary_eti <- summary(model_eti_GEE)
     
+    summary_eti <- summary(model_eti_GEE)
     
     # Specify the indices of summary_eti corresponding to the exposure time variables
     indices <- grep("exp_", rownames(summary_eti$coefficients))
     index_max <- length(indices)
     
-    # Extract coefficient estimates and covariance matrix corresponding to exposure
-    #     time variables
+    # Extract coefficient estimates and covariance matrix corresponding to exposure time variables
     coeffs <- summary_eti$coefficients[,1][indices] # column 1 contains the estimates
     cov_mtx <- stats::vcov(model_eti_GEE)[indices,indices]
     se_eti  <- sqrt(diag(as.matrix(cov_mtx)))
@@ -1103,6 +1104,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
       ci_lower = c(zero_value, as.numeric(ci_lower_eti_return)),
       ci_upper = c(zero_value, as.numeric(ci_upper_eti_return))
     )
+    
+    is_converged <- model_eti_GEE$geese$error == 0
+    conv_messages <- if(is_converged) NULL else "geeglm failed to converge or reached max iterations."
     
     if(estimand_type == "TATE") {
       
@@ -1136,7 +1140,8 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se         = tate_se,
         te_ci         = tate_ci_return,
         te_p          = tate_p,
-        converged     = NA,
+        converged     = is_converged,
+        messages      = conv_messages,
         effect_curve  = effect_curve,
         dat           = dat_orig
       )
@@ -1167,13 +1172,13 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
         te_se         = pte_se,
         te_ci         = pte_ci_return,
         te_p          = pte_p,
-        converged     = NA,
+        converged     = is_converged,
+        messages      = conv_messages,
         effect_curve  = effect_curve,
         dat           = dat_orig
       )
       
     }
-    
   }
   
   # Append configuration metadata to the results object for print function
