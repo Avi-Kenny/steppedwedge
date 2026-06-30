@@ -23,7 +23,8 @@ params(
 
 - offset:
 
-  A linear predictor offset term; see docs for \`lme4::lmer\`.
+  A linear predictor offset term; see docs for \`lme4::lmer\` (mixed
+  models) or \`geepack::geeglm\` (GEE models).
 
 - n_knots_exp:
 
