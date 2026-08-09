@@ -31,7 +31,7 @@
 #' example_data <- load_data(time = "period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = "outcome_cont", offset = NULL, data = sw_data_example)
 #' base::summary(example_data)
-#' 
+#'
 #' example_data_binomial <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example_binom)
 #' base::summary(example_data_binomial)
@@ -195,7 +195,7 @@ load_data <- function(
 
     }
   }
-  
+
   # Validate: `successes` <= `trials` for each observation
   if (outcome_binomial == TRUE) {
     if (any(.successes > .trials)) {
@@ -221,9 +221,10 @@ load_data <- function(
     "individual_id" = .individual_id,
     "offset" = .offset,
     "treatment" = .treatment,
-    "exposure_time" = .exposure_time,
-    "time_type" = time_type
+    "exposure_time" = .exposure_time
   )
+
+  attr(dat, "time_type") <- time_type
 
   # Test whether, for all observations with a particular value of cluster_id and time, the value of treatment is the same
   # If not, throw an error
@@ -252,11 +253,11 @@ load_data <- function(
   dat_return <- dat_no_missing %>%
     dplyr::group_by(cluster_id) %>%
     # create variable for first period where cluster has treatment == 1
-    dplyr::mutate(first_exposure = ifelse(max(treatment) > 0, 
+    dplyr::mutate(first_exposure = ifelse(max(treatment) > 0,
                                           min(time[treatment == 1]),
                                           NA)) %>%
-    dplyr::mutate(first_exposure_sort = ifelse(is.na(first_exposure), 
-                                               0, 
+    dplyr::mutate(first_exposure_sort = ifelse(is.na(first_exposure),
+                                               0,
                                                first_exposure)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cluster_id = forcats::fct_reorder(factor(cluster_id), first_exposure_sort)) %>%
