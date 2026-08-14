@@ -124,6 +124,9 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   }
   
   if (!methods::is(dat,"sw_dat")) { stop("`dat` must be of class `sw_dat`.") }
+  if (method == "mixed" && exp_time == "TEH" && advanced$var_est == "robust") {
+    stop("Robust variance estimation (var_est = 'robust') is not possible for the Treatment Effect Heterogeneity (TEH) model. Please use var_est = 'model' or select a different exp_time model (e.g., 'ETI').")
+  }
   
   # call appropriate family function with chosen link to create family object
   if (is.character(family)) {
