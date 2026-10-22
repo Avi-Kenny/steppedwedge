@@ -210,7 +210,6 @@ load_data <- function(
   if(typeof(.outcome) == "logical") {.outcome <- as.integer(.outcome)}
   if(typeof(.treatment) == "logical") {.treatment <- as.integer(.treatment)}
 
-
   # Create data object
   dat <- data.frame(
     "outcome" = .outcome,
