@@ -14,7 +14,8 @@ load_data(
   exposure_time = NULL,
   offset = NULL,
   time_type = "discrete",
-  data
+  data,
+  covariates = NULL
 )
 ```
 
@@ -59,7 +60,10 @@ load_data(
 - offset:
 
   A character string (optional); the name of the numeric variable
-  specifying the offset.
+  specifying the offset. The offset is added to the linear predictor of
+  every model fit by
+  [`analyze`](https://avi-kenny.github.io/steppedwedge/reference/analyze.md),
+  and rows with a missing offset are dropped.
 
 - time_type:
 
@@ -69,6 +73,19 @@ load_data(
 - data:
 
   A dataframe containing the stepped wedge trial data.
+
+- covariates:
+
+  A character vector (optional); the names of variables in \`data\` to
+  include as additive main effects in the mean model fit by
+  [`analyze`](https://avi-kenny.github.io/steppedwedge/reference/analyze.md).
+  Covariates can be individual-level or cluster-level and must be
+  numeric, logical, factor, or character. Covariates cannot duplicate a
+  design variable (time, cluster, individual, treatment, outcome,
+  exposure time, or offset), and categorical covariates that are a
+  one-to-one relabelling of the cluster or time variable are rejected,
+  since they would add cluster or time fixed effects to the model. Rows
+  with missing covariate values are dropped.
 
 ## Value
 
@@ -84,4 +101,11 @@ base::summary(example_data)
 example_data_binomial <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
 treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example_binom)
 base::summary(example_data_binomial)
+
+# Including covariates in the mean model
+sw_data_cov <- sw_data_example
+sw_data_cov$x <- stats::rnorm(nrow(sw_data_cov))
+example_data_cov <- load_data(time = "period", cluster_id = "cluster",
+treatment = "trt", outcome = "outcome_cont", data = sw_data_cov,
+covariates = "x")
 ```

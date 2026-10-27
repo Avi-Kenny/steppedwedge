@@ -106,6 +106,21 @@ with treatment effect estimates (and standard errors and 95 passed to
 \`analyze()\`, and an indicator whether the effect estimates and CI are
 exponentiated.
 
+## Details
+
+Covariates specified via the \`covariates\` argument of
+[`load_data`](https://avi-kenny.github.io/steppedwedge/reference/load_data.md)
+are included in the mean model as additive main effects, alongside the
+calendar time and exposure time terms. This is distinct from a two-way
+fixed effects model: cluster-level variation remains modelled by random
+effects (mixed models) or the working correlation structure (GEE). With
+a non-identity link (e.g. logit), the covariate-adjusted treatment
+effect is conditional on the covariates and generally differs from the
+unadjusted effect. Covariates should be measured before randomization or
+otherwise be unaffected by treatment; adjusting for time-varying
+covariates that treatment can influence may bias the treatment effect
+estimate.
+
 ## Examples
 
 ``` r
