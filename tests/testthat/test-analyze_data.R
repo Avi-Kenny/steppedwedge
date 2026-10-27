@@ -492,3 +492,226 @@ test_that("GEE IT model works with corstr='independence'", {
   expect_equal(result$model_type, "it_GEE")
 })
 
+
+# Covariates ------------------------------------------------------------------
+
+sample_data_cov <- sample_data
+sample_data_cov$x_ind <- rnorm(nrow(sample_data_cov))
+sample_data_cov$outcome_cont <- sample_data_cov$outcome_cont +
+  0.8 * sample_data_cov$x_ind
+sample_data_cov$region <- factor(
+  c("north", "south", "east")[(sample_data_cov$cluster %% 3) + 1]
+)
+# Name contains "exp_" to guard against loose matching of ETI coefficients
+sample_data_cov$prior_exp_score <- rnorm(nrow(sample_data_cov))
+
+covs <- c("x_ind", "region", "prior_exp_score")
+
+sw_data_cov <- suppressMessages(load_data(
+  time = "period",
+  cluster_id = "cluster",
+  treatment = "trt",
+  outcome = "outcome_cont",
+  data = sample_data_cov,
+  covariates = covs
+))
+
+cov_coef_names <- c("x_ind", "regionnorth", "regionsouth", "prior_exp_score")
+
+test_that("covariates enter the mean model for every exp_time and method", {
+  specs <- list(
+    list(method = "mixed", exp_time = "IT"),
+    list(method = "mixed", exp_time = "ETI"),
+    list(method = "mixed", exp_time = "NCS"),
+    list(method = "mixed", exp_time = "TEH"),
+    list(method = "mixed", exp_time = "DCT"),
+    list(method = "GEE", exp_time = "IT"),
+    list(method = "GEE", exp_time = "ETI")
+  )
+
+  for (spec in specs) {
+    res <- suppressMessages(suppressWarnings(analyze(
+      sw_data_cov,
+      method = spec$method,
+      estimand_type = "TATE",
+      estimand_time = c(1, 4),
+      exp_time = spec$exp_time
+    )))
+    coefs <- if (spec$method == "mixed") lme4::fixef(res$model) else stats::coef(res$model)
+
+    expect_contains(names(coefs), cov_coef_names)
+    expect_equal(res$covariates, covs)
+    expect_true(is.finite(res$te_est))
+  }
+})
+
+test_that("IT mixed model with covariates matches a direct lmer fit", {
+  res <- analyze(sw_data_cov, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "IT")
+
+  d <- sw_data_cov
+  d$ij <- as.integer(factor(paste0(d$cluster_id, "-", d$time)))
+  direct <- lme4::lmer(
+    outcome ~ factor(time) - 1 + x_ind + region + prior_exp_score + treatment +
+      (1 | cluster_id) + (1 | ij),
+    data = d
+  )
+
+  expect_equal(res$te_est, unname(lme4::fixef(direct)["treatment"]))
+  expect_equal(res$te_se, sqrt(stats::vcov(direct)["treatment", "treatment"]))
+})
+
+test_that("GEE IT model with covariates matches a direct geeglm fit", {
+  res <- analyze(sw_data_cov, method = "GEE", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "IT")
+
+  direct <- geepack::geeglm(
+    outcome ~ factor(time) - 1 + x_ind + region + prior_exp_score + treatment,
+    data = sw_data_cov, id = cluster_id, corstr = "exchangeable"
+  )
+
+  expect_equal(res$te_est, unname(stats::coef(direct)["treatment"]))
+})
+
+test_that("ETI effect curve ignores covariates whose names contain 'exp_'", {
+  res <- analyze(sw_data_cov, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "ETI")
+  exp_times <- sort(unique(sw_data_cov$exposure_time[sw_data_cov$exposure_time > 0]))
+
+  expect_length(res$effect_curve$est, length(exp_times) + 1)
+  expect_equal(
+    res$effect_curve$est[-1],
+    unname(lme4::fixef(res$model)[paste0("exp_", exp_times)])
+  )
+})
+
+test_that("NCS return_ncs transformation is consistent with covariates", {
+  res <- analyze(sw_data_cov, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "NCS",
+                 advanced = params(n_knots_exp = 3, return_ncs = TRUE))
+  beta <- lme4::fixef(res$model)
+  n_exp <- length(res$effect_curve$est) - 1
+
+  expect_equal(
+    unname(res$beta_new[paste0("ExpTime_", seq_len(n_exp))]),
+    res$effect_curve$est[-1]
+  )
+  expect_equal(res$beta_new[cov_coef_names], beta[cov_coef_names])
+  expect_equal(
+    as.numeric(res$T_mat %*% beta),
+    unname(res$beta_new)
+  )
+})
+
+test_that("covariates work with a binary outcome and robust variance", {
+  sw_data_cov_bin <- suppressMessages(load_data(
+    time = "period", cluster_id = "cluster", treatment = "trt",
+    outcome = "outcome_bin", data = sample_data_cov, covariates = covs
+  ))
+  res <- analyze(sw_data_cov_bin, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "ETI", family = "binomial",
+                 advanced = params(var_est = "robust"))
+
+  expect_contains(names(lme4::fixef(res$model)), cov_coef_names)
+  expect_true(is.finite(res$te_se))
+})
+
+test_that("print shows covariates when present", {
+  res <- analyze(sw_data_cov, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "IT")
+  expect_output(print(res), "Covariates: x_ind, region, prior_exp_score")
+})
+
+# Offset ----------------------------------------------------------------------
+
+# Cluster labels are reversed relative to rollout order and rows are shuffled,
+# so load_data() reorders rows and any offset must follow them
+offset_data <- sample_data[sample(nrow(sample_data)), c("cluster", "period", "trt")]
+offset_data$cluster <- 16 - offset_data$cluster
+offset_data$log_size <- log(runif(nrow(offset_data), 0.5, 5))
+offset_data$count <- rpois(
+  nrow(offset_data),
+  exp(-0.5 + 0.4 * offset_data$trt + offset_data$log_size)
+)
+
+load_offset_data <- function(offset = "log_size") {
+  suppressMessages(load_data(
+    time = "period", cluster_id = "cluster", treatment = "trt",
+    outcome = "count", offset = offset, data = offset_data
+  ))
+}
+
+sw_offset <- load_offset_data()
+sw_no_offset <- load_offset_data(offset = NULL)
+
+test_that("load_data reorders rows relative to the input in this fixture", {
+  expect_false(identical(sw_offset$offset, offset_data$log_size))
+})
+
+test_that("mixed model uses the offset stored by load_data()", {
+  res <- analyze(sw_offset, method = "mixed", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "IT", family = poisson,
+                 re = "clust")
+  direct <- lme4::glmer(
+    count ~ factor(period) - 1 + trt + offset(log_size) + (1 | cluster),
+    family = poisson, data = offset_data
+  )
+
+  expect_equal(res$te_est, unname(lme4::fixef(direct)["trt"]), tolerance = 1e-4)
+})
+
+test_that("GEE model uses the offset stored by load_data()", {
+  res <- analyze(sw_offset, method = "GEE", estimand_type = "TATE",
+                 estimand_time = c(1, 4), exp_time = "ETI", family = poisson)
+  exp_times <- sort(unique(sw_offset$exposure_time[sw_offset$exposure_time > 0]))
+
+  d <- offset_data[order(offset_data$cluster), ]
+  d <- merge(
+    d,
+    unique(sw_offset[c("cluster_id", "time", "exposure_time")]),
+    by.x = c("cluster", "period"), by.y = c("cluster_id", "time"),
+    sort = FALSE
+  )
+  d <- d[order(d$cluster), ]
+  for (s in exp_times) d[[paste0("exp_", s)]] <- as.integer(d$exposure_time == s)
+  direct <- geepack::geeglm(
+    stats::as.formula(paste0(
+      "count ~ factor(period) - 1 + ", paste0("exp_", exp_times, collapse = " + "),
+      " + offset(log_size)"
+    )),
+    family = poisson, data = d, id = cluster, corstr = "exchangeable"
+  )
+
+  expect_equal(
+    res$effect_curve$est[-1],
+    unname(stats::coef(direct)[paste0("exp_", exp_times)]),
+    tolerance = 1e-6
+  )
+})
+
+test_that("params(offset = ) is deprecated but still supported", {
+  res_load <- analyze(sw_offset, method = "mixed", estimand_type = "TATE",
+                      estimand_time = c(1, 4), exp_time = "IT", family = poisson,
+                      re = "clust")
+
+  expect_snapshot(
+    res_params <- analyze(sw_no_offset, method = "mixed", estimand_type = "TATE",
+                          estimand_time = c(1, 4), exp_time = "IT",
+                          family = poisson, re = "clust",
+                          advanced = params(offset = sw_offset$offset))
+  )
+  expect_equal(res_params$te_est, res_load$te_est)
+})
+
+test_that("analyze() rejects conflicting or misaligned offsets", {
+  expect_snapshot(
+    analyze(sw_offset, method = "mixed", exp_time = "IT", family = poisson,
+            re = "clust", advanced = params(offset = sw_offset$offset)),
+    error = TRUE
+  )
+  expect_snapshot(
+    analyze(sw_no_offset, method = "mixed", exp_time = "IT", family = poisson,
+            re = "clust", advanced = params(offset = 1:10)),
+    error = TRUE
+  )
+})

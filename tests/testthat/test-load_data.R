@@ -127,3 +127,99 @@ test_that("load_data handles incorrect inputs correctly", {
   ), "The value of the `treatment` variable is not the same for all observations in each cluster-period.")
 })
 
+
+
+# Covariates ------------------------------------------------------------------
+
+sample_data_cov <- sample_data
+sample_data_cov$age <- seq(30, 64, by = 2)
+sample_data_cov$sex <- factor(rep(c("F", "M"), 9), levels = c("F", "M", "X"))
+sample_data_cov$site <- paste0("site_", sample_data_cov$cluster_id)
+sample_data_cov$period_label <- paste0("p", sample_data_cov$period)
+sample_data_cov$enrolled <- as.Date("2024-01-01") + seq_len(18)
+sample_data_cov$exp_1 <- 1
+
+load_cov <- function(covariates, data = sample_data_cov) {
+  load_data(
+    time = "period",
+    cluster_id = "cluster_id",
+    treatment = "treatment",
+    outcome = "y_bin",
+    data = data,
+    covariates = covariates
+  )
+}
+
+test_that("load_data carries covariates through", {
+  result <- suppressMessages(load_cov(c("age", "sex")))
+
+  expect_equal(attr(result, "covariates"), c("age", "sex"))
+  expect_equal(result$age, sample_data_cov$age)
+  expect_s3_class(result$sex, "factor")
+  expect_equal(levels(result$sex), c("F", "M"))
+})
+
+test_that("load_data without covariates sets no covariate attribute", {
+  result <- suppressMessages(load_cov(NULL))
+  expect_null(attr(result, "covariates"))
+  expect_false("age" %in% names(result))
+})
+
+test_that("load_data drops rows with missing covariates", {
+  data_missing <- sample_data_cov
+  data_missing$age[c(1, 5)] <- NA
+
+  expect_snapshot(result <- load_cov("age", data = data_missing))
+  expect_equal(nrow(result), 16)
+  expect_equal(sum(is.na(result$age)), 0)
+})
+
+test_that("load_data validates covariates", {
+  expect_snapshot(load_cov(1), error = TRUE)
+  expect_snapshot(load_cov(c("age", "age")), error = TRUE)
+  expect_snapshot(load_cov(c("age", "bmi")), error = TRUE)
+  expect_snapshot(load_cov("period"), error = TRUE)
+  expect_snapshot(load_cov("exp_1"), error = TRUE)
+  expect_snapshot(load_cov("enrolled"), error = TRUE)
+})
+
+test_that("load_data rejects categorical relabellings of cluster or time", {
+  expect_snapshot(load_cov("site"), error = TRUE)
+  expect_snapshot(load_cov("period_label"), error = TRUE)
+})
+
+test_that("load_data rejects reserved covariate names", {
+  data_reserved <- sample_data_cov
+  data_reserved$time <- 1
+  expect_snapshot(load_cov("time", data = data_reserved), error = TRUE)
+})
+
+# Offset ----------------------------------------------------------------------
+
+test_that("load_data stores the offset and drops rows with a missing offset", {
+  data_offset <- sample_data
+  data_offset$log_n <- log(seq_len(18))
+  data_offset$log_n[3] <- NA
+
+  expect_snapshot(
+    result <- load_data(
+      time = "period", cluster_id = "cluster_id", treatment = "treatment",
+      outcome = "y_bin", offset = "log_n", data = data_offset
+    )
+  )
+  expect_equal(nrow(result), 17)
+  expect_equal(result$offset, data_offset$log_n[-3])
+})
+
+test_that("load_data requires a numeric offset", {
+  data_offset <- sample_data
+  data_offset$log_n <- "a"
+
+  expect_snapshot(
+    load_data(
+      time = "period", cluster_id = "cluster_id", treatment = "treatment",
+      outcome = "y_bin", offset = "log_n", data = data_offset
+    ),
+    error = TRUE
+  )
+})
