@@ -11,3 +11,4 @@
 ^data-raw$
 ^\.positai$
 ^\.claude$
+^\.posit/assistant$
