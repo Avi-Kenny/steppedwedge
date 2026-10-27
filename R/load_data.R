@@ -19,10 +19,21 @@
 #'     variable identifying the exposure time variable. If this is not provided,
 #'     the package will calculate exposure time automatically.
 #' @param offset A character string (optional); the name of the numeric
-#'     variable specifying the offset.
+#'     variable specifying the offset. The offset is added to the linear
+#'     predictor of every model fit by \code{\link{analyze}}, and rows with a
+#'     missing offset are dropped.
 #' @param data A dataframe containing the stepped wedge trial data.
 #' @param time_type One of c("discrete", "continuous"); whether the model treats
 #'     time as discrete or continuous.
+#' @param covariates A character vector (optional); the names of variables in
+#'     `data` to include as additive main effects in the mean model fit by
+#'     \code{\link{analyze}}. Covariates can be individual-level or
+#'     cluster-level and must be numeric, logical, factor, or character.
+#'     Covariates cannot duplicate a design variable (time, cluster, individual,
+#'     treatment, outcome, exposure time, or offset), and categorical covariates
+#'     that are a one-to-one relabelling of the cluster or time variable are
+#'     rejected, since they would add cluster or time fixed effects to the
+#'     model. Rows with missing covariate values are dropped.
 #'
 #' @return An object of class \code{sw_data}
 #' @export
@@ -36,9 +47,17 @@
 #' treatment = "trt", outcome = c("numerator", "denominator"), data = sw_data_example_binom)
 #' base::summary(example_data_binomial)
 #'
+#' # Including covariates in the mean model
+#' sw_data_cov <- sw_data_example
+#' sw_data_cov$x <- stats::rnorm(nrow(sw_data_cov))
+#' example_data_cov <- load_data(time = "period", cluster_id = "cluster",
+#' treatment = "trt", outcome = "outcome_cont", data = sw_data_cov,
+#' covariates = "x")
+#'
 load_data <- function(
     time, cluster_id, individual_id=NULL, treatment, outcome,
-    exposure_time=NULL, offset=NULL, time_type="discrete", data
+    exposure_time=NULL, offset=NULL, time_type="discrete", data,
+    covariates=NULL
 ) {
 
   # To prevent R CMD CHECK notes
@@ -156,6 +175,13 @@ load_data <- function(
         }
       }
 
+      # Validate: `offset`
+      if (!is.null(offset) && arg %in% c("offset")) {
+        if (!is.numeric(val)) {
+          stop(paste0("`", arg, "` must be numeric."))
+        }
+      }
+
       # Validate: `treatment`
       if (arg %in% c("treatment")) {
         if (any(!(val %in% c(0, 1, F, T, NA)))) {
@@ -205,6 +231,15 @@ load_data <- function(
     }
   }
 
+  if (!is.null(covariates)) {
+    validate_covariates(
+      covariates = covariates,
+      data = data,
+      design_vars = c(time, cluster_id, individual_id, treatment, outcome,
+                      successes, trials, exposure_time, offset)
+    )
+  }
+
 
   # Convert binary variables to integers (if specified as boolean)
   if(typeof(.outcome) == "logical") {.outcome <- as.integer(.outcome)}
@@ -224,6 +259,10 @@ load_data <- function(
     "exposure_time" = .exposure_time
   )
 
+  if (!is.null(covariates)) {
+    dat[covariates] <- data[covariates]
+  }
+
   attr(dat, "time_type") <- time_type
 
   # Test whether, for all observations with a particular value of cluster_id and time, the value of treatment is the same
@@ -239,10 +278,26 @@ load_data <- function(
     warning("The value of the `treatment` variable is not the same for all observations in each cluster-period.")
   }
 
-  # Handle missing values
-  # Ignore everything related to covariates for now, only check necessary columns for missingness
-  # Give warning if anything necessary missing (x/y records contain missing data and are being dropped)
-  dat_no_missing <- dat[stats::complete.cases(dat$outcome, dat$time, dat$cluster_id, dat$treatment), ]
+  # Handle missing values; rows missing any design variable or covariate are
+  # dropped and reported in the load message
+  complete <- stats::complete.cases(dat$outcome, dat$time, dat$cluster_id,
+                                    dat$treatment)
+  if (!is.null(offset)) {
+    complete <- complete & !is.na(dat$offset)
+  }
+  if (!is.null(covariates)) {
+    complete <- complete & stats::complete.cases(dat[covariates])
+  }
+  dat_no_missing <- dat[complete, ]
+
+  if (!is.null(covariates)) {
+    # Unused factor levels would produce all-zero columns in the GEE design
+    dat_no_missing[covariates] <- lapply(
+      dat_no_missing[covariates],
+      function(x) if (is.factor(x)) droplevels(x) else x
+    )
+    check_covariate_aliasing(dat_no_missing, covariates)
+  }
 
   # Count number of rows dropped due to missing values
   num_dropped <- nrow(dat) - nrow(dat_no_missing)
@@ -279,6 +334,7 @@ load_data <- function(
   attr(dat_return, "n_times") <- n_times
   attr(dat_return, "n_seq") <- n_seq
   attr(dat_return, "binomial") <- outcome_binomial
+  attr(dat_return, "covariates") <- covariates
 
   class(dat_return) <- c("data.frame", "sw_dat")
 
@@ -293,10 +349,21 @@ load_data <- function(
     n_times,
     " time points."
   )
+  if (!is.null(covariates)) {
+    msg <- paste0(msg, " Covariates: ", paste(covariates, collapse = ", "), ".")
+  }
   if (num_dropped>0) {
+    vars_checked <- c("`cluster_id`", "`time`", "`treatment`", "`outcome`",
+                      if (!is.null(offset)) "`offset`",
+                      if (!is.null(covariates)) "covariates")
+    n_vars <- length(vars_checked)
+    vars_checked <- paste0(
+      paste(vars_checked[-n_vars], collapse = ", "), ", or ",
+      vars_checked[n_vars], "."
+    )
     msg <- paste0(
       msg, " Note: ", num_dropped, "/", num_total,
-      " rows were dropped due to missing values for `cluster_id`, `time`, `treatment`, or `outcome`."
+      " rows were dropped due to missing values for ", vars_checked
     )
   }
 
@@ -304,6 +371,84 @@ load_data <- function(
 
   return(dat_return)
 
+}
+
+validate_covariates <- function(covariates, data, design_vars) {
+
+  if (!is.character(covariates) || length(covariates) == 0 ||
+      anyNA(covariates)) {
+    stop("`covariates` must be a character vector of variable names in `data`.")
+  }
+  if (anyDuplicated(covariates)) {
+    stop("`covariates` must not contain duplicate names.")
+  }
+
+  fmt <- function(x) paste0("`", x, "`", collapse = ", ")
+
+  not_in_data <- setdiff(covariates, names(data))
+  if (length(not_in_data) > 0) {
+    stop("The following `covariates` are not variables in `data`: ",
+         fmt(not_in_data), ".")
+  }
+
+  design_overlap <- intersect(covariates, design_vars)
+  if (length(design_overlap) > 0) {
+    stop("The following `covariates` are already used as design variables ",
+         "(time, cluster, individual, treatment, outcome, exposure time, or ",
+         "offset) and cannot also be covariates: ", fmt(design_overlap), ".")
+  }
+
+  # Column names that load_data() and analyze() create internally
+  reserved <- c("outcome", "successes", "trials", "time", "cluster_id",
+                "individual_id", "offset", "treatment", "exposure_time",
+                "first_exposure", "avg_tx", "ij", "j", "b",
+                "delayed_treatment")
+  reserved_pattern <- "^(j_[0-9]+|b[0-9]+|exp_[0-9]+|washout_[0-9]+)$"
+  is_reserved <- covariates %in% reserved | grepl(reserved_pattern, covariates)
+  if (any(is_reserved)) {
+    stop("The following `covariates` names are reserved for internal use; ",
+         "please rename them in `data`: ", fmt(covariates[is_reserved]), ".")
+  }
+
+  valid_type <- vapply(
+    data[covariates],
+    function(x) is.numeric(x) || is.logical(x) || is.factor(x) || is.character(x),
+    logical(1)
+  )
+  if (!all(valid_type)) {
+    stop("`covariates` must be numeric, logical, factor, or character ",
+         "variables. Invalid: ", fmt(covariates[!valid_type]), ".")
+  }
+
+  invisible(TRUE)
+}
+
+check_covariate_aliasing <- function(dat, covariates) {
+
+  is_relabelling <- function(x, design) {
+    n_design <- length(unique(design))
+    length(unique(x)) == n_design &&
+      nrow(unique(data.frame(x, design))) == n_design
+  }
+
+  for (cov in covariates) {
+    x <- dat[[cov]]
+    if (is.numeric(x)) next
+    if (is_relabelling(x, dat$cluster_id)) {
+      stop("Covariate `", cov, "` is a one-to-one relabelling of the cluster ",
+           "identifier. Including it would add cluster fixed effects to the ",
+           "mean model, which is not supported; between-cluster variation is ",
+           "handled by random effects (method = \"mixed\") or the working ",
+           "correlation structure (method = \"GEE\").")
+    }
+    if (is_relabelling(x, dat$time)) {
+      stop("Covariate `", cov, "` is a one-to-one relabelling of the time ",
+           "variable. Calendar time is modelled via the `cal_time` argument ",
+           "of analyze().")
+    }
+  }
+
+  invisible(TRUE)
 }
 
 

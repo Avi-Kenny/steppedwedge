@@ -27,6 +27,9 @@ print.sw_analysis <- function(x, ...) {
   
   # 2. Time Assumptions
   cat('Exp time: "', x$exp_time, '", cal time: "', x$cal_time, '"\n', sep = "")
+  if (length(x$covariates) > 0) {
+    cat("Covariates: ", paste(x$covariates, collapse = ", "), "\n", sep = "")
+  }
   
   # Determine suffix for labels if exponentiated
   suffix <- if (isTRUE(x$exponentiated)) " (exponentiated)" else ""

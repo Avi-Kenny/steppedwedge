@@ -42,6 +42,18 @@
 #'     see the documentation for `geepack::geeglm`.
 #' @param advanced A list of options returned by \code{\link{params}}.
 #'
+#' @details Covariates specified via the `covariates` argument of
+#'     \code{\link{load_data}} are included in the mean model as additive main
+#'     effects, alongside the calendar time and exposure time terms. This is
+#'     distinct from a two-way fixed effects model: cluster-level variation
+#'     remains modelled by random effects (mixed models) or the working
+#'     correlation structure (GEE). With a non-identity link (e.g. logit), the
+#'     covariate-adjusted treatment effect is conditional on the covariates and
+#'     generally differs from the unadjusted effect. Covariates should be
+#'     measured before randomization or otherwise be unaffected by treatment;
+#'     adjusting for time-varying covariates that treatment can influence may
+#'     bias the treatment effect estimate.
+#'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
 #' treatment effect 95% confidence interval as a numeric vector of length 2,
@@ -189,6 +201,44 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
                   "cbind(successes, trials - successes) ~ ",
                   "outcome ~ ")
   
+  # Parse formula terms for covariates; these are placed before the exposure
+  #     time terms so that treatment-related coefficients come last
+  covariates <- attr(dat, "covariates")
+  f_cov <- if (length(covariates) > 0) {
+    paste0(paste0("`", covariates, "`", collapse = " + "), " + ")
+  } else {
+    ""
+  }
+  
+  # Resolve the offset. The `offset` column stored by load_data() is aligned
+  #     with the rows of `dat`; a raw vector passed via params(offset = ) may not
+  #     be, because load_data() drops incomplete rows and reorders clusters.
+  if (!is.null(advanced$offset)) {
+    if ("offset" %in% names(dat)) {
+      stop("An offset was specified in both `load_data()` and `params()`. ",
+           "Specify it only via `load_data(offset = )`.")
+    }
+    if (length(advanced$offset) != nrow(dat)) {
+      stop("`params(offset = )` has length ", length(advanced$offset),
+           " but the data has ", nrow(dat), " rows. Specify the offset via ",
+           "`load_data(offset = )` instead.")
+    }
+    warning("`params(offset = )` is deprecated; use `load_data(offset = )` ",
+            "instead. A vector passed to `params()` must already match the ",
+            "row order of the `load_data()` output, which sorts rows by ",
+            "cluster rollout order.", call. = FALSE)
+    dat$offset <- advanced$offset
+  }
+  f_off <- if ("offset" %in% names(dat)) " + offset(offset)" else ""
+  
+  fit_mixed <- function(formula) {
+    if (family$family == "gaussian" && family$link == "identity") {
+      lme4::lmer(formula, data = dat)
+    } else {
+      lme4::glmer(formula, family = family, data = dat)
+    }
+  }
+  
   # Save vector of (non-zero) exposure times
   exp_times <- sort(unique(dat$exposure_time))
   exp_times <- exp_times[exp_times!=0]
@@ -201,24 +251,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ################################################.
     
     # Fit mixed model
-    if(is.null(advanced$offset)) {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
-        model_it_mixed <- lme4::lmer(formula, data=dat)
-      } else {
-        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
-        model_it_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }
-    } else {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
-        model_it_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
-      } else {
-        formula <- stats::as.formula(paste0(f_out, f_cal, "treatment", f_re))
-        model_it_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                      offset=advanced$offset)
-      }
-    }
+    formula <- stats::as.formula(paste0(
+      f_out, f_cal, f_cov, "treatment", f_off, f_re
+    ))
+    model_it_mixed <- fit_mixed(formula)
     
     
     summary_it <- summary(model_it_mixed)
@@ -291,31 +327,17 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_exp <- paste0("exp_", exp_times, collapse = " + ")
     
     # Fit mixed model
-    if(is.null(advanced$offset)) {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
-        model_eti_mixed <- lme4::lmer(formula, data=dat)
-      } else {
-        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
-        model_eti_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }
-    } else {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
-        model_eti_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
-      } else {
-        formula <- stats::as.formula(paste0(f_out, f_cal, f_exp, f_re))
-        model_eti_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=advanced$offset)
-      }
-    }
+    formula <- stats::as.formula(paste0(
+      f_out, f_cal, f_cov, f_exp, f_off, f_re
+    ))
+    model_eti_mixed <- fit_mixed(formula)
     
     
     summary_eti <- summary(model_eti_mixed)
     
     
     # Specify the indices of summary_eti corresponding to the exposure time variables
-    indices <- grep("exp_", rownames(summary_eti$coefficients))
+    indices <- grep("^exp_[0-9]+$", rownames(summary_eti$coefficients))
     index_max <- length(indices)
     
     # Extract coefficient estimates and covariance matrix corresponding to exposure
@@ -461,22 +483,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     
     # Fit mixed model
-    formula_str <- paste0(f_out, f_cal, f_exp_dct, f_re)
-    formula <- stats::as.formula(formula_str)
-    
-    if(is.null(advanced$offset)) {
-      if(family$family == "gaussian" & family$link == "identity") {
-        model_dct_mixed <- lme4::lmer(formula, data=dat)
-      } else {
-        model_dct_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }
-    } else {
-      if(family$family == "gaussian" & family$link == "identity") {
-        model_dct_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
-      } else {
-        model_dct_mixed <- lme4::glmer(formula, family=family, data=dat, offset=advanced$offset)
-      }
-    }
+    formula <- stats::as.formula(paste0(
+      f_out, f_cal, f_cov, f_exp_dct, f_off, f_re
+    ))
+    model_dct_mixed <- fit_mixed(formula)
     
     summary_dct <- summary(model_dct_mixed)
     
@@ -579,32 +589,11 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     
     # Fit mixed model
-    if(is.null(advanced$offset)) {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(
-          f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
-        ))
-        model_teh_mixed <- lme4::lmer(formula, data=dat)
-      } else {
-        formula <- stats::as.formula(paste0(
-          f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
-        ))
-        model_teh_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }
-    } else {
-      if(family$family == "gaussian" & family$link == "identity") {
-        formula <- stats::as.formula(paste0(
-          f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
-        ))
-        model_teh_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
-      } else {
-        formula <- stats::as.formula(paste0(
-          f_out, f_cal, "treatment + (0 + treatment|exposure_time)", f_re
-        ))
-        model_teh_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=advanced$offset)
-      }
-    }
+    formula <- stats::as.formula(paste0(
+      f_out, f_cal, f_cov, "treatment + (0 + treatment|exposure_time)", f_off,
+      f_re
+    ))
+    model_teh_mixed <- fit_mixed(formula)
     
     
     summary_teh <- summary(model_teh_mixed)
@@ -757,23 +746,10 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     
     # Fit mixed model
     formula <- stats::as.formula(paste0(
-      f_out, f_cal, paste0("b", 1:advanced$n_knots_exp, collapse = " + "), f_re
+      f_out, f_cal, f_cov, paste0("b", 1:advanced$n_knots_exp, collapse = " + "),
+      f_off, f_re
     ))
-    
-    if(is.null(advanced$offset)) {
-      if(family$family == "gaussian" & family$link == "identity") {
-        model_ncs_mixed <- lme4::lmer(formula, data=dat)
-      } else {
-        model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat)
-      }
-    } else {
-      if(family$family == "gaussian" & family$link == "identity") {
-        model_ncs_mixed <- lme4::lmer(formula, data=dat, offset=advanced$offset)
-      } else {
-        model_ncs_mixed <- lme4::glmer(formula, family=family, data=dat,
-                                       offset=advanced$offset)
-      }
-    }
+    model_ncs_mixed <- fit_mixed(formula)
     
     summary_ncs <- summary(model_ncs_mixed)
     
@@ -840,27 +816,17 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     # Create A* block diagonal transformation matrix to return
     
     if(advanced$return_ncs == TRUE) {
-      # Dimensions for the identity block (non-spline parameters)
-      total_fixed_params <- nrow(summary_ncs$coefficients)
-      n_spline_params <- length(indices)
-      n_other_params <- total_fixed_params - n_spline_params
+      # Build T_mat by column index rather than block position, so it remains
+      #     correct regardless of where the spline terms sit among the fixed
+      #     effects. Rows: non-spline params (identity), then exposure times (B).
+      total_fixed_params <- length(coeffs_orig)
+      other_indices <- setdiff(seq_len(total_fixed_params), indices)
+      n_other_params <- length(other_indices)
       
-      # Create the identity block (I) for non-spline terms
-      I_block <- diag(n_other_params)
-      
-      # Create zero blocks to fill the off-diagonals
-      # Top-right: 0s connecting non-spline params to exposure time rows
-      Zero_top_right <- matrix(0, nrow = n_other_params, ncol = n_spline_params)
-      
-      # Bottom-left: 0s connecting spline params to non-spline rows
-      Zero_bottom_left <- matrix(0, nrow = nrow(B), ncol = n_other_params)
-      
-      # Bind them together: [ I   0 ]
-      #                     [ 0   B ]
-      Top_Row <- cbind(I_block, Zero_top_right)
-      Bottom_Row <- cbind(Zero_bottom_left, B)
-      
-      T_mat <- rbind(Top_Row, Bottom_Row)
+      T_mat <- matrix(0, nrow = n_other_params + nrow(B),
+                      ncol = total_fixed_params)
+      T_mat[cbind(seq_len(n_other_params), other_indices)] <- 1
+      T_mat[n_other_params + seq_len(nrow(B)), indices] <- B
       
       rownames(T_mat) <- c(rownames(summary_ncs$coefficients)[-indices], 
                            paste0("ExpTime_", 1:nrow(B)))
@@ -968,26 +934,15 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     ##############################################.
     
     # Fit GEE model
-    formula <- paste0(f_out, f_cal, "treatment")
+    formula <- paste0(f_out, f_cal, f_cov, "treatment", f_off)
     
-    if(is.null(advanced$offset)) {
-      model_it_GEE <- geepack::geeglm(
-        stats::as.formula(formula),
-        data = dat,
-        family = family,
-        id = cluster_id,
-        corstr = corstr
-      )
-    } else {
-      model_it_GEE <- geepack::geeglm(
-        stats::as.formula(formula),
-        data = dat,
-        family = family,
-        id = cluster_id,
-        corstr = corstr,
-        offset = advanced$offset
-      )
-    }
+    model_it_GEE <- geepack::geeglm(
+      stats::as.formula(formula),
+      data = dat,
+      family = family,
+      id = cluster_id,
+      corstr = corstr
+    )
     
     summary_it <- summary(model_it_GEE)
     
@@ -1050,31 +1005,20 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
     f_exp <- paste0("exp_", exp_times, collapse = " + ")
     
     # Fit GEE model
-    formula <- paste0(f_out, f_cal, f_exp)
+    formula <- paste0(f_out, f_cal, f_cov, f_exp, f_off)
     
-    if(is.null(advanced$offset)) {
-      model_eti_GEE <- geepack::geeglm(
-        stats::as.formula(formula),
-        data = dat,
-        family = family,
-        id = cluster_id,
-        corstr = corstr
-      )
-    } else {
-      model_eti_GEE <- geepack::geeglm(
-        stats::as.formula(formula),
-        data = dat,
-        family = family,
-        id = cluster_id,
-        corstr = corstr,
-        offset = advanced$offset
-      )
-    }
+    model_eti_GEE <- geepack::geeglm(
+      stats::as.formula(formula),
+      data = dat,
+      family = family,
+      id = cluster_id,
+      corstr = corstr
+    )
     
     summary_eti <- summary(model_eti_GEE)
     
     # Specify the indices of summary_eti corresponding to the exposure time variables
-    indices <- grep("exp_", rownames(summary_eti$coefficients))
+    indices <- grep("^exp_[0-9]+$", rownames(summary_eti$coefficients))
     index_max <- length(indices)
     
     # Extract coefficient estimates and covariance matrix corresponding to exposure time variables
@@ -1190,6 +1134,7 @@ analyze <- function(dat, method="mixed", estimand_type="TATE",
   results$cal_time <- cal_time
   results$re <- re
   results$corstr <- corstr
+  results$covariates <- covariates
   results$exponentiated <- exponentiate
   
   class(results) <- c("list", "sw_analysis")

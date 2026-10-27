@@ -84,6 +84,19 @@ are exponentiated.
 \description{
 Analyze a stepped wedge dataset
 }
+\details{
+Covariates specified via the `covariates` argument of
+    \code{\link{load_data}} are included in the mean model as additive main
+    effects, alongside the calendar time and exposure time terms. This is
+    distinct from a two-way fixed effects model: cluster-level variation
+    remains modelled by random effects (mixed models) or the working
+    correlation structure (GEE). With a non-identity link (e.g. logit), the
+    covariate-adjusted treatment effect is conditional on the covariates and
+    generally differs from the unadjusted effect. Covariates should be
+    measured before randomization or otherwise be unaffected by treatment;
+    adjusting for time-varying covariates that treatment can influence may
+    bias the treatment effect estimate.
+}
 \examples{
 # Load data
 test_data <- load_data(time ="period", cluster_id = "cluster", individual_id = NULL,
