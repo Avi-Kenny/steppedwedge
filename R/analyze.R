@@ -34,9 +34,12 @@
 #'     object). Defaults to FALSE.
 #' @param re A character vector of random effects to include; only relevant if
 #'     method="mixed" is used. Possible random effects include "clust" (random
-#'     intercept for cluster), "time" (random intercept for cluster-time
-#'     interaction), "ind" (random intercept for individuals;
-#'     appropriate when a cohort design is used), "tx" (random treatment effect)
+#'     intercept for cluster), "time" (random intercept for each cluster-period,
+#'     i.e. each combination of cluster and calendar time; calendar time is the
+#'     `time` variable passed to `load_data()`, not exposure time), "ind"
+#'     (random intercept for individuals; appropriate when a cohort design is
+#'     used), and "tx" (a cluster-specific deviation in the treatment effect;
+#'     see Details).
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
@@ -53,6 +56,25 @@
 #'     measured before randomization or otherwise be unaffected by treatment;
 #'     adjusting for time-varying covariates that treatment can influence may
 #'     bias the treatment effect estimate.
+#'
+#'     With `re = "tx"`, each cluster receives a random shift added to every
+#'     treated observation. In the ETI, NCS, and DCT models, treatment is a
+#'     linear combination of the fixed-effect columns, so the shift is the same
+#'     at every exposure time rather than a separate effect for each exposure
+#'     time. In the IT model it is a cluster-specific treatment effect. In the
+#'     TEH model it is a cluster-level term that sits alongside the fixed
+#'     treatment effect and the exposure-time random slopes.
+#'
+#'     The exposure-time estimates in the ETI, NCS, and DCT models, and the
+#'     TATE/PTE estimates derived from them, are fixed effects. With an identity
+#'     link they are population-level estimates. With a non-identity link such
+#'     as logit or log, they are conditional on the cluster-specific random
+#'     effects and are not population-average effects. The TEH estimates include
+#'     the random slopes and are likewise conditional for non-identity links.
+#'
+#'     If a random-effect variance is estimated at zero, the fit is singular.
+#'     In that case the returned `converged` value is `FALSE`, so check it
+#'     before interpreting results from `re = "tx"`.
 #'
 #' @return A list with the model object, model type as a string, estimand type
 #' as a string, numeric treatment effect estimate, numeric treatment effect standard error,
