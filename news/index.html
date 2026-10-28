@@ -33,18 +33,46 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="steppedwedge-development-version">steppedwedge (development version)<a class="anchor" aria-label="anchor" href="#steppedwedge-development-version"></a></h2>
-<ul><li><p><code><a href="../reference/analyze.html">analyze()</a></code> now uses the offset supplied via <code>load_data(offset = )</code>, which was previously stored but ignored. Because the offset is stored as a column, it stays aligned with the rows after <code><a href="../reference/load_data.html">load_data()</a></code> drops incomplete rows and sorts clusters by rollout order. <code>params(offset = )</code> is deprecated: it now warns, and it errors if its length does not match the data or if an offset was also given to <code><a href="../reference/load_data.html">load_data()</a></code>.</p></li>
-<li><p><code><a href="../reference/analyze.html">analyze()</a></code> now includes covariates supplied via <code>load_data(covariates = )</code> as additive main effects in the mean model for all mixed and GEE models. Exposure time indicator coefficients are now matched exactly, so covariates whose names contain <code>exp_</code> are no longer mistaken for treatment effects, and the <code>return_ncs = TRUE</code> transformation matrix is built by coefficient index rather than block position.</p></li>
-<li><p><code><a href="../reference/load_data.html">load_data()</a></code> gains a <code>covariates</code> argument for individual- or cluster-level variables. Rows with missing covariate values are dropped and reported, and covariates that duplicate design variables, use reserved internal names, or are categorical relabellings of the cluster or time variable are rejected.</p></li>
+<h2 class="pkg-version" data-toc-text="1.1.0" id="steppedwedge-110">steppedwedge 1.1.0<a class="anchor" aria-label="anchor" href="#steppedwedge-110"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-1-1-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-1-0"></a></h3>
+<ul><li>The <code>offset</code> argument of <code><a href="../reference/analyze.html">analyze()</a></code> has moved to <code><a href="../reference/load_data.html">load_data()</a></code>. Passing <code>offset</code> through <code><a href="../reference/params.html">params()</a></code> is deprecated.</li>
+<li>
+<code><a href="../reference/load_data.html">load_data()</a></code> stores <code>time_type</code> as an attribute rather than a data frame column. Access it with <code>attr(data, "time_type")</code>.</li>
 </ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.0" id="steppedwedge-100">steppedwedge 1.0.0<a class="anchor" aria-label="anchor" href="#steppedwedge-100"></a></h2><p class="text-muted">CRAN release: 2025-02-21</p>
+<div class="section level3">
+<h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
+<ul><li>
+<code><a href="../reference/analyze.html">analyze()</a></code> supports Delayed Constant Treatment (DCT) models.</li>
+<li>
+<code><a href="../reference/analyze.html">analyze()</a></code> supports random treatment effects across clusters via <code>re = "tx"</code>.</li>
+<li>
+<code><a href="../reference/analyze.html">analyze()</a></code> adjusts for covariates passed from <code>load_data(covariates = )</code>.</li>
+<li>
+<code><a href="../reference/analyze.html">analyze()</a></code> supports robust variance estimation via <code>params(var_est = "robust")</code>.</li>
+<li>
+<code><a href="../reference/analyze.html">analyze()</a></code> reports p-values and, with <code>exponentiate = TRUE</code>, exponentiated estimates.</li>
+<li>
+<code><a href="../reference/load_data.html">load_data()</a></code> accepts an <code>exposure_time</code> variable.</li>
+<li>
+<code><a href="../reference/plot_effect_curves.html">plot_effect_curves()</a></code> visualizes estimated treatment effect curves.</li>
+<li>
+<code><a href="../reference/plot_clusters.html">plot_clusters()</a></code> visualizes cluster-level data or fitted analysis objects.</li>
+<li>
+<code>params(return_ncs = TRUE)</code> returns the natural cubic spline transformation matrix and the transformed coefficients and covariance matrices.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-1-1-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-1-1-0"></a></h3>
+<ul><li>Documentation and vignettes include examples for binary outcomes, DCT models, and cluster plots.</li>
+<li>The binomial outcome dataset is now <code>sw_data_example_binom</code>.</li>
+<li>
+<code><a href="../reference/params.html">params()</a></code> gains <code>n_knots_exp</code> and <code>n_knots_cal</code> to configure spline knots.</li>
+<li>TEH models correctly code <code>estimand_time</code>.</li>
+<li>Combining robust variance estimation with TEH models gives an informative error.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> formats and displays estimates, standard errors, and p-values for analysis objects.</li>
+</ul></div>
 </div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="steppedwedge-010">steppedwedge 0.1.0<a class="anchor" aria-label="anchor" href="#steppedwedge-010"></a></h2>
-<ul><li>Initial CRAN submission.</li>
-</ul></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
