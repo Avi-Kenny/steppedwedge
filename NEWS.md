@@ -1,12 +1,35 @@
-# steppedwedge (development version)
+# steppedwedge 1.1.0
 
-* `analyze()` now uses the offset supplied via `load_data(offset = )`, which was previously stored but ignored. Because the offset is stored as a column, it stays aligned with the rows after `load_data()` drops incomplete rows and sorts clusters by rollout order. `params(offset = )` is deprecated: it now warns, and it errors if its length does not match the data or if an offset was also given to `load_data()`.
+## Breaking changes
 
-* `analyze()` now includes covariates supplied via `load_data(covariates = )` as additive main effects in the mean model for all mixed and GEE models. Exposure time indicator coefficients are now matched exactly, so covariates whose names contain `exp_` are no longer mistaken for treatment effects, and the `return_ncs = TRUE` transformation matrix is built by coefficient index rather than block position.
-* `load_data()` gains a `covariates` argument for individual- or cluster-level variables. Rows with missing covariate values are dropped and reported, and covariates that duplicate design variables, use reserved internal names, or are categorical relabellings of the cluster or time variable are rejected.
+* The `offset` argument of `analyze()` has moved to `load_data()`. Passing
+  `offset` through `params()` is deprecated.
+* `load_data()` stores `time_type` as an attribute rather than a data frame
+  column. Access it with `attr(data, "time_type")`.
 
-# steppedwedge 1.0.0
+## New features
 
-# steppedwedge 0.1.0
+* `analyze()` supports Delayed Constant Treatment (DCT) models.
+* `analyze()` supports random treatment effects across clusters via `re = "tx"`.
+* `analyze()` adjusts for covariates passed from `load_data(covariates = )`.
+* `analyze()` supports robust variance estimation via
+  `params(var_est = "robust")`.
+* `analyze()` reports p-values and, with `exponentiate = TRUE`, exponentiated
+  estimates.
+* `load_data()` accepts an `exposure_time` variable.
+* `plot_effect_curves()` visualizes estimated treatment effect curves.
+* `plot_clusters()` visualizes cluster-level data or fitted analysis objects.
+* `params(return_ncs = TRUE)` returns the natural cubic spline transformation
+  matrix and the transformed coefficients and covariance matrices.
 
-* Initial CRAN submission.
+## Minor improvements and bug fixes
+
+* Documentation and vignettes include examples for binary outcomes, DCT models,
+  and cluster plots.
+* The binomial outcome dataset is now `sw_data_example_binom`.
+* `params()` gains `n_knots_exp` and `n_knots_cal` to configure spline knots.
+* TEH models correctly code `estimand_time`.
+* Combining robust variance estimation with TEH models gives an informative
+  error.
+* `print()` formats and displays estimates, standard errors, and p-values for
+  analysis objects.
