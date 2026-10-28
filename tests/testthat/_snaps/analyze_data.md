@@ -26,3 +26,11 @@
       Error in `analyze()`:
       ! `params(offset = )` has length 10 but the data has 2011 rows. Specify the offset via `load_data(offset = )` instead.
 
+# TEH model rejects robust variance estimation
+
+    Code
+      fit_quiet(sw_data_cont, exp_time = "TEH", advanced = params(var_est = "robust"))
+    Condition
+      Error in `analyze()`:
+      ! Robust variance estimation (var_est = 'robust') is not possible for the Treatment Effect Heterogeneity (TEH) model. Please use var_est = 'model' or select a different exp_time model (e.g., 'ETI').
+

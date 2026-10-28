@@ -94,3 +94,96 @@
       Error in `load_data()`:
       ! `offset` must be numeric.
 
+# load_data rejects tibbles and empty data frames
+
+    Code
+      load_val(data = tibble::as_tibble(sample_data_val))
+    Condition
+      Error in `load_data()`:
+      ! `data` must be a non-tibble data frame.
+
+---
+
+    Code
+      load_val(data = sample_data_val[0, ])
+    Condition
+      Error in `load_data()`:
+      ! `data` is an empty data frame.
+
+# load_data validates individual_id, offset, and exposure_time names
+
+    Code
+      load_val(individual_id = "nope")
+    Condition
+      Error in `load_data()`:
+      ! `individual_id` must be a character string specifying a single variable in `data`.
+
+---
+
+    Code
+      load_val(offset = "nope")
+    Condition
+      Error in `load_data()`:
+      ! `offset` must be a character string specifying a single variable in `data`.
+
+---
+
+    Code
+      load_val(exposure_time = "nope")
+    Condition
+      Error in `load_data()`:
+      ! `exposure_time` must be a character string specifying a single variable in `data`.
+
+# load_data validates outcome, successes, and trials names
+
+    Code
+      load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+        outcome = "nope", data = sample_data_val)
+    Condition
+      Error in `load_data()`:
+      ! `outcome` must be a character string specifying a single variable in `data`.
+
+---
+
+    Code
+      load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+        outcome = c("succ", "nope"), data = sample_data_val)
+    Condition
+      Error in `load_data()`:
+      ! `trials` must be a character string specifying a single variable in `data`.
+
+# load_data checks types of time, exposure_time, and binomial columns
+
+    Code
+      load_data(time = "period_chr", cluster_id = "cluster_id", treatment = "treatment",
+        outcome = "y_bin", data = sample_data_val)
+    Condition
+      Error in `load_data()`:
+      ! `time` must be numeric.
+
+---
+
+    Code
+      load_val(exposure_time = "expo_chr")
+    Condition
+      Error in `load_data()`:
+      ! `exposure_time` must be numeric.
+
+---
+
+    Code
+      load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+        outcome = c("succ_chr", "trials"), data = sample_data_val)
+    Condition
+      Error in `load_data()`:
+      ! `successes` must only contain numeric values.
+
+---
+
+    Code
+      load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+        outcome = c("succ_big", "trials"), data = sample_data_val)
+    Condition
+      Error in `load_data()`:
+      ! `successes` must be less than or equal to `trials` for all observations.
+

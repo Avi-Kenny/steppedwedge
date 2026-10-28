@@ -715,3 +715,111 @@ test_that("analyze() rejects conflicting or misaligned offsets", {
     error = TRUE
   )
 })
+
+
+# Coverage: robust variance, exponentiation, and NCS calendar time ------------
+
+fit_quiet <- function(...) suppressMessages(suppressWarnings(analyze(...)))
+
+expect_exp_curve <- function(lin, ex) {
+  expect_equal(ex$effect_curve$est[1], 1)
+  expect_equal(ex$effect_curve$est[-1], exp(lin$effect_curve$est[-1]),
+               tolerance = 1e-8)
+}
+
+test_that("TEH model rejects robust variance estimation", {
+  expect_snapshot(
+    fit_quiet(sw_data_cont, exp_time = "TEH", advanced = params(var_est = "robust")),
+    error = TRUE
+  )
+})
+
+test_that("NCS calendar time adds spline terms", {
+  res <- fit_quiet(sw_data_cont, exp_time = "IT", cal_time = "NCS",
+                   advanced = params(n_knots_cal = 4))
+  expect_true(all(paste0("j_", 1:4) %in% names(lme4::fixef(res$model))))
+})
+
+test_that("robust variance is available for PTE and DCT estimates", {
+  pte <- fit_quiet(sw_data_cont, estimand_type = "PTE", estimand_time = 3,
+                   exp_time = "IT", advanced = params(var_est = "robust"))
+  expect_equal(
+    unname(pte$te_se),
+    unname(sqrt(vcovCR.glmerMod(pte$model, cluster = pte$dat$cluster_id)[
+      "treatment", "treatment"]))
+  )
+
+  dct <- fit_quiet(sw_data_cont, exp_time = "DCT",
+                   advanced = params(w = 2, var_est = "robust"))
+  expect_gt(dct$te_se, 0)
+  expect_true(all(is.finite(dct$effect_curve$se)))
+})
+
+test_that("exponentiated ETI PTE matches exp of the linear estimate", {
+  lin <- fit_quiet(sw_data, family = binomial, estimand_type = "PTE",
+                   estimand_time = 3, exp_time = "ETI")
+  ex <- fit_quiet(sw_data, family = binomial, estimand_type = "PTE",
+                  estimand_time = 3, exp_time = "ETI", exponentiate = TRUE)
+  expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+  expect_equal(ex$te_ci, exp(lin$te_ci), tolerance = 1e-8)
+})
+
+test_that("exponentiated TEH estimates match exp of the linear estimates", {
+  lin <- fit_quiet(sw_data_cont, exp_time = "TEH", estimand_type = "TATE",
+                   estimand_time = c(1, 4))
+  ex <- fit_quiet(sw_data_cont, exp_time = "TEH", estimand_type = "TATE",
+                  estimand_time = c(1, 4), exponentiate = TRUE)
+  expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+  expect_exp_curve(lin, ex)
+
+  lin_p <- fit_quiet(sw_data_cont, exp_time = "TEH", estimand_type = "PTE",
+                     estimand_time = 3)
+  ex_p <- fit_quiet(sw_data_cont, exp_time = "TEH", estimand_type = "PTE",
+                    estimand_time = 3, exponentiate = TRUE)
+  expect_equal(ex_p$te_est, exp(lin_p$te_est), tolerance = 1e-8)
+})
+
+test_that("exponentiated NCS estimates match exp of the linear estimates", {
+  lin <- fit_quiet(sw_data_cont, exp_time = "NCS", estimand_type = "TATE",
+                   estimand_time = c(1, 4))
+  ex <- fit_quiet(sw_data_cont, exp_time = "NCS", estimand_type = "TATE",
+                  estimand_time = c(1, 4), exponentiate = TRUE)
+  expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+  expect_exp_curve(lin, ex)
+
+  lin_p <- fit_quiet(sw_data_cont, exp_time = "NCS", estimand_type = "PTE",
+                     estimand_time = 3)
+  ex_p <- fit_quiet(sw_data_cont, exp_time = "NCS", estimand_type = "PTE",
+                    estimand_time = 3, exponentiate = TRUE)
+  expect_equal(ex_p$te_est, exp(lin_p$te_est), tolerance = 1e-8)
+})
+
+test_that("exponentiated DCT estimates match exp of the linear estimates", {
+  lin <- fit_quiet(sw_data, family = binomial, exp_time = "DCT",
+                   advanced = params(w = 1))
+  ex <- fit_quiet(sw_data, family = binomial, exp_time = "DCT",
+                  advanced = params(w = 1), exponentiate = TRUE)
+  expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+  expect_exp_curve(lin, ex)
+})
+
+test_that("exponentiated GEE estimates match exp of the linear estimates", {
+  for (e in c("IT", "ETI")) {
+    lin <- fit_quiet(sw_data, method = "GEE", family = binomial, exp_time = e,
+                     estimand_type = "TATE", estimand_time = c(1, 4))
+    ex <- fit_quiet(sw_data, method = "GEE", family = binomial, exp_time = e,
+                    estimand_type = "TATE", estimand_time = c(1, 4),
+                    exponentiate = TRUE)
+    expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+    expect_exp_curve(lin, ex)
+  }
+})
+
+test_that("exponentiated GEE ETI PTE matches exp of the linear estimate", {
+  lin <- fit_quiet(sw_data, method = "GEE", family = binomial, exp_time = "ETI",
+                   estimand_type = "PTE", estimand_time = 3)
+  ex <- fit_quiet(sw_data, method = "GEE", family = binomial, exp_time = "ETI",
+                  estimand_type = "PTE", estimand_time = 3, exponentiate = TRUE)
+  expect_equal(ex$te_est, exp(lin$te_est), tolerance = 1e-8)
+  expect_equal(ex$te_ci, exp(lin$te_ci), tolerance = 1e-8)
+})

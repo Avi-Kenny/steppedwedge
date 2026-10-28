@@ -26,3 +26,9 @@ test_that("plot_design raises error for incorrect class", {
 
 
 
+
+test_that("plot_design returns a ggplot with one tile per cluster-period", {
+  p <- plot_design(sw_data)
+  expect_s3_class(p$design_plot, "ggplot")
+  expect_equal(nrow(p$design_plot$data), 6)
+})

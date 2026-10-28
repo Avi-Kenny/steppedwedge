@@ -223,3 +223,85 @@ test_that("load_data requires a numeric offset", {
     error = TRUE
   )
 })
+
+
+# Validation branches ---------------------------------------------------------
+
+sample_data_val <- sample_data
+sample_data_val$period_chr <- as.character(sample_data_val$period)
+sample_data_val$expo_chr <- as.character(sample_data_val$period)
+sample_data_val$expo_num <- as.numeric(sample_data_val$treatment) * 2
+sample_data_val$y_lgl <- as.logical(sample_data_val$y_bin)
+sample_data_val$trt_lgl <- as.logical(sample_data_val$treatment)
+sample_data_val$succ <- sample_data_val$y_bin
+sample_data_val$succ_chr <- as.character(sample_data_val$y_bin)
+sample_data_val$succ_big <- 2
+sample_data_val$trials <- 1
+
+load_val <- function(data = sample_data_val, ...) {
+  suppressMessages(load_data(
+    time = "period",
+    cluster_id = "cluster_id",
+    treatment = "treatment",
+    outcome = "y_bin",
+    data = data,
+    ...
+  ))
+}
+
+test_that("load_data rejects tibbles and empty data frames", {
+  expect_snapshot(load_val(data = tibble::as_tibble(sample_data_val)), error = TRUE)
+  expect_snapshot(load_val(data = sample_data_val[0, ]), error = TRUE)
+})
+
+test_that("load_data validates individual_id, offset, and exposure_time names", {
+  expect_snapshot(load_val(individual_id = "nope"), error = TRUE)
+  expect_snapshot(load_val(offset = "nope"), error = TRUE)
+  expect_snapshot(load_val(exposure_time = "nope"), error = TRUE)
+})
+
+test_that("load_data validates outcome, successes, and trials names", {
+  expect_snapshot(
+    load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+              outcome = "nope", data = sample_data_val),
+    error = TRUE
+  )
+  expect_snapshot(
+    load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+              outcome = c("succ", "nope"), data = sample_data_val),
+    error = TRUE
+  )
+})
+
+test_that("load_data checks types of time, exposure_time, and binomial columns", {
+  expect_snapshot(
+    load_data(time = "period_chr", cluster_id = "cluster_id", treatment = "treatment",
+              outcome = "y_bin", data = sample_data_val),
+    error = TRUE
+  )
+  expect_snapshot(load_val(exposure_time = "expo_chr"), error = TRUE)
+  expect_snapshot(
+    load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+              outcome = c("succ_chr", "trials"), data = sample_data_val),
+    error = TRUE
+  )
+  expect_snapshot(
+    load_data(time = "period", cluster_id = "cluster_id", treatment = "treatment",
+              outcome = c("succ_big", "trials"), data = sample_data_val),
+    error = TRUE
+  )
+})
+
+test_that("load_data converts logical outcome and treatment to integers", {
+  res <- suppressMessages(load_data(
+    time = "period", cluster_id = "cluster_id", treatment = "trt_lgl",
+    outcome = "y_lgl", data = sample_data_val
+  ))
+  expect_type(res$outcome, "integer")
+  expect_type(res$treatment, "integer")
+})
+
+test_that("load_data uses a supplied exposure_time column", {
+  res <- load_val(exposure_time = "expo_num")
+  expect_equal(res$exposure_time, sample_data_val$expo_num)
+})
