@@ -1,14 +1,9 @@
-## Resubmission
-This is a resubmission. In this version I have:
+## Test environments
 
-* Deleted the hidden file .RDataTmp.
-
-* Confirmed that the possibly misspelled words in the DESCRIPTION are
-  spelled correctly.
-
+* Windows 11 x64, R 4.6.1, checked with `devtools::check(remote = TRUE, manual = TRUE)`, which runs `R CMD check --as-cran` and builds the PDF manual.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+[X errors | X warnings | X notes]. Replace this line with the result of the final check run.
 
 * This is a new release.
