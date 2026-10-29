@@ -84,8 +84,8 @@ analyze(
   cluster-period, i.e. each combination of cluster and calendar time;
   calendar time is the \`time\` variable passed to \`load_data()\`, not
   exposure time), "ind" (random intercept for individuals; appropriate
-  when a cohort design is used), and "tx" (a cluster-specific deviation
-  in the treatment effect; see Details).
+  when a cohort design is used), and "tx" (a cluster-level random slope
+  on treatment; see Details).
 
 - corstr:
 
