@@ -38,8 +38,8 @@
 #'     i.e. each combination of cluster and calendar time; calendar time is the
 #'     `time` variable passed to `load_data()`, not exposure time), "ind"
 #'     (random intercept for individuals; appropriate when a cohort design is
-#'     used), and "tx" (a cluster-specific deviation in the treatment effect;
-#'     see Details).
+#'     used), and "tx" (a cluster-level random slope on treatment; see
+#'     Details).
 #' @param corstr One of c("independence", "exchangeable", "ar1"); only relevant
 #'     if method="GEE" is used. Defines the GEE working correlation structure;
 #'     see the documentation for `geepack::geeglm`.
@@ -57,13 +57,16 @@
 #'     adjusting for time-varying covariates that treatment can influence may
 #'     bias the treatment effect estimate.
 #'
-#'     With `re = "tx"`, each cluster receives a random shift added to every
-#'     treated observation. In the ETI, NCS, and DCT models, treatment is a
-#'     linear combination of the fixed-effect columns, so the shift is the same
-#'     at every exposure time rather than a separate effect for each exposure
-#'     time. In the IT model it is a cluster-specific treatment effect. In the
-#'     TEH model it is a cluster-level term that sits alongside the fixed
-#'     treatment effect and the exposure-time random slopes.
+#'     With `re = "tx"`, each cluster has a random slope on the treatment
+#'     indicator. The slope is cluster-level, so it applies equally to all of
+#'     the cluster's treated observations. In models with a time-varying
+#'     treatment effect (ETI, NCS, DCT, and TEH), it adds one cluster-specific
+#'     deviation shared across exposure times, rather than a separate deviation
+#'     at each exposure time. In the ETI, NCS, and DCT models this follows
+#'     because treatment is the sum of the exposure-time indicators. In the IT
+#'     model the term is a cluster-specific treatment effect. In the TEH model
+#'     it sits alongside the fixed treatment effect and the exposure-time random
+#'     slopes.
 #'
 #'     The exposure-time estimates in the ETI, NCS, and DCT models, and the
 #'     TATE/PTE estimates derived from them, are fixed effects. With an identity
