@@ -4,6 +4,6 @@
 
 ## R CMD check results
 
-[X errors | X warnings | X notes]. Replace this line with the result of the final check run.
+0 errors | 0 warnings | 0 notes.
 
 * This is a new release.
