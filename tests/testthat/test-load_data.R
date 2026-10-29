@@ -250,7 +250,7 @@ load_val <- function(data = sample_data_val, ...) {
 }
 
 test_that("load_data rejects tibbles and empty data frames", {
-  expect_snapshot(load_val(data = tibble::as_tibble(sample_data_val)), error = TRUE)
+  expect_snapshot(load_val(data = dplyr::as_tibble(sample_data_val)), error = TRUE)
   expect_snapshot(load_val(data = sample_data_val[0, ]), error = TRUE)
 })
 

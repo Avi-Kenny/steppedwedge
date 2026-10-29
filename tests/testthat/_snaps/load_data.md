@@ -97,7 +97,7 @@
 # load_data rejects tibbles and empty data frames
 
     Code
-      load_val(data = tibble::as_tibble(sample_data_val))
+      load_val(data = dplyr::as_tibble(sample_data_val))
     Condition
       Error in `load_data()`:
       ! `data` must be a non-tibble data frame.
