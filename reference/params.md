@@ -25,12 +25,7 @@ params(
 
   Deprecated; use the \`offset\` argument of
   [`load_data`](https://avi-kenny.github.io/steppedwedge/reference/load_data.md)
-  instead. A numeric vector added to the linear predictor. Because
-  [`load_data`](https://avi-kenny.github.io/steppedwedge/reference/load_data.md)
-  drops incomplete rows and sorts rows by cluster rollout order, a
-  vector supplied here must already match the row order of the
-  [`load_data`](https://avi-kenny.github.io/steppedwedge/reference/load_data.md)
-  output.
+  instead.
 
 - n_knots_exp:
 

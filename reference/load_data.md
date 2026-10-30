@@ -55,15 +55,16 @@ load_data(
 
   A character string (optional); the name of the numeric variable
   identifying the exposure time variable. If this is not provided, the
-  package will calculate exposure time automatically.
+  package will calculate exposure time automatically based on
+  `treatment` and `time`.
 
 - offset:
 
   A character string (optional); the name of the numeric variable
   specifying the offset. The offset is added to the linear predictor of
   every model fit by
-  [`analyze`](https://avi-kenny.github.io/steppedwedge/reference/analyze.md),
-  and rows with a missing offset are dropped.
+  [`analyze`](https://avi-kenny.github.io/steppedwedge/reference/analyze.md).
+  Rows with a missing offset are dropped.
 
 - time_type:
 
@@ -77,15 +78,12 @@ load_data(
 - covariates:
 
   A character vector (optional); the names of variables in \`data\` to
-  include as additive main effects in the mean model fit by
+  include as additive covariates in the mean model fit by
   [`analyze`](https://avi-kenny.github.io/steppedwedge/reference/analyze.md).
   Covariates can be individual-level or cluster-level and must be
-  numeric, logical, factor, or character. Covariates cannot duplicate a
-  design variable (time, cluster, individual, treatment, outcome,
-  exposure time, or offset), and categorical covariates that are a
-  one-to-one relabelling of the cluster or time variable are rejected,
-  since they would add cluster or time fixed effects to the model. Rows
-  with missing covariate values are dropped.
+  numeric, binary, or categorical. Typically, covariates are chosen
+  because of presumed association with the outcome, which may increase
+  the precision of treatment effect estimation.
 
 ## Value
 

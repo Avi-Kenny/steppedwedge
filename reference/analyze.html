@@ -150,31 +150,17 @@ are exponentiated.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Covariates specified via the `covariates` argument of
     <code><a href="load_data.html">load_data</a></code> are included in the mean model as additive main
-    effects, alongside the calendar time and exposure time terms. This is
-    distinct from a two-way fixed effects model: cluster-level variation
-    remains modelled by random effects (mixed models) or the working
-    correlation structure (GEE). With a non-identity link (e.g. logit), the
-    covariate-adjusted treatment effect is conditional on the covariates and
-    generally differs from the unadjusted effect. Covariates should be
-    measured before randomization or otherwise be unaffected by treatment;
-    adjusting for time-varying covariates that treatment can influence may
-    bias the treatment effect estimate.</p>
-<p>With `re = "tx"`, each cluster receives a random shift added to every
-    treated observation. In the ETI, NCS, and DCT models, treatment is a
-    linear combination of the fixed-effect columns, so the shift is the same
-    at every exposure time rather than a separate effect for each exposure
-    time. In the IT model it is a cluster-specific treatment effect. In the
-    TEH model it is a cluster-level term that sits alongside the fixed
-    treatment effect and the exposure-time random slopes.</p>
-<p>The exposure-time estimates in the ETI, NCS, and DCT models, and the
-    TATE/PTE estimates derived from them, are fixed effects. With an identity
-    link they are population-level estimates. With a non-identity link such
-    as logit or log, they are conditional on the cluster-specific random
-    effects and are not population-average effects. The TEH estimates include
-    the random slopes and are likewise conditional for non-identity links.</p>
-<p>If a random-effect variance is estimated at zero, the fit is singular.
-    In that case the returned `converged` value is `FALSE`, so check it
-    before interpreting results from `re = "tx"`.</p>
+    effects, alongside the calendar time and exposure time terms. Covariates
+    should typically be measured before randomization.</p>
+<p>With `re = "tx"`, each cluster has a random slope on the treatment
+    indicator. This results in an additive deviation from the main treatment
+    effect coefficient. In models that allow for a time-varying treatment
+    effect (ETI, NCS, DCT, and TEH), the cluster-specific deviation results
+    in an additive scaling of the entire effect curve. Here, "additive"
+    refers to the linear predictor scale; the effects relative to the outcome
+    will be different if a nonlinear link function is used. For example, if a
+    log link function is used, the deviations will have a multiplicative
+    effect on the outcome.</p>
     </div>
 
     <div class="section level2">
@@ -206,7 +192,7 @@ are exponentiated.</p>
 <span><span class="va">test_data_bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_data.html">load_data</a></span><span class="op">(</span>time <span class="op">=</span><span class="st">"period"</span>, cluster_id <span class="op">=</span> <span class="st">"cluster"</span>, individual_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>treatment <span class="op">=</span> <span class="st">"trt"</span>, outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"numerator"</span>, <span class="st">"denominator"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">sw_data_example_binom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">results_pte_bin</span> <span class="op">&lt;-</span> <span class="fu">analyze</span><span class="op">(</span>dat <span class="op">=</span> <span class="va">test_data_bin</span>, family <span class="op">=</span> <span class="va">binomial</span>, method <span class="op">=</span> <span class="st">"mixed"</span>, </span>
+<span><span class="va">results_pte_bin</span> <span class="op">&lt;-</span> <span class="fu">analyze</span><span class="op">(</span>dat <span class="op">=</span> <span class="va">test_data_bin</span>, family <span class="op">=</span> <span class="va">binomial</span>, method <span class="op">=</span> <span class="st">"mixed"</span>,</span>
 <span>estimand_type <span class="op">=</span> <span class="st">"TATE"</span>, estimand_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, exp_time <span class="op">=</span> <span class="st">"ETI"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results_pte_bin</span></span>
