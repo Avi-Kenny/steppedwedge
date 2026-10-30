@@ -40,11 +40,12 @@ outcome variable(s) must be either numeric or Boolean (T/F).}
 
 \item{exposure_time}{A character string (optional); the name of the numeric
 variable identifying the exposure time variable. If this is not provided,
-the package will calculate exposure time automatically.}
+the package will calculate exposure time automatically based on
+\code{treatment} and \code{time}.}
 
 \item{offset}{A character string (optional); the name of the numeric
 variable specifying the offset. The offset is added to the linear
-predictor of every model fit by \code{\link{analyze}}, and rows with a
+predictor of every model fit by \code{\link{analyze}}. Rows with a
 missing offset are dropped.}
 
 \item{time_type}{One of c("discrete", "continuous"); whether the model treats
@@ -53,14 +54,11 @@ time as discrete or continuous.}
 \item{data}{A dataframe containing the stepped wedge trial data.}
 
 \item{covariates}{A character vector (optional); the names of variables in
-`data` to include as additive main effects in the mean model fit by
+`data` to include as additive covariates in the mean model fit by
 \code{\link{analyze}}. Covariates can be individual-level or
-cluster-level and must be numeric, logical, factor, or character.
-Covariates cannot duplicate a design variable (time, cluster, individual,
-treatment, outcome, exposure time, or offset), and categorical covariates
-that are a one-to-one relabelling of the cluster or time variable are
-rejected, since they would add cluster or time fixed effects to the
-model. Rows with missing covariate values are dropped.}
+cluster-level and must be numeric, binary, or categorical. Typically,
+covariates are chosen because of presumed association with the outcome,
+which may increase the precision of treatment effect estimation.}
 }
 \value{
 An object of class \code{sw_data}

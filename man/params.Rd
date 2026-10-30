@@ -17,10 +17,7 @@ params(
 }
 \arguments{
 \item{offset}{Deprecated; use the `offset` argument of
-\code{\link{load_data}} instead. A numeric vector added to the linear
-predictor. Because \code{\link{load_data}} drops incomplete rows and
-sorts rows by cluster rollout order, a vector supplied here must already
-match the row order of the \code{\link{load_data}} output.}
+\code{\link{load_data}} instead.}
 
 \item{n_knots_exp}{An integer; only relevant when exp_time="NCS". Specifies
 the number of knots to use for exposure time, including boundary knots.
@@ -39,13 +36,13 @@ or "robust", to use the robust variance estimator.}
 only relevant when var_est="robust".}
 
 \item{return_ncs}{Logical; only relevant when exp_time="NCS". Specifies whether
-the full covariance matrix for the calendar time parameters and the 
+the full covariance matrix for the calendar time parameters and the
 transformed treatment effect parameters are returned.}
 
 \item{re_correlated}{Logical; specifies whether random treatment effect and random
 intercept for cluster are correlated.}
 
-\item{w}{Integer; the number of washout periods to use when `exp_time = "DCT"` 
+\item{w}{Integer; the number of washout periods to use when `exp_time = "DCT"`
 (Delayed Constant Treatment). Defaults to 1.}
 }
 \value{
