@@ -1,9 +1,6 @@
 ## Test environments
-
-* Windows 11 x64, R 4.6.1, checked with `devtools::check(remote = TRUE, manual = TRUE)`, which runs `R CMD check --as-cran` and builds the PDF manual.
+* local Windows 11 Home, R 4.4.1
+* win-builder (devel and release)
 
 ## R CMD check results
-
-0 errors | 0 warnings | 0 notes.
-
-* This is a new release.
+* There were no ERRORs or WARNINGs.

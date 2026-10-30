@@ -1,13 +1,8 @@
 #' Set advanced parameters for analysis of data from stepped wedge trials
-#' 
+#'
 #' @description This should be used in conjunction with \code{\link{analyze}} to
 #'     set parameters controlling analysis; see examples.
 #'
-#' @param offset Deprecated; use the `offset` argument of
-#'     \code{\link{load_data}} instead. A numeric vector added to the linear
-#'     predictor. Because \code{\link{load_data}} drops incomplete rows and
-#'     sorts rows by cluster rollout order, a vector supplied here must already
-#'     match the row order of the \code{\link{load_data}} output.
 #' @param n_knots_exp An integer; only relevant when exp_time="NCS". Specifies
 #'     the number of knots to use for exposure time, including boundary knots.
 #'     The spline basis includes an intercept, and the degree of the basis is
@@ -21,12 +16,14 @@
 #' @param var_est_type A character string; one of c("classic","DF","KC","MD","FG");
 #'     only relevant when var_est="robust".
 #' @param return_ncs Logical; only relevant when exp_time="NCS". Specifies whether
-#'     the full covariance matrix for the calendar time parameters and the 
+#'     the full covariance matrix for the calendar time parameters and the
 #'     transformed treatment effect parameters are returned.
 #' @param re_correlated Logical; specifies whether random treatment effect and random
 #'     intercept for cluster are correlated.
-#' @param w Integer; the number of washout periods to use when `exp_time = "DCT"` 
+#' @param w Integer; the number of washout periods to use when `exp_time = "DCT"`
 #'     (Delayed Constant Treatment). Defaults to 1.
+#' @param offset Deprecated; use the `offset` argument of
+#'     \code{\link{load_data}} instead.
 #'
 #' @return A list of options
 #' @export
@@ -35,11 +32,11 @@
 #' \donttest{
 #' dat <- load_data(time = "period", cluster_id = "cluster", individual_id = NULL,
 #' treatment = "trt", outcome = "outcome_bin", data = sw_data_example)
-#' 
+#'
 #' analyze(dat = dat, method = "mixed", estimand_type = "TATE",  exp_time = "NCS",
 #' family = binomial, advanced = params(var_est = "robust"))
 #' }
-#' 
+#'
 params <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
                    var_est_type="classic", return_ncs=F, re_correlated=F,
                    w=1) {
@@ -48,6 +45,6 @@ params <- function(offset=NULL, n_knots_exp=4, n_knots_cal=4, var_est="model",
     stop("The washout period 'w' must be a positive integer.")
   }
   return(list(offset=offset, n_knots_exp=n_knots_exp, n_knots_cal=n_knots_cal,
-              var_est=var_est, var_est_type=var_est_type, return_ncs=return_ncs, 
+              var_est=var_est, var_est_type=var_est_type, return_ncs=return_ncs,
               re_correlated=re_correlated, w=w))
 }
